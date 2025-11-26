@@ -32,6 +32,8 @@ class OrderRepository
 
     public const META_EXPIRE_DATE = '_omnipay_expire_date';
 
+    public const META_REMITTANCE_LAST5 = '_omnipay_remittance_last5';
+
     /**
      * 付款資訊欄位對應表
      */
@@ -191,6 +193,7 @@ class OrderRepository
             self::META_BARCODE_2 => __('條碼二', 'woocommerce-omnipay'),
             self::META_BARCODE_3 => __('條碼三', 'woocommerce-omnipay'),
             self::META_EXPIRE_DATE => __('繳費期限', 'woocommerce-omnipay'),
+            self::META_REMITTANCE_LAST5 => __('匯款帳號後5碼', 'woocommerce-omnipay'),
         ];
     }
 

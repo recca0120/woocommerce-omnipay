@@ -33,7 +33,7 @@ class NewebPayGateway extends OmnipayGateway
      *
      * @return string redirect URL
      */
-    protected function process_payment_info()
+    protected function handle_payment_info()
     {
         $gateway = $this->get_omnipay_gateway();
         $response = $gateway->getPaymentInfo()->send();

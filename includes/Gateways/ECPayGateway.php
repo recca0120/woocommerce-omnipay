@@ -40,7 +40,7 @@ class ECPayGateway extends OmnipayGateway
      *
      * @param  NotificationInterface  $notification
      */
-    protected function process_notification($notification)
+    protected function handle_notification($notification)
     {
         $data = $notification->getData();
 
@@ -58,7 +58,7 @@ class ECPayGateway extends OmnipayGateway
         }
 
         // 付款完成通知交給父類處理
-        parent::process_notification($notification);
+        parent::handle_notification($notification);
     }
 
     /**

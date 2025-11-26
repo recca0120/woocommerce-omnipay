@@ -219,6 +219,122 @@ class BankTransferTest extends WP_UnitTestCase
         $this->assertStringContainsString('1234567890', $output);
     }
 
+    // ==================== 客戶匯款帳號後5碼測試 ====================
+
+    /**
+     * 測試：付款資訊輸出包含匯款帳號後5碼表單
+     */
+    public function test_payment_info_output_contains_remittance_form()
+    {
+        $order = $this->create_test_order(1000);
+        $order->update_meta_data('_omnipay_bank_code', '012');
+        $order->update_meta_data('_omnipay_bank_account', '1234567890');
+        $order->save();
+
+        $output = $this->gateway->get_payment_info_output($order);
+
+        // 應該包含輸入表單
+        $this->assertStringContainsString('omnipay-payment-info', $output);
+        $this->assertStringContainsString('remittance_last5', $output);
+    }
+
+    /**
+     * 測試：客戶提交匯款帳號後5碼成功
+     */
+    public function test_submit_remittance_last5_success()
+    {
+        $order = $this->create_test_order(1000);
+        $order->update_meta_data('_omnipay_bank_code', '012');
+        $order->update_meta_data('_omnipay_bank_account', '1234567890');
+        $order->set_payment_method($this->gateway->id);
+        $order->save();
+
+        // 模擬 AJAX 請求
+        $_POST = [
+            'order_id' => $order->get_id(),
+            'order_key' => $order->get_order_key(),
+            'remittance_last5' => '12345',
+            'nonce' => wp_create_nonce('omnipay_remittance_nonce'),
+        ];
+
+        ob_start();
+        $this->gateway->handle_remittance();
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertTrue($response['success']);
+
+        // 驗證資料已儲存
+        $order = wc_get_order($order->get_id());
+        $this->assertEquals('12345', $order->get_meta('_omnipay_remittance_last5'));
+    }
+
+    /**
+     * 測試：匯款帳號後5碼格式驗證（必須是5位數字）
+     */
+    public function test_submit_remittance_last5_validates_format()
+    {
+        $order = $this->create_test_order(1000);
+        $order->set_payment_method($this->gateway->id);
+        $order->save();
+
+        $_POST = [
+            'order_id' => $order->get_id(),
+            'order_key' => $order->get_order_key(),
+            'remittance_last5' => 'abc',  // 無效格式
+            'nonce' => wp_create_nonce('omnipay_remittance_nonce'),
+        ];
+
+        ob_start();
+        $this->gateway->handle_remittance();
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertFalse($response['success']);
+        $this->assertStringContainsString('5', $response['message']);
+    }
+
+    /**
+     * 測試：驗證 order_key 錯誤時拒絕提交
+     */
+    public function test_submit_remittance_last5_rejects_invalid_order_key()
+    {
+        $order = $this->create_test_order(1000);
+        $order->set_payment_method($this->gateway->id);
+        $order->save();
+
+        $_POST = [
+            'order_id' => $order->get_id(),
+            'order_key' => 'wrong_key',
+            'remittance_last5' => '12345',
+            'nonce' => wp_create_nonce('omnipay_remittance_nonce'),
+        ];
+
+        ob_start();
+        $this->gateway->handle_remittance();
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
+        $this->assertFalse($response['success']);
+    }
+
+    /**
+     * 測試：已填寫的匯款帳號後5碼會顯示在付款資訊中
+     */
+    public function test_payment_info_shows_submitted_remittance_last5()
+    {
+        $order = $this->create_test_order(1000);
+        $order->update_meta_data('_omnipay_bank_code', '012');
+        $order->update_meta_data('_omnipay_bank_account', '1234567890');
+        $order->update_meta_data('_omnipay_remittance_last5', '12345');
+        $order->save();
+
+        $output = $this->gateway->get_payment_info_output($order);
+
+        // 應該顯示已填寫的帳號後5碼
+        $this->assertStringContainsString('12345', $output);
+    }
+
     // ==================== Helper Methods ====================
 
     /**
