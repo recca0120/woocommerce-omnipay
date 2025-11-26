@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         verbose="true"
+         failOnWarning="true"
+         failOnRisky="true">
+    <testsuites>
+        <testsuite name="default">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <!-- wp-phpunit configuration -->
+        <env name="WP_PHPUNIT__TESTS_CONFIG" value="tests/wp-config.php"/>
+
+        <!-- WordPress core directory (optional) -->
+        <!-- If not set, wp-config.php will auto-detect using relative path -->
+        <!-- <env name="WP_CORE_DIR" value="/path/to/wordpress"/> -->
+
+        <!-- SQLite configuration (default for local development) -->
+        <!-- Note: in-memory SQLite doesn't work with WordPress test framework (multiple connections) -->
+        <env name="DB_ENGINE" value="sqlite"/>
+        <env name="DB_FILE" value="test.sqlite"/>
+        <env name="DB_DIR" value="/tmp/wp-phpunit-tests/"/>
+    </php>
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">includes</directory>
+        </include>
+        <exclude>
+            <file>includes/Services/WooCommerceLogger.php</file>
+            <file>includes/Exceptions/OrderNotFoundException.php</file>
+        </exclude>
+        <report>
+            <html outputDirectory="coverage"/>
+        </report>
+    </coverage>
+</phpunit>

@@ -1,0 +1,8 @@
+.omnipay-payment-info {
+    margin: 2em 0;
+}
+
+.omnipay-payment-info .omnipay-barcode {
+    display: block;
+    margin: 0 auto;
+}

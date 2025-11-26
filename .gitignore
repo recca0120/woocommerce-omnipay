@@ -1,0 +1,56 @@
+# Composer dependencies
+/vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+phpunit.xml
+
+# WordPress test environment
+.wordpress-test/
+
+# SQLite database directory (created by WordPress SQLite plugin during tests)
+wp-content/database/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+/build/
+/dist/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+.project
+.settings/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Backup files
+*.bak
+*.backup
+*.sql
+*.tar.gz
+*.zip

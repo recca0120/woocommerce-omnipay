@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl
+
+      - name: Install dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Create plugin directory
+        run: |
+          mkdir -p build/woocommerce-omnipay
+
+          # Copy plugin files (exclude dev files)
+          rsync -av --progress . build/woocommerce-omnipay \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='build' \
+            --exclude='tests' \
+            --exclude='phpunit.xml' \
+            --exclude='phpunit.xml.dist' \
+            --exclude='.gitignore' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='*.md' \
+            --exclude='coverage' \
+            --exclude='.phpunit.cache' \
+            --exclude='.phpunit.result.cache'
+
+          # Keep LICENSE and essential files
+          cp LICENSE build/woocommerce-omnipay/ 2>/dev/null || true
+          cp README.md build/woocommerce-omnipay/ 2>/dev/null || true
+
+      - name: Create ZIP archive
+        run: |
+          cd build
+          zip -r woocommerce-omnipay.zip woocommerce-omnipay
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/woocommerce-omnipay.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
