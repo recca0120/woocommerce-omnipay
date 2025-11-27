@@ -39,7 +39,7 @@ class ECPayTest extends WP_UnitTestCase
                 'gateways' => [
                     [
                         'omnipay_name' => 'ECPay',
-                        'gateway_id' => 'omnipay_ecpay',
+                        'gateway_id' => 'ecpay',
                         'title' => '綠界金流',
                         'description' => '使用綠界金流付款',
                     ],
@@ -331,7 +331,7 @@ class ECPayTest extends WP_UnitTestCase
         $expected_status,
         $expected_id_pattern
     ) {
-        $gateway_id = 'omnipay_ecpay_test';
+        $gateway_id = 'ecpay_test';
 
         // 透過 WooCommerce 設定來設定 allow_resubmit 和 transaction_id_prefix
         $settings = [
@@ -340,7 +340,8 @@ class ECPayTest extends WP_UnitTestCase
         if ($prefix !== null) {
             $settings['transaction_id_prefix'] = $prefix;
         }
-        update_option('woocommerce_'.$gateway_id.'_settings', $settings);
+        // OmnipayGateway 會自動加上 omnipay_ 前綴，所以 option key 是 woocommerce_omnipay_{gateway_id}_settings
+        update_option('woocommerce_omnipay_'.$gateway_id.'_settings', $settings);
 
         $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
             'gateway_id' => $gateway_id,
@@ -364,7 +365,7 @@ class ECPayTest extends WP_UnitTestCase
         }
 
         // 清理設定
-        delete_option('woocommerce_'.$gateway_id.'_settings');
+        delete_option('woocommerce_omnipay_'.$gateway_id.'_settings');
     }
 
     public static function allowResubmitProvider()

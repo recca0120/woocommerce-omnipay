@@ -51,7 +51,7 @@ class YiPayTest extends WP_UnitTestCase
                 'gateways' => [
                     [
                         'omnipay_name' => 'YiPay',
-                        'gateway_id' => 'omnipay_yipay',
+                        'gateway_id' => 'yipay',
                         'title' => 'YiPay 乙禾金流',
                         'description' => '使用 YiPay 乙禾金流付款',
                     ],

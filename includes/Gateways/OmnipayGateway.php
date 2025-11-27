@@ -58,7 +58,9 @@ class OmnipayGateway extends WC_Payment_Gateway
     {
         // 如果提供了配置，使用配置初始化
         if (! empty($gateway_config)) {
-            $this->id = $gateway_config['gateway_id'] ?? '';
+            // gateway_id 自動加上 omnipay_ 前綴
+            $gateway_id = $gateway_config['gateway_id'] ?? '';
+            $this->id = 'omnipay_'.$gateway_id;
             $this->method_title = $gateway_config['title'] ?? '';
             $this->method_description = $gateway_config['description'] ?? '';
             $this->omnipay_gateway_name = $gateway_config['omnipay_name'] ?? '';

@@ -45,7 +45,7 @@ class NewebPayTest extends WP_UnitTestCase
                 'gateways' => [
                     [
                         'omnipay_name' => 'NewebPay',
-                        'gateway_id' => 'omnipay_newebpay',
+                        'gateway_id' => 'newebpay',
                         'title' => '藍新金流',
                         'description' => '使用藍新金流付款',
                     ],

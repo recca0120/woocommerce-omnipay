@@ -58,12 +58,12 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'Dummy',
-                    'gateway_id' => 'omnipay_dummy',
+                    'gateway_id' => 'dummy',
                     'title' => 'Dummy',
                 ],
                 [
                     'omnipay_name' => 'ECPay',
-                    'gateway_id' => 'omnipay_ecpay',
+                    'gateway_id' => 'ecpay',
                     'title' => '綠界金流',
                     'description' => '使用綠界金流付款',
                 ],
@@ -85,12 +85,12 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'ECPay',
-                    'gateway_id' => 'omnipay_ecpaycredit',
+                    'gateway_id' => 'ecpay_credit',
                     'title' => 'ECPay 信用卡',
                 ],
                 [
                     'omnipay_name' => 'ECPay',
-                    'gateway_id' => 'omnipay_ecpayatm',
+                    'gateway_id' => 'ecpay_atm',
                     'title' => 'ECPay ATM',
                 ],
             ],
@@ -106,8 +106,8 @@ class GatewayRegistryTest extends WP_UnitTestCase
         $this->assertEquals('ECPay', $gateways[1]['omnipay_name']);
 
         // gateway_id 各自獨立
-        $this->assertEquals('omnipay_ecpaycredit', $gateways[0]['gateway_id']);
-        $this->assertEquals('omnipay_ecpayatm', $gateways[1]['gateway_id']);
+        $this->assertEquals('ecpay_credit', $gateways[0]['gateway_id']);
+        $this->assertEquals('ecpay_atm', $gateways[1]['gateway_id']);
     }
 
     /**
@@ -119,12 +119,12 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'Dummy',
-                    'gateway_id' => 'omnipay_dummy',
+                    'gateway_id' => 'dummy',
                     'title' => 'Valid Gateway',
                 ],
                 [
                     // 沒有 omnipay_name
-                    'gateway_id' => 'omnipay_invalid',
+                    'gateway_id' => 'invalid',
                     'title' => 'Invalid Gateway',
                 ],
             ],
@@ -134,7 +134,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
         $gateways = $registry->getGateways();
 
         $this->assertCount(1, $gateways);
-        $this->assertEquals('omnipay_dummy', $gateways[0]['gateway_id']);
+        $this->assertEquals('dummy', $gateways[0]['gateway_id']);
     }
 
     /**
@@ -146,7 +146,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'Dummy',
-                    'gateway_id' => 'omnipay_dummy',
+                    'gateway_id' => 'dummy',
                     'title' => 'Valid Gateway',
                 ],
                 [
@@ -161,7 +161,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
         $gateways = $registry->getGateways();
 
         $this->assertCount(1, $gateways);
-        $this->assertEquals('omnipay_dummy', $gateways[0]['gateway_id']);
+        $this->assertEquals('dummy', $gateways[0]['gateway_id']);
     }
 
     /**
@@ -173,12 +173,12 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'Dummy',
-                    'gateway_id' => 'omnipay_dummy',
+                    'gateway_id' => 'dummy',
                     'title' => 'Valid Gateway',
                 ],
                 [
                     'omnipay_name' => 'NonExistentOmnipayGateway',
-                    'gateway_id' => 'omnipay_nonexistent',
+                    'gateway_id' => 'nonexistent',
                     'title' => 'Non Existent',
                 ],
             ],
@@ -188,7 +188,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
         $gateways = $registry->getGateways();
 
         $this->assertCount(1, $gateways);
-        $this->assertEquals('omnipay_dummy', $gateways[0]['gateway_id']);
+        $this->assertEquals('dummy', $gateways[0]['gateway_id']);
     }
 
     /**
@@ -200,7 +200,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'Dummy',
-                    'gateway_id' => 'omnipay_testgateway',
+                    'gateway_id' => 'testgateway',
                     'title' => 'Test Title',
                     'description' => 'Test Description',
                 ],
@@ -218,7 +218,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
         $this->assertArrayHasKey('description', $gateway);
 
         $this->assertEquals('Dummy', $gateway['omnipay_name']);
-        $this->assertEquals('omnipay_testgateway', $gateway['gateway_id']);
+        $this->assertEquals('testgateway', $gateway['gateway_id']);
         $this->assertEquals('Test Title', $gateway['title']);
         $this->assertEquals('Test Description', $gateway['description']);
     }
@@ -232,7 +232,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'ECPay',
-                    'gateway_id' => 'omnipay_ecpay',
+                    'gateway_id' => 'ecpay',
                 ],
             ],
         ];
@@ -252,7 +252,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'Dummy',
-                    'gateway_id' => 'omnipay_dummy',
+                    'gateway_id' => 'dummy',
                     'title' => 'Test Payment',
                 ],
             ],
@@ -273,7 +273,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
             'gateways' => [
                 [
                     'omnipay_name' => 'Dummy',
-                    'gateway_id' => 'omnipay_dummy',
+                    'gateway_id' => 'dummy',
                     'title' => 'Test',
                 ],
             ],

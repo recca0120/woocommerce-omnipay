@@ -32,7 +32,7 @@ class BankTransferTest extends WP_UnitTestCase
                 'gateways' => [
                     [
                         'omnipay_name' => 'BankTransfer',
-                        'gateway_id' => 'omnipay_banktransfer',
+                        'gateway_id' => 'banktransfer',
                         'title' => '銀行轉帳',
                         'description' => '使用銀行轉帳付款',
                     ],

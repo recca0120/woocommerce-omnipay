@@ -204,31 +204,31 @@ function woocommerce_omnipay_get_config()
         'gateways' => [
             [
                 'omnipay_name' => 'BankTransfer',
-                'gateway_id' => 'omnipay_banktransfer',
+                'gateway_id' => 'banktransfer',
                 'title' => '銀行轉帳',
                 'description' => '使用銀行轉帳付款',
             ],
             [
                 'omnipay_name' => 'Dummy',
-                'gateway_id' => 'omnipay_dummy',
+                'gateway_id' => 'dummy',
                 'title' => 'Dummy Gateway',
                 'description' => 'Dummy payment gateway for testing',
             ],
             [
                 'omnipay_name' => 'ECPay',
-                'gateway_id' => 'omnipay_ecpay',
+                'gateway_id' => 'ecpay',
                 'title' => '綠界金流',
                 'description' => '使用綠界金流付款',
             ],
             [
                 'omnipay_name' => 'NewebPay',
-                'gateway_id' => 'omnipay_newebpay',
+                'gateway_id' => 'newebpay',
                 'title' => '藍新金流',
                 'description' => '使用藍新金流付款',
             ],
             [
                 'omnipay_name' => 'YiPay',
-                'gateway_id' => 'omnipay_yipay',
+                'gateway_id' => 'yipay',
                 'title' => 'YiPay 乙禾金流',
                 'description' => '使用 YiPay 乙禾金流付款',
             ],

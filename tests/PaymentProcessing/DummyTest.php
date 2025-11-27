@@ -26,7 +26,7 @@ class DummyTest extends WP_UnitTestCase
                 'gateways' => [
                     [
                         'omnipay_name' => 'Dummy',
-                        'gateway_id' => 'omnipay_dummy',
+                        'gateway_id' => 'dummy',
                         'title' => 'Dummy Gateway',
                         'description' => 'Dummy payment gateway for testing',
                     ],
