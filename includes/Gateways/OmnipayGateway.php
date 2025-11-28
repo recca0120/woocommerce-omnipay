@@ -193,36 +193,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     public function get_omnipay_gateway()
     {
-        return $this->omnipay_bridge->createGateway($this->get_omnipay_parameters());
-    }
-
-    /**
-     * 從 WooCommerce 設定取得 Omnipay 參數
-     *
-     * 優先順序：Gateway 設定 > 共用設定 > Omnipay 預設值
-     *
-     * @return array
-     */
-    protected function get_omnipay_parameters()
-    {
-        $parameters = [];
-        $shared_settings = $this->omnipay_bridge->getSharedSettings();
-
-        foreach ($this->omnipay_bridge->getDefaultParameters() as $key => $default_value) {
-            // 優先使用共用設定
-            if (isset($shared_settings[$key]) && $shared_settings[$key] !== '') {
-                $setting_value = $shared_settings[$key];
-            } else {
-                // 否則使用 Gateway 自己的設定
-                $setting_value = $this->get_option($key);
-            }
-
-            if (! empty($setting_value)) {
-                $parameters[$key] = OmnipayBridge::convertOptionValue($setting_value, $default_value);
-            }
-        }
-
-        return $parameters;
+        return $this->omnipay_bridge->createGateway($this->settings);
     }
 
     /**

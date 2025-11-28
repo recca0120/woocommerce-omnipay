@@ -27,11 +27,15 @@ class OmnipayBridge
     /**
      * 建立已初始化的 Omnipay Gateway 實例
      *
+     * 優先順序：Gateway 設定 > 共用設定 > Omnipay 預設值
+     *
+     * @param  array  $gatewaySettings  Gateway 自身的設定
      * @return \Omnipay\Common\GatewayInterface
      */
-    public function createGateway(array $parameters = [])
+    public function createGateway(array $gatewaySettings = [])
     {
         $gateway = Omnipay::create($this->omnipay_gateway_name);
+        $parameters = $this->mergeParameters($gateway->getDefaultParameters(), $gatewaySettings);
         $gateway->initialize($parameters);
 
         return $gateway;
@@ -51,6 +55,35 @@ class OmnipayBridge
         } catch (\Exception $e) {
             return [];
         }
+    }
+
+    /**
+     * 合併參數（共用設定 + Gateway 設定）
+     *
+     * @param  array  $defaultParameters  Omnipay 預設參數
+     * @param  array  $gatewaySettings  Gateway 自身的設定
+     * @return array
+     */
+    protected function mergeParameters(array $defaultParameters, array $gatewaySettings)
+    {
+        $parameters = [];
+        $sharedSettings = $this->getSharedSettings();
+
+        foreach ($defaultParameters as $key => $defaultValue) {
+            // 優先使用共用設定
+            $settingValue = '';
+            if (isset($sharedSettings[$key]) && $sharedSettings[$key] !== '') {
+                $settingValue = $sharedSettings[$key];
+            } elseif (isset($gatewaySettings[$key]) && $gatewaySettings[$key] !== '') {
+                $settingValue = $gatewaySettings[$key];
+            }
+
+            if ($settingValue !== '') {
+                $parameters[$key] = self::convertOptionValue($settingValue, $defaultValue);
+            }
+        }
+
+        return $parameters;
     }
 
     /**
