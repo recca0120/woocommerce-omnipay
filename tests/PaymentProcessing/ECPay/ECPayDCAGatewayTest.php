@@ -49,8 +49,8 @@ class ECPayDCAGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('Credit', $redirect_data['data']['ChoosePayment']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('Credit', $redirectData['data']['ChoosePayment']);
     }
 
     public function test_process_payment_sends_period_parameters()
@@ -61,10 +61,10 @@ class ECPayDCAGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertArrayHasKey('PeriodType', $redirect_data['data']);
-        $this->assertArrayHasKey('Frequency', $redirect_data['data']);
-        $this->assertArrayHasKey('ExecTimes', $redirect_data['data']);
-        $this->assertArrayHasKey('PeriodAmount', $redirect_data['data']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('M', $redirectData['data']['PeriodType']);
+        $this->assertEquals(1, $redirectData['data']['Frequency']);
+        $this->assertEquals(12, $redirectData['data']['ExecTimes']);
+        $this->assertEquals(500, $redirectData['data']['PeriodAmount']);
     }
 }

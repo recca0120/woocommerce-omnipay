@@ -50,8 +50,8 @@ class ECPayATMGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('ATM', $redirect_data['data']['ChoosePayment']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('ATM', $redirectData['data']['ChoosePayment']);
     }
 
     public function test_form_fields_has_amount_and_expire_settings()
@@ -100,8 +100,8 @@ class ECPayATMGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('7', $redirect_data['data']['ExpireDate']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('7', $redirectData['data']['ExpireDate']);
     }
 
     private function setGatewaySettings(array $settings)

@@ -32,10 +32,10 @@ class BankTransferTest extends TestCase
         $this->assertEquals('success', $result['result']);
         $this->assertStringContainsString('omnipay_redirect=1', $result['redirect']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertArrayHasKey('bank_code', $redirect_data['data']);
-        $this->assertArrayHasKey('account_number', $redirect_data['data']);
-        $this->assertStringContainsString('order-received', $redirect_data['data']['payment_info_url']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertArrayHasKey('bank_code', $redirectData['data']);
+        $this->assertArrayHasKey('account_number', $redirectData['data']);
+        $this->assertStringContainsString('order-received', $redirectData['data']['payment_info_url']);
 
         $order = wc_get_order($order->get_id());
         $this->assertEquals('on-hold', $order->get_status());

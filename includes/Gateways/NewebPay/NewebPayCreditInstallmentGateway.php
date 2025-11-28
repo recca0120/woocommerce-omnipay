@@ -98,11 +98,9 @@ class NewebPayCreditInstallmentGateway extends NewebPayGateway
         $data['CREDIT'] = '1';
 
         // 加入分期期數參數（multiselect 回傳陣列，需轉為逗號分隔字串）
-        $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
-        if (is_array($installments)) {
-            $installments = implode(',', $installments);
-        }
-        $data['InstFlag'] = $installments;
+        // 使用 WC_Payment_Gateway::get_option 繞過 OmnipayGateway 的 sanitize 處理
+        $installments = \WC_Payment_Gateway::get_option('installments', ['3', '6', '12', '18', '24']);
+        $data['InstFlag'] = is_array($installments) ? implode(',', $installments) : $installments;
 
         return $data;
     }

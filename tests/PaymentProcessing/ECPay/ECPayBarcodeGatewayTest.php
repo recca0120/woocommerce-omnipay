@@ -51,8 +51,8 @@ class ECPayBarcodeGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('BARCODE', $redirect_data['data']['ChoosePayment']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('BARCODE', $redirectData['data']['ChoosePayment']);
     }
 
     public function test_accept_notification_stores_barcode_payment_info()
@@ -97,8 +97,8 @@ class ECPayBarcodeGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('7', $redirect_data['data']['StoreExpireDate']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('7', $redirectData['data']['StoreExpireDate']);
     }
 
     private function setGatewaySettings(array $settings)

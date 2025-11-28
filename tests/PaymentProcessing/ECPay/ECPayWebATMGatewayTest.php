@@ -46,8 +46,8 @@ class ECPayWebATMGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('WebATM', $redirect_data['data']['ChoosePayment']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('WebATM', $redirectData['data']['ChoosePayment']);
     }
 
     public function test_form_fields_has_amount_settings()

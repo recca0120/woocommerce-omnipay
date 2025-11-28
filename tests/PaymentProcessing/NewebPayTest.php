@@ -42,10 +42,10 @@ class NewebPayTest extends TestCase
         $this->assertEquals('success', $result['result']);
         $this->assertStringContainsString('omnipay_redirect=1', $result['redirect']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertStringContainsString('newebpay.com', $redirect_data['url']);
-        $this->assertArrayHasKey('TradeInfo', $redirect_data['data']);
-        $this->assertArrayHasKey('TradeSha', $redirect_data['data']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertStringContainsString('newebpay.com', $redirectData['url']);
+        $this->assertArrayHasKey('TradeInfo', $redirectData['data']);
+        $this->assertArrayHasKey('TradeSha', $redirectData['data']);
 
         $this->assertEquals('on-hold', wc_get_order($order->get_id())->get_status());
     }

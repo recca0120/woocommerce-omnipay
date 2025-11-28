@@ -56,8 +56,8 @@ class YiPayATMGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('4', $redirect_data['data']['type']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('4', $redirectData['data']['type']);
     }
 
     public function test_get_payment_info_stores_atm_info()

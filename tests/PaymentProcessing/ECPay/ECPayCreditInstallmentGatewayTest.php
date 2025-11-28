@@ -49,8 +49,8 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('Credit', $redirect_data['data']['ChoosePayment']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('Credit', $redirectData['data']['ChoosePayment']);
     }
 
     public function test_process_payment_sends_installment_parameter()
@@ -61,8 +61,8 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertArrayHasKey('CreditInstallment', $redirect_data['data']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('3,6,12,18,24', $redirectData['data']['CreditInstallment']);
     }
 
     public function test_form_fields_has_min_amount_and_installments()

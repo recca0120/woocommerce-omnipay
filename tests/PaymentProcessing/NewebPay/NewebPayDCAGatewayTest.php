@@ -47,7 +47,7 @@ class NewebPayDCAGatewayTest extends TestCase
         $this->assertEquals('藍新定期定額', $this->gateway->method_title);
     }
 
-    public function test_process_payment_sends_period_parameters()
+    public function test_process_payment_sends_credit_parameter()
     {
         $order = $this->createOrder(500);
 
@@ -55,19 +55,16 @@ class NewebPayDCAGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertArrayHasKey('TradeInfo', $redirect_data['data']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertArrayHasKey('TradeInfo', $redirectData['data']);
 
         $encryptor = new Encryptor($this->hashKey, $this->hashIV);
-        $tradeInfo = $encryptor->decrypt($redirect_data['data']['TradeInfo']);
+        $tradeInfo = $encryptor->decrypt($redirectData['data']['TradeInfo']);
         if (is_string($tradeInfo)) {
             parse_str($tradeInfo, $tradeInfo);
         }
+        // 注意：omnipay-newebpay 套件目前不支援定期定額參數 (PeriodAmt, PeriodType, PeriodTimes)
+        // 只驗證 CREDIT 參數有傳送
         $this->assertEquals('1', $tradeInfo['CREDIT']);
-        // 驗證定期定額參數存在（Gateway 有傳送）
-        $hasPeriodParams = isset($tradeInfo['PeriodAmt']) ||
-                           isset($tradeInfo['PeriodType']) ||
-                           isset($tradeInfo['PeriodTimes']);
-        $this->assertTrue($hasPeriodParams || true, 'Period parameters should be sent');
     }
 }

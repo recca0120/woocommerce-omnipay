@@ -55,16 +55,16 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertArrayHasKey('TradeInfo', $redirect_data['data']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertArrayHasKey('TradeInfo', $redirectData['data']);
 
         $encryptor = new Encryptor($this->hashKey, $this->hashIV);
-        $tradeInfo = $encryptor->decrypt($redirect_data['data']['TradeInfo']);
+        $tradeInfo = $encryptor->decrypt($redirectData['data']['TradeInfo']);
         if (is_string($tradeInfo)) {
             parse_str($tradeInfo, $tradeInfo);
         }
         $this->assertEquals('1', $tradeInfo['CREDIT']);
-        $this->assertArrayHasKey('InstFlag', $tradeInfo);
+        $this->assertEquals('3,6,12,18,24', $tradeInfo['InstFlag']);
     }
 
     public function test_form_fields_has_min_amount_and_installments()

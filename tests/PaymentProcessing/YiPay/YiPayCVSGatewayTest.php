@@ -49,8 +49,8 @@ class YiPayCVSGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('3', $redirect_data['data']['type']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('3', $redirectData['data']['type']);
     }
 
     public function test_form_fields_has_amount_settings()

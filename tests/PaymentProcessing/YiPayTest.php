@@ -42,9 +42,9 @@ class YiPayTest extends TestCase
         $this->assertEquals('success', $result['result']);
         $this->assertStringContainsString('omnipay_redirect=1', $result['redirect']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertStringContainsString('yipay.com.tw', $redirect_data['url']);
-        $this->assertArrayHasKey('checkCode', $redirect_data['data']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertStringContainsString('yipay.com.tw', $redirectData['url']);
+        $this->assertArrayHasKey('checkCode', $redirectData['data']);
 
         $this->assertEquals('on-hold', wc_get_order($order->get_id())->get_status());
     }

@@ -6,11 +6,11 @@ use Omnipay\Common\Message\NotificationInterface;
 use Psr\Log\LoggerInterface;
 use WC_Payment_Gateway;
 use WooCommerceOmnipay\Exceptions\OrderNotFoundException;
-use WooCommerceOmnipay\Gateways\Traits\DisplaysPaymentInfo;
 use WooCommerceOmnipay\Helper;
 use WooCommerceOmnipay\Repositories\OrderRepository;
 use WooCommerceOmnipay\Services\OmnipayBridge;
 use WooCommerceOmnipay\Services\WooCommerceLogger;
+use WooCommerceOmnipay\Traits\DisplaysPaymentInfo;
 
 /**
  * Omnipay Gateway

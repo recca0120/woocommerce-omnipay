@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Gateways\Traits;
+namespace WooCommerceOmnipay\Traits;
 
 use WooCommerceOmnipay\Repositories\OrderRepository;
 

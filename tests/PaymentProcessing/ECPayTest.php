@@ -32,9 +32,9 @@ class ECPayTest extends TestCase
         $this->assertEquals('success', $result['result']);
         $this->assertStringContainsString('omnipay_redirect=1', $result['redirect']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertStringContainsString('ecpay.com.tw', $redirect_data['url']);
-        $this->assertArrayHasKey('PaymentInfoURL', $redirect_data['data']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertStringContainsString('ecpay.com.tw', $redirectData['url']);
+        $this->assertArrayHasKey('PaymentInfoURL', $redirectData['data']);
 
         $order = wc_get_order($order->get_id());
         $this->assertEquals('on-hold', $order->get_status());

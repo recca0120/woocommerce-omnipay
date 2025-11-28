@@ -50,8 +50,8 @@ class ECPayCVSGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('CVS', $redirect_data['data']['ChoosePayment']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('CVS', $redirectData['data']['ChoosePayment']);
     }
 
     public function test_form_fields_has_amount_and_expire_settings()
@@ -70,8 +70,8 @@ class ECPayCVSGatewayTest extends TestCase
 
         $this->assertEquals('success', $result['result']);
 
-        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('10080', $redirect_data['data']['StoreExpireDate']);
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('10080', $redirectData['data']['StoreExpireDate']);
     }
 
     private function setGatewaySettings(array $settings)
