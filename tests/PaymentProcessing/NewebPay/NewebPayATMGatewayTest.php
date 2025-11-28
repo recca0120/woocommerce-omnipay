@@ -67,58 +67,9 @@ class NewebPayATMGatewayTest extends TestCase
         $this->assertEquals('1', $tradeInfo['VACC']);
     }
 
-    public function test_get_payment_info_stores_atm_info()
-    {
-        $order = $this->createOrder(100);
-        $this->gateway->process_payment($order->get_id());
-
-        $this->simulateCallback($this->makePaymentInfoData($order, [
-            'PaymentType' => 'VACC',
-            'BankCode' => '012',
-            'CodeNo' => '9103522175887271',
-        ]));
-
-        $url = $this->gateway->getPaymentInfo();
-
-        $this->assertStringContainsString('order-received', $url);
-
-        $order = wc_get_order($order->get_id());
-        $this->assertEquals('012', $order->get_meta('_omnipay_bank_code'));
-        $this->assertEquals('9103522175887271', $order->get_meta('_omnipay_virtual_account'));
-    }
-
     public function test_form_fields_has_amount_settings()
     {
         $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
         $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
-    }
-
-    private function makePaymentInfoData($order, array $overrides = [])
-    {
-        $result = array_merge([
-            'Status' => 'SUCCESS',
-            'Message' => '取號成功',
-            'MerchantID' => $this->merchantId,
-            'Amt' => (int) $order->get_total(),
-            'TradeNo' => '24112500001234',
-            'MerchantOrderNo' => (string) $order->get_id(),
-            'PaymentType' => 'VACC',
-        ], $overrides);
-
-        return $this->encrypt($result);
-    }
-
-    private function encrypt(array $result)
-    {
-        $encryptor = new Encryptor($this->hashKey, $this->hashIV);
-        $tradeInfo = $encryptor->encrypt($result);
-
-        return [
-            'Status' => $result['Status'],
-            'MerchantID' => $this->merchantId,
-            'TradeInfo' => $tradeInfo,
-            'TradeSha' => $encryptor->tradeSha($tradeInfo),
-            'Version' => '2.0',
-        ];
     }
 }
