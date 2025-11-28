@@ -1,0 +1,128 @@
+<?php
+
+namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
+
+use Omnipay\YiPay\Hasher;
+use WooCommerceOmnipay\Gateways\YiPay\YiPayATMGateway;
+use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
+
+/**
+ * YiPay ATM Gateway 測試
+ */
+class YiPayATMGatewayTest extends TestCase
+{
+    protected $gatewayId = 'yipay_atm';
+
+    protected $gatewayName = 'YiPay';
+
+    protected $gatewayClass = YiPayATMGateway::class;
+
+    private $merchantId = '1234567890';
+
+    private $key = 'dGVzdGtleXRlc3QxMjM0NQ==';
+
+    private $iv = 'dGVzdGl2dGVzdDEyMzQ1Ng==';
+
+    protected function setUp(): void
+    {
+        $this->settings = [
+            'merchantId' => $this->merchantId,
+            'key' => $this->key,
+            'iv' => $this->iv,
+            'testMode' => 'yes',
+            'allow_resubmit' => 'no',
+        ];
+        parent::setUp();
+
+        $this->gateway = new YiPayATMGateway([
+            'gateway' => 'YiPay',
+            'gateway_id' => 'yipay_atm',
+            'title' => '乙禾 ATM',
+        ]);
+    }
+
+    public function test_gateway_has_correct_id()
+    {
+        $this->assertEquals('omnipay_yipay_atm', $this->gateway->id);
+    }
+
+    public function test_gateway_has_correct_title()
+    {
+        $this->assertEquals('乙禾 ATM', $this->gateway->method_title);
+    }
+
+    public function test_process_payment_sends_atm_payment_type()
+    {
+        $order = $this->createOrder(100);
+
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirect_data = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('4', $redirect_data['data']['type']);
+    }
+
+    public function test_get_payment_info_stores_atm_info()
+    {
+        $order = $this->createOrder(100);
+        $this->gateway->process_payment($order->get_id());
+
+        $this->simulateCallback($this->makePaymentInfoData($order, [
+            'type' => '4',
+            'account' => '9103522175887271',
+        ]));
+
+        ob_start();
+        $this->gateway->getPaymentInfo();
+        ob_get_clean();
+
+        $order = wc_get_order($order->get_id());
+        $this->assertEquals('9103522175887271', $order->get_meta('_omnipay_virtual_account'));
+    }
+
+    private function makePaymentInfoData($order, array $overrides = [])
+    {
+        $type = (int) ($overrides['type'] ?? '4');
+
+        $returnUrl = WC()->api_request_url('omnipay_yipay_atm_complete');
+        $notifyUrl = WC()->api_request_url('omnipay_yipay_atm_notify');
+        $paymentInfoUrl = WC()->api_request_url('omnipay_yipay_atm_payment_info');
+
+        $data = [
+            'merchantId' => $this->merchantId,
+            'orderNo' => (string) $order->get_id(),
+            'amount' => (string) ((int) $order->get_total()),
+            'statusCode' => '00',
+            'statusMessage' => '取號成功',
+            'transactionNo' => '',
+            'type' => (string) $type,
+            'returnURL' => $notifyUrl,
+            'cancelURL' => $returnUrl,
+            'backgroundURL' => $paymentInfoUrl,
+            'account' => $overrides['account'] ?? '9103522175887271',
+        ];
+
+        $data = array_merge($data, $overrides);
+        $data['checkCode'] = $this->sign($type, $data);
+
+        return $data;
+    }
+
+    private function sign(int $type, array $data)
+    {
+        $keys = ['merchantId', 'amount', 'orderNo', 'returnURL', 'cancelURL', 'backgroundURL', 'transactionNo', 'statusCode'];
+        $keys[] = match ($type) {
+            3 => 'pinCode',
+            4 => 'account',
+            default => 'approvalCode',
+        };
+
+        $signed = [];
+        foreach ($keys as $key) {
+            $signed[$key] = $data[$key] ?? '';
+        }
+
+        return (new Hasher($this->key, $this->iv))->make($signed);
+    }
+}

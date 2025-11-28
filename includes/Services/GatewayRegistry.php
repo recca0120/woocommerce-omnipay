@@ -10,6 +10,7 @@ namespace WooCommerceOmnipay\Services;
  * 配置格式：純陣列，每個元素包含：
  * - gateway: 必須指定的 Omnipay gateway 名稱
  * - gateway_id: 必須指定的 WooCommerce gateway ID
+ * - class: 選填，指定的 Gateway 類別（完整命名空間）
  * - title: 選填，預設使用 gateway
  * - description: 選填，自動產生
  */
