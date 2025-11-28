@@ -243,20 +243,16 @@ class OmnipayGateway extends WC_Payment_Gateway
                 return $this->onPaymentFailed($order, $errorMessage);
             }
         } catch (OrderNotFoundException $e) {
-            $this->logger->error('process_payment: Order not found', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
-            wc_add_notice($e->getMessage(), 'error');
+            $this->logger->error('process_payment: '.$e->getMessage(), ['order_id' => $orderId]);
+            wc_add_notice(__('找不到訂單資料。', 'woocommerce-omnipay'), 'error');
 
             return ['result' => 'failure'];
         } catch (\Exception $e) {
-            $this->logger->error('process_payment: Exception', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
-            $this->orders->addNote($order, sprintf('Payment error: %s', $e->getMessage()));
-            wc_add_notice('Payment error: '.$e->getMessage(), 'error');
+            $this->logger->error('process_payment: '.$e->getMessage(), ['order_id' => $orderId]);
+            if (isset($order) && $order) {
+                $this->orders->addNote($order, sprintf('Payment error: %s', $e->getMessage()));
+            }
+            wc_add_notice(__('付款處理發生錯誤，請稍後再試。', 'woocommerce-omnipay'), 'error');
 
             return ['result' => 'failure'];
         }
@@ -382,7 +378,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      * 付款失敗事件
      *
      * @param  \WC_Order  $order  訂單
-     * @param  string  $errorMessage  錯誤訊息
+     * @param  string  $errorMessage  錯誤訊息（技術訊息，記錄到訂單備註）
      * @param  string  $source  來源 (process_payment, callback, return URL)
      * @param  bool  $addNotice  是否顯示錯誤訊息給使用者
      * @return array
@@ -393,7 +389,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->orders->addNote($order, sprintf('Payment failed via %s: %s', $source, $errorMessage));
 
         if ($addNotice) {
-            wc_add_notice($errorMessage, 'error');
+            wc_add_notice(__('付款失敗，請重新嘗試或選擇其他付款方式。', 'woocommerce-omnipay'), 'error');
         }
 
         return [
@@ -500,9 +496,7 @@ class OmnipayGateway extends WC_Payment_Gateway
             $this->logger->warning('acceptNotification: '.$e->getMessage());
             $this->sendCallbackResponse(false, 'Order not found');
         } catch (\Exception $e) {
-            $this->logger->error('acceptNotification: Exception', [
-                'error' => $e->getMessage(),
-            ]);
+            $this->logger->error('acceptNotification: '.$e->getMessage());
             $this->sendCallbackResponse(false, $e->getMessage());
         }
     }
@@ -517,7 +511,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     public function getPaymentInfo()
     {
-        $this->logger->info('get_payment_info: Received callback', $this->getRequestData());
+        $this->logger->info('getPaymentInfo: Received callback', $this->getRequestData());
 
         try {
             $redirectUrl = $this->handlePaymentInfo();
@@ -529,15 +523,13 @@ class OmnipayGateway extends WC_Payment_Gateway
 
             return $this->redirect($redirectUrl);
         } catch (OrderNotFoundException $e) {
-            $this->logger->warning('get_payment_info: '.$e->getMessage());
-            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
+            $this->logger->warning('getPaymentInfo: '.$e->getMessage());
+            wc_add_notice(__('找不到訂單資料。', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         } catch (\Exception $e) {
-            $this->logger->error('get_payment_info: Exception', [
-                'error' => $e->getMessage(),
-            ]);
-            wc_add_notice($e->getMessage(), 'error');
+            $this->logger->error('getPaymentInfo: '.$e->getMessage());
+            wc_add_notice(__('處理付款資訊時發生錯誤。', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         }
@@ -556,7 +548,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         $gateway = $this->get_gateway();
         $notification = $gateway->acceptNotification($this->getCallbackParameters());
 
-        $this->logger->info('get_payment_info: Parsed notification', [
+        $this->logger->info('getPaymentInfo: Parsed notification', [
             'transaction_id' => $notification->getTransactionId(),
             'data' => Helper::maskSensitiveData($notification->getData() ?? []),
         ]);
@@ -565,7 +557,7 @@ class OmnipayGateway extends WC_Payment_Gateway
 
         $this->savePaymentInfo($order, $notification->getData());
 
-        $this->logger->info('get_payment_info: Payment info saved', [
+        $this->logger->info('getPaymentInfo: Payment info saved', [
             'order_id' => $order->get_id(),
         ]);
 
@@ -609,14 +601,12 @@ class OmnipayGateway extends WC_Payment_Gateway
             return $this->redirect($this->get_return_url($order));
         } catch (OrderNotFoundException $e) {
             $this->logger->warning('completePurchase: '.$e->getMessage());
-            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('找不到訂單資料。', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         } catch (\Exception $e) {
-            $this->logger->error('completePurchase: Exception', [
-                'error' => $e->getMessage(),
-            ]);
-            wc_add_notice($e->getMessage(), 'error');
+            $this->logger->error('completePurchase: '.$e->getMessage());
+            wc_add_notice(__('完成付款時發生錯誤。', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         }
