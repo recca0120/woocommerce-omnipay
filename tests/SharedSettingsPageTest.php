@@ -12,37 +12,41 @@ class SharedSettingsPageTest extends WP_UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->page = new SharedSettingsPage('ECPay', 'ecpay');
+        $this->page = new SharedSettingsPage([
+            ['omnipay_name' => 'ECPay'],
+            ['omnipay_name' => 'NewebPay'],
+        ]);
     }
 
     protected function tearDown(): void
     {
         delete_option('woocommerce_omnipay_ecpay_shared_settings');
+        delete_option('woocommerce_omnipay_newebpay_shared_settings');
         parent::tearDown();
     }
 
-    public function test_adds_section_to_checkout_settings()
+    public function test_adds_omnipay_tab_to_woocommerce_settings()
     {
-        $sections = $this->page->add_section([]);
+        $tabs = $this->page->add_tab([]);
 
-        $this->assertArrayHasKey('omnipay_ecpay', $sections);
-        $this->assertEquals('ECPay', $sections['omnipay_ecpay']);
+        $this->assertArrayHasKey('omnipay', $tabs);
+        $this->assertEquals('Omnipay', $tabs['omnipay']);
     }
 
-    public function test_returns_original_sections_for_other_pages()
+    public function test_get_sections_returns_all_gateways()
     {
-        $original = ['other' => 'Other Section'];
-        $sections = $this->page->add_section($original);
+        $sections = $this->page->get_sections();
 
-        $this->assertArrayHasKey('other', $sections);
-        $this->assertArrayHasKey('omnipay_ecpay', $sections);
+        $this->assertArrayHasKey('ecpay', $sections);
+        $this->assertArrayHasKey('newebpay', $sections);
+        $this->assertEquals('ECPay', $sections['ecpay']);
+        $this->assertEquals('NewebPay', $sections['newebpay']);
     }
 
-    public function test_get_settings_returns_omnipay_fields()
+    public function test_get_settings_returns_omnipay_fields_for_ecpay()
     {
-        $settings = $this->page->get_settings([], 'omnipay_ecpay');
+        $settings = $this->page->get_settings('ecpay');
 
-        // 應該包含 Omnipay 參數欄位
         $field_ids = array_column($settings, 'id');
 
         $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[MerchantID]', $field_ids);
@@ -52,7 +56,7 @@ class SharedSettingsPageTest extends WP_UnitTestCase
 
     public function test_get_settings_returns_plugin_fields()
     {
-        $settings = $this->page->get_settings([], 'omnipay_ecpay');
+        $settings = $this->page->get_settings('ecpay');
 
         $field_ids = array_column($settings, 'id');
 
@@ -60,11 +64,18 @@ class SharedSettingsPageTest extends WP_UnitTestCase
         $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[allow_resubmit]', $field_ids);
     }
 
-    public function test_get_settings_returns_original_for_other_section()
+    public function test_get_settings_returns_empty_for_unknown_section()
     {
-        $original = [['id' => 'other_setting']];
-        $settings = $this->page->get_settings($original, 'other_section');
+        $settings = $this->page->get_settings('unknown');
 
-        $this->assertEquals($original, $settings);
+        $this->assertEmpty($settings);
+    }
+
+    public function test_first_section_is_default()
+    {
+        $sections = $this->page->get_sections();
+
+        $first_key = array_key_first($sections);
+        $this->assertEquals('ecpay', $first_key);
     }
 }

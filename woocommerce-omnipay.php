@@ -64,26 +64,14 @@ function woocommerce_omnipay_init()
 add_action('plugins_loaded', 'woocommerce_omnipay_init');
 
 /**
- * Register shared settings pages for each Omnipay gateway
+ * Register shared settings page
  */
 function woocommerce_omnipay_register_shared_settings()
 {
     $config = woocommerce_omnipay_get_config();
-    $registered = [];
 
-    foreach ($config['gateways'] as $gateway) {
-        $omnipay_name = $gateway['omnipay_name'] ?? '';
-
-        // 每個 omnipay_name 只註冊一次
-        if (empty($omnipay_name) || isset($registered[$omnipay_name])) {
-            continue;
-        }
-
-        $page = new \WooCommerceOmnipay\SharedSettingsPage($omnipay_name);
-        $page->register();
-
-        $registered[$omnipay_name] = true;
-    }
+    $page = new \WooCommerceOmnipay\SharedSettingsPage($config['gateways']);
+    $page->register();
 }
 
 /**

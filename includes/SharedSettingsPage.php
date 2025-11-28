@@ -7,34 +7,36 @@ use WooCommerceOmnipay\Services\OmnipayBridge;
 /**
  * 共用設定頁面
  *
- * 在 WooCommerce > 設定 > 付款 下新增 Omnipay gateway 的共用設定區塊
+ * 在 WooCommerce > 設定 下新增 Omnipay tab，並以 sub-tab 區分各 Gateway
  */
 class SharedSettingsPage
 {
     /**
-     * @var string Omnipay gateway 名稱
+     * @var array Gateway 配置列表
      */
-    private $omnipay_name;
+    private $gateways;
 
     /**
-     * @var string section ID
+     * @var array 已建立的 OmnipayBridge 實例快取
      */
-    private $section_id;
+    private $bridges = [];
 
     /**
-     * @var OmnipayBridge
+     * @param  array  $gateways  Gateway 配置列表
      */
-    private $omnipay_bridge;
-
-    /**
-     * @param  string  $omnipay_name  Omnipay gateway 名稱（如 ECPay）
-     * @param  string  $section_id  section ID（如 ecpay）
-     */
-    public function __construct($omnipay_name, $section_id = null)
+    public function __construct(array $gateways)
     {
-        $this->omnipay_name = $omnipay_name;
-        $this->section_id = 'omnipay_'.($section_id ?: strtolower($omnipay_name));
-        $this->omnipay_bridge = new OmnipayBridge($omnipay_name);
+        // 取得不重複的 omnipay_name 列表
+        $seen = [];
+        $this->gateways = [];
+
+        foreach ($gateways as $gateway) {
+            $name = $gateway['omnipay_name'] ?? '';
+            if (! empty($name) && ! isset($seen[$name])) {
+                $this->gateways[] = $gateway;
+                $seen[$name] = true;
+            }
+        }
     }
 
     /**
@@ -42,49 +44,135 @@ class SharedSettingsPage
      */
     public function register()
     {
-        add_filter('woocommerce_get_sections_checkout', [$this, 'add_section']);
-        add_filter('woocommerce_get_settings_checkout', [$this, 'get_settings'], 10, 2);
+        add_filter('woocommerce_settings_tabs_array', [$this, 'add_tab'], 50);
+        add_action('woocommerce_settings_omnipay', [$this, 'output_settings']);
+        add_action('woocommerce_update_options_omnipay', [$this, 'save_settings']);
+        add_action('woocommerce_sections_omnipay', [$this, 'output_sections']);
     }
 
     /**
-     * 新增設定區塊
+     * 新增 Omnipay tab
      *
-     * @param  array  $sections
+     * @param  array  $tabs
      * @return array
      */
-    public function add_section($sections)
+    public function add_tab($tabs)
     {
-        $sections[$this->section_id] = $this->omnipay_name;
+        $tabs['omnipay'] = 'Omnipay';
+
+        return $tabs;
+    }
+
+    /**
+     * 取得所有 sections（sub-tabs）
+     *
+     * @return array
+     */
+    public function get_sections()
+    {
+        $sections = [];
+
+        foreach ($this->gateways as $gateway) {
+            $name = $gateway['omnipay_name'];
+            $key = strtolower($name);
+            $sections[$key] = $name;
+        }
 
         return $sections;
     }
 
     /**
-     * 取得設定欄位
-     *
-     * @param  array  $settings
-     * @param  string  $current_section
-     * @return array
+     * 輸出 sections 導航
      */
-    public function get_settings($settings, $current_section)
+    public function output_sections()
     {
-        if ($current_section !== $this->section_id) {
-            return $settings;
+        global $current_section;
+
+        $sections = $this->get_sections();
+
+        if (empty($sections)) {
+            return;
         }
 
-        $option_key = SharedSettings::getOptionKey($this->omnipay_name);
+        echo '<ul class="subsubsub">';
+
+        $links = [];
+        foreach ($sections as $id => $label) {
+            $url = admin_url('admin.php?page=wc-settings&tab=omnipay&section='.$id);
+            $class = ($current_section === $id || (empty($current_section) && $id === array_key_first($sections))) ? 'current' : '';
+            $links[] = '<li><a href="'.esc_url($url).'" class="'.esc_attr($class).'">'.esc_html($label).'</a></li>';
+        }
+
+        echo implode(' | ', $links);
+        echo '</ul><br class="clear" />';
+    }
+
+    /**
+     * 輸出設定頁面
+     */
+    public function output_settings()
+    {
+        global $current_section;
+
+        $section = $current_section ?: $this->get_default_section();
+        $settings = $this->get_settings($section);
+
+        \WC_Admin_Settings::output_fields($settings);
+    }
+
+    /**
+     * 儲存設定
+     */
+    public function save_settings()
+    {
+        global $current_section;
+
+        $section = $current_section ?: $this->get_default_section();
+        $settings = $this->get_settings($section);
+
+        \WC_Admin_Settings::save_fields($settings);
+    }
+
+    /**
+     * 取得預設 section
+     *
+     * @return string
+     */
+    private function get_default_section()
+    {
+        $sections = $this->get_sections();
+
+        return array_key_first($sections) ?: '';
+    }
+
+    /**
+     * 取得設定欄位
+     *
+     * @param  string  $section
+     * @return array
+     */
+    public function get_settings($section)
+    {
+        $omnipay_name = $this->get_omnipay_name_by_section($section);
+
+        if (! $omnipay_name) {
+            return [];
+        }
+
+        $option_key = SharedSettings::getOptionKey($omnipay_name);
+        $bridge = $this->get_bridge($omnipay_name);
 
         $fields = [
             [
-                'title' => sprintf('%s 共用設定', $this->omnipay_name),
+                'title' => sprintf('%s 共用設定', $omnipay_name),
                 'type' => 'title',
-                'desc' => sprintf('設定 %s 的共用參數，這些設定會套用到所有 %s 付款方式。', $this->omnipay_name, $this->omnipay_name),
-                'id' => $this->section_id.'_options',
+                'desc' => sprintf('設定 %s 的共用參數，這些設定會套用到所有 %s 付款方式。', $omnipay_name, $omnipay_name),
+                'id' => 'omnipay_'.$section.'_options',
             ],
         ];
 
         // 加入 Omnipay 參數欄位
-        foreach ($this->omnipay_bridge->getDefaultParameters() as $key => $default_value) {
+        foreach ($bridge->getDefaultParameters() as $key => $default_value) {
             $fields[] = $this->create_field($option_key, $key, $default_value);
         }
 
@@ -108,10 +196,43 @@ class SharedSettingsPage
 
         $fields[] = [
             'type' => 'sectionend',
-            'id' => $this->section_id.'_options',
+            'id' => 'omnipay_'.$section.'_options',
         ];
 
         return $fields;
+    }
+
+    /**
+     * 根據 section 取得 omnipay_name
+     *
+     * @param  string  $section
+     * @return string|null
+     */
+    private function get_omnipay_name_by_section($section)
+    {
+        foreach ($this->gateways as $gateway) {
+            $name = $gateway['omnipay_name'];
+            if (strtolower($name) === $section) {
+                return $name;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 取得 OmnipayBridge 實例
+     *
+     * @param  string  $omnipay_name
+     * @return OmnipayBridge
+     */
+    private function get_bridge($omnipay_name)
+    {
+        if (! isset($this->bridges[$omnipay_name])) {
+            $this->bridges[$omnipay_name] = new OmnipayBridge($omnipay_name);
+        }
+
+        return $this->bridges[$omnipay_name];
     }
 
     /**
