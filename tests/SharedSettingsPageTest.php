@@ -47,21 +47,21 @@ class SharedSettingsPageTest extends WP_UnitTestCase
     {
         $settings = $this->page->get_settings('ecpay');
 
-        $field_ids = array_column($settings, 'id');
+        $fieldIds = array_column($settings, 'id');
 
-        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[MerchantID]', $field_ids);
-        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[HashKey]', $field_ids);
-        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[HashIV]', $field_ids);
+        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[MerchantID]', $fieldIds);
+        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[HashKey]', $fieldIds);
+        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[HashIV]', $fieldIds);
     }
 
     public function test_get_settings_returns_plugin_fields()
     {
         $settings = $this->page->get_settings('ecpay');
 
-        $field_ids = array_column($settings, 'id');
+        $fieldIds = array_column($settings, 'id');
 
-        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[transaction_id_prefix]', $field_ids);
-        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[allow_resubmit]', $field_ids);
+        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[transaction_id_prefix]', $fieldIds);
+        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[allow_resubmit]', $fieldIds);
     }
 
     public function test_get_settings_returns_empty_for_unknown_section()
@@ -75,7 +75,7 @@ class SharedSettingsPageTest extends WP_UnitTestCase
     {
         $sections = $this->page->get_sections();
 
-        $first_key = array_key_first($sections);
-        $this->assertEquals('ecpay', $first_key);
+        $firstKey = array_key_first($sections);
+        $this->assertEquals('ecpay', $firstKey);
     }
 }

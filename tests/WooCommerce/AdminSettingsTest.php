@@ -27,14 +27,14 @@ class AdminSettingsTest extends WP_UnitTestCase
     public function test_gateway_has_basic_fields()
     {
         $gateway = WC()->payment_gateways->payment_gateways()['omnipay_ecpay'];
-        $form_fields = $gateway->form_fields;
+        $formFields = $gateway->form_fields;
 
         // 驗證基本欄位
-        $this->assertArrayHasKey('enabled', $form_fields);
-        $this->assertArrayHasKey('title', $form_fields);
-        $this->assertArrayHasKey('description', $form_fields);
-        $this->assertArrayHasKey('allow_resubmit', $form_fields);
-        $this->assertArrayHasKey('transaction_id_prefix', $form_fields);
+        $this->assertArrayHasKey('enabled', $formFields);
+        $this->assertArrayHasKey('title', $formFields);
+        $this->assertArrayHasKey('description', $formFields);
+        $this->assertArrayHasKey('allow_resubmit', $formFields);
+        $this->assertArrayHasKey('transaction_id_prefix', $formFields);
     }
 
     // ==================== 設定測試 ====================
@@ -71,11 +71,11 @@ class AdminSettingsTest extends WP_UnitTestCase
             }
 
             // 檢查字串欄位
-            foreach (['description', 'title', 'label'] as $string_field) {
-                if (isset($field[$string_field])) {
+            foreach (['description', 'title', 'label'] as $stringField) {
+                if (isset($field[$stringField])) {
                     $this->assertIsString(
-                        $field[$string_field],
-                        sprintf('Field "%s" %s must be string', $key, $string_field)
+                        $field[$stringField],
+                        sprintf('Field "%s" %s must be string', $key, $stringField)
                     );
                 }
             }
@@ -85,13 +85,13 @@ class AdminSettingsTest extends WP_UnitTestCase
                 $this->assertArrayHasKey('options', $field, sprintf('Select field "%s" must have options', $key));
                 $this->assertIsArray($field['options'], sprintf('Field "%s" options must be array', $key));
 
-                foreach ($field['options'] as $option_key => $option_value) {
+                foreach ($field['options'] as $optionKey => $optionValue) {
                     $this->assertTrue(
-                        is_string($option_key) || is_numeric($option_key),
+                        is_string($optionKey) || is_numeric($optionKey),
                         sprintf('Field "%s" option key must be string/numeric', $key)
                     );
                     $this->assertIsString(
-                        $option_value,
+                        $optionValue,
                         sprintf('Field "%s" option value must be string', $key)
                     );
                 }
@@ -121,7 +121,7 @@ class AdminSettingsTest extends WP_UnitTestCase
         $gateway->process_admin_options();
 
         // 重新載入 gateway 以讀取儲存的設定
-        $reloaded_gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $reloadedGateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'ecpay',
             'title' => 'ECPay',
             'description' => '綠界金流',
@@ -129,10 +129,10 @@ class AdminSettingsTest extends WP_UnitTestCase
         ]);
 
         // 驗證設定已儲存
-        $this->assertEquals('yes', $reloaded_gateway->get_option('enabled'));
-        $this->assertEquals('Test ECPay', $reloaded_gateway->get_option('title'));
-        $this->assertEquals('Test Description', $reloaded_gateway->get_option('description'));
-        $this->assertEquals('TEST_', $reloaded_gateway->get_option('transaction_id_prefix'));
+        $this->assertEquals('yes', $reloadedGateway->get_option('enabled'));
+        $this->assertEquals('Test ECPay', $reloadedGateway->get_option('title'));
+        $this->assertEquals('Test Description', $reloadedGateway->get_option('description'));
+        $this->assertEquals('TEST_', $reloadedGateway->get_option('transaction_id_prefix'));
 
         // 清理
         $_POST = [];
@@ -155,21 +155,21 @@ class AdminSettingsTest extends WP_UnitTestCase
         ];
 
         $gateway->process_admin_options();
-        $reloaded_gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $reloadedGateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'ecpay',
             'gateway' => 'ECPay',
         ]);
-        $this->assertEquals('yes', $reloaded_gateway->get_option('allow_resubmit'));
+        $this->assertEquals('yes', $reloadedGateway->get_option('allow_resubmit'));
 
         // 測試未勾選的情況（checkbox 未勾選時不會出現在 POST 資料中）
         $_POST = [];
 
         $gateway->process_admin_options();
-        $reloaded_gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $reloadedGateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'ecpay',
             'gateway' => 'ECPay',
         ]);
-        $this->assertEquals('no', $reloaded_gateway->get_option('allow_resubmit'));
+        $this->assertEquals('no', $reloadedGateway->get_option('allow_resubmit'));
 
         // 清理
         $_POST = [];
@@ -189,10 +189,10 @@ class AdminSettingsTest extends WP_UnitTestCase
         // 重新載入 payment gateways
         WC()->payment_gateways()->init();
 
-        $available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+        $availableGateways = WC()->payment_gateways()->get_available_payment_gateways();
 
         // 驗證 Dummy Gateway 在可用列表中
-        $this->assertArrayHasKey('omnipay_dummy', $available_gateways);
+        $this->assertArrayHasKey('omnipay_dummy', $availableGateways);
     }
 
     /**
@@ -208,10 +208,10 @@ class AdminSettingsTest extends WP_UnitTestCase
         // 重新載入 payment gateways
         WC()->payment_gateways()->init();
 
-        $available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+        $availableGateways = WC()->payment_gateways()->get_available_payment_gateways();
 
         // 驗證 Dummy Gateway 不在可用列表中
-        $this->assertArrayNotHasKey('omnipay_dummy', $available_gateways);
+        $this->assertArrayNotHasKey('omnipay_dummy', $availableGateways);
     }
 
     // ==================== 設定優先順序測試 ====================
@@ -283,17 +283,17 @@ class AdminSettingsTest extends WP_UnitTestCase
             'gateway' => 'ECPay',
         ]);
 
-        $form_fields = $gateway->form_fields;
+        $formFields = $gateway->form_fields;
 
         // 不應該有 Omnipay 參數欄位
-        $this->assertArrayNotHasKey('MerchantID', $form_fields);
-        $this->assertArrayNotHasKey('HashKey', $form_fields);
-        $this->assertArrayNotHasKey('HashIV', $form_fields);
+        $this->assertArrayNotHasKey('MerchantID', $formFields);
+        $this->assertArrayNotHasKey('HashKey', $formFields);
+        $this->assertArrayNotHasKey('HashIV', $formFields);
 
         // 但應該有基本欄位
-        $this->assertArrayHasKey('enabled', $form_fields);
-        $this->assertArrayHasKey('title', $form_fields);
-        $this->assertArrayHasKey('description', $form_fields);
+        $this->assertArrayHasKey('enabled', $formFields);
+        $this->assertArrayHasKey('title', $formFields);
+        $this->assertArrayHasKey('description', $formFields);
     }
 
     /**
@@ -307,12 +307,12 @@ class AdminSettingsTest extends WP_UnitTestCase
             'override_settings' => true,
         ]);
 
-        $form_fields = $gateway->form_fields;
+        $formFields = $gateway->form_fields;
 
         // 應該有 Omnipay 參數欄位
-        $this->assertArrayHasKey('MerchantID', $form_fields);
-        $this->assertArrayHasKey('HashKey', $form_fields);
-        $this->assertArrayHasKey('HashIV', $form_fields);
+        $this->assertArrayHasKey('MerchantID', $formFields);
+        $this->assertArrayHasKey('HashKey', $formFields);
+        $this->assertArrayHasKey('HashIV', $formFields);
     }
 
     protected function tearDown(): void

@@ -47,7 +47,7 @@ class CreditCardFormTest extends WP_UnitTestCase
         $this->assertIsString($output);
 
         // 驗證所有必要欄位都存在
-        $required_fields = [
+        $requiredFields = [
             'omnipay_number' => 'card number field',
             'omnipay_expiryMonth' => 'expiry month field',
             'omnipay_expiryYear' => 'expiry year field',
@@ -56,9 +56,9 @@ class CreditCardFormTest extends WP_UnitTestCase
             'omnipay_lastName' => 'last name field',
         ];
 
-        foreach ($required_fields as $field_name => $description) {
+        foreach ($requiredFields as $fieldName => $description) {
             $this->assertStringContainsString(
-                $field_name,
+                $fieldName,
                 $output,
                 "Should contain {$description}"
             );
@@ -93,9 +93,9 @@ class CreditCardFormTest extends WP_UnitTestCase
      *
      * @dataProvider missingFieldProvider
      */
-    public function test_validate_fields_fails_with_missing_required_field($missing_field, $description)
+    public function test_validate_fields_fails_with_missing_required_field($missingField, $description)
     {
-        $complete_data = [
+        $completeData = [
             'omnipay_number' => '4242424242424242',
             'omnipay_expiryMonth' => '12',
             'omnipay_expiryYear' => '2030',
@@ -105,8 +105,8 @@ class CreditCardFormTest extends WP_UnitTestCase
         ];
 
         // 移除要測試的欄位
-        unset($complete_data[$missing_field]);
-        $_POST = $complete_data;
+        unset($completeData[$missingField]);
+        $_POST = $completeData;
 
         $result = $this->gateway->validate_fields();
 
