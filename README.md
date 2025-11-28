@@ -73,17 +73,39 @@ composer require recca0120/woocommerce-omnipay
 4. 可選：設定交易編號前綴（多站情境使用）
 5. 可選：啟用重新提交允許客戶重試失敗的付款
 
+### 共用設定
+
+在 WooCommerce → 設定 → Omnipay 可設定各金流的共用參數（MerchantID、HashKey、HashIV 等），這些設定會自動套用到所有使用相同金流的付款方式。
+
+**設定優先順序**：個別金流設定 > 共用設定 > Omnipay 預設值
+
 ### 外掛設定
 
 可透過 `woocommerce_omnipay_gateway_config` filter 自訂金流設定：
 
 ```php
 add_filter('woocommerce_omnipay_gateway_config', function($config) {
-    $config['gateways']['ECPay']['enabled'] = true;
-    $config['gateways']['ECPay']['title'] = '綠界金流';
+    // 新增金流
+    $config['gateways'][] = [
+        'gateway' => 'ECPay',           // Omnipay gateway 名稱
+        'gateway_id' => 'ecpay_credit', // WooCommerce gateway ID
+        'title' => '綠界信用卡',
+        'description' => '使用信用卡付款',
+        'override_settings' => true,    // 顯示 Omnipay 參數欄位（預設 false）
+    ];
     return $config;
 });
 ```
+
+**設定欄位說明**：
+
+| 欄位 | 必填 | 說明 |
+|------|------|------|
+| `gateway` | 是 | Omnipay gateway 名稱（如 ECPay、NewebPay） |
+| `gateway_id` | 是 | WooCommerce 付款方式 ID（會自動加上 `omnipay_` 前綴） |
+| `title` | 否 | 顯示名稱（預設使用 gateway 名稱） |
+| `description` | 否 | 付款方式說明 |
+| `override_settings` | 否 | 是否在個別金流設定中顯示 Omnipay 參數欄位（預設 false，使用共用設定） |
 
 ## 付款流程
 
@@ -191,8 +213,9 @@ class MyGateway extends OmnipayGateway
 
 ```php
 add_filter('woocommerce_omnipay_gateway_config', function($config) {
-    $config['gateways']['MyGateway'] = [
-        'enabled' => true,
+    $config['gateways'][] = [
+        'gateway' => 'MyGateway',
+        'gateway_id' => 'mygateway',
         'title' => 'My Gateway',
         'description' => 'Pay with My Gateway',
     ];

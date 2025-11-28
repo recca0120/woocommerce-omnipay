@@ -14,12 +14,12 @@ class BankTransferGateway extends OmnipayGateway
     /**
      * Constructor
      */
-    public function __construct(array $gateway_config = [])
+    public function __construct(array $config)
     {
-        parent::__construct($gateway_config);
+        parent::__construct($config);
 
         // 註冊匯款帳號後5碼的 AJAX 處理
-        add_action('woocommerce_api_'.$this->id.'_remittance', [$this, 'handle_remittance']);
+        add_action('woocommerce_api_'.$this->id.'_remittance', [$this, 'handleRemittance']);
     }
 
     /**
@@ -31,7 +31,7 @@ class BankTransferGateway extends OmnipayGateway
      * @param  \WC_Order  $order  訂單
      * @return string
      */
-    protected function get_payment_info_url($order)
+    protected function getPaymentInfoUrl($order)
     {
         return $this->get_return_url($order);
     }
@@ -45,12 +45,12 @@ class BankTransferGateway extends OmnipayGateway
      * @param  \Omnipay\Common\Message\RedirectResponseInterface  $response  Omnipay 回應
      * @return array
      */
-    protected function on_payment_redirect($order, $response)
+    protected function onPaymentRedirect($order, $response)
     {
         $redirect_data = $response->getRedirectData();
-        $this->save_payment_info($order, $redirect_data);
+        $this->savePaymentInfo($order, $redirect_data);
 
-        return parent::on_payment_redirect($order, $response);
+        return parent::onPaymentRedirect($order, $response);
     }
 
     /**
@@ -59,35 +59,32 @@ class BankTransferGateway extends OmnipayGateway
      * @param  \WC_Order  $order  訂單
      * @param  array  $data  通知資料
      */
-    protected function save_payment_info($order, array $data)
+    protected function savePaymentInfo($order, array $data)
     {
-        if (! empty($data['bank_code'])) {
-            $order->update_meta_data('_omnipay_bank_code', $data['bank_code']);
-        }
-        if (! empty($data['account_number'])) {
-            $order->update_meta_data('_omnipay_bank_account', $data['account_number']);
-        }
-        $order->save();
+        $this->orders->savePaymentInfo($order, [
+            'BankCode' => $data['bank_code'] ?? '',
+            'BankAccount' => $data['account_number'] ?? '',
+        ]);
     }
 
     /**
      * 取得付款資訊輸出（含匯款帳號後5碼表單）
      *
      * @param  \WC_Order  $order
-     * @param  bool  $plain_text
+     * @param  bool  $plainText
      * @return string
      */
-    public function get_payment_info_output($order, $plain_text = false)
+    public function getPaymentInfoOutput($order, $plainText = false)
     {
-        $output = parent::get_payment_info_output($order, $plain_text);
+        $output = parent::getPaymentInfoOutput($order, $plainText);
 
         // 純文字模式或非此 gateway 的訂單不顯示表單
-        if ($plain_text || $order->get_payment_method() !== $this->id) {
+        if ($plainText || $order->get_payment_method() !== $this->id) {
             return $output;
         }
 
         // 加入匯款帳號後5碼表單
-        $output .= $this->get_remittance_form_output($order);
+        $output .= $this->getRemittanceFormOutput($order);
 
         return $output;
     }
@@ -98,7 +95,7 @@ class BankTransferGateway extends OmnipayGateway
      * @param  \WC_Order  $order
      * @return string
      */
-    protected function get_remittance_form_output($order)
+    protected function getRemittanceFormOutput($order)
     {
         return woocommerce_omnipay_get_template('order/remittance-form.php', [
             'order' => $order,
@@ -110,7 +107,7 @@ class BankTransferGateway extends OmnipayGateway
     /**
      * 處理匯款帳號後5碼提交
      */
-    public function handle_remittance()
+    public function handleRemittance()
     {
         $order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
         $order_key = isset($_POST['order_key']) ? sanitize_text_field($_POST['order_key']) : '';
@@ -119,7 +116,7 @@ class BankTransferGateway extends OmnipayGateway
 
         // 驗證 nonce
         if (! wp_verify_nonce($nonce, 'omnipay_remittance_nonce')) {
-            $this->send_json_response(false, __('安全驗證失敗', 'woocommerce-omnipay'));
+            $this->sendJsonResponse(false, __('安全驗證失敗', 'woocommerce-omnipay'));
 
             return;
         }
@@ -127,24 +124,22 @@ class BankTransferGateway extends OmnipayGateway
         // 驗證訂單
         $order = $this->orders->findById($order_id);
         if (! $order || $order->get_order_key() !== $order_key) {
-            $this->send_json_response(false, __('訂單驗證失敗', 'woocommerce-omnipay'));
+            $this->sendJsonResponse(false, __('訂單驗證失敗', 'woocommerce-omnipay'));
 
             return;
         }
 
         // 驗證格式（必須是5位數字）
         if (! preg_match('/^\d{5}$/', $last5)) {
-            $this->send_json_response(false, __('請輸入5位數字', 'woocommerce-omnipay'));
+            $this->sendJsonResponse(false, __('請輸入5位數字', 'woocommerce-omnipay'));
 
             return;
         }
 
         // 儲存
-        $order->update_meta_data(OrderRepository::META_REMITTANCE_LAST5, $last5);
-        $order->add_order_note(sprintf(__('客戶已填寫匯款帳號後5碼：%s', 'woocommerce-omnipay'), $last5));
-        $order->save();
+        $this->orders->saveRemittanceLast5($order, $last5);
 
-        $this->send_json_response(true, __('已成功送出', 'woocommerce-omnipay'));
+        $this->sendJsonResponse(true, __('已成功送出', 'woocommerce-omnipay'));
     }
 
     /**
@@ -153,7 +148,7 @@ class BankTransferGateway extends OmnipayGateway
      * @param  bool  $success
      * @param  string  $message
      */
-    protected function send_json_response($success, $message)
+    protected function sendJsonResponse($success, $message)
     {
         if (! headers_sent()) {
             header('Content-Type: application/json');

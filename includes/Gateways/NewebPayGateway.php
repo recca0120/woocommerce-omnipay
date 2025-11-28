@@ -35,21 +35,21 @@ class NewebPayGateway extends OmnipayGateway
      *
      * @return string redirect URL
      */
-    protected function handle_payment_info()
+    protected function handlePaymentInfo()
     {
         $gateway = $this->get_gateway();
         $response = $gateway->getPaymentInfo()->send();
 
-        $this->logger->info('get_payment_info: Gateway response', [
+        $this->logger->info('getPaymentInfo: Gateway response', [
             'transaction_id' => $response->getTransactionId(),
             'data' => Helper::maskSensitiveData($response->getData() ?? []),
         ]);
 
         $order = $this->orders->findByTransactionIdOrFail($response->getTransactionId());
 
-        $this->save_payment_info($order, $response->getData());
+        $this->savePaymentInfo($order, $response->getData());
 
-        $this->logger->info('get_payment_info: Payment info saved', [
+        $this->logger->info('getPaymentInfo: Payment info saved', [
             'order_id' => $order->get_id(),
         ]);
 
@@ -64,17 +64,15 @@ class NewebPayGateway extends OmnipayGateway
      * @param  \WC_Order  $order  訂單
      * @param  array  $data  通知資料
      */
-    protected function save_payment_info($order, array $data)
+    protected function savePaymentInfo($order, array $data)
     {
         // 轉換 NewebPay 的欄位名稱為標準名稱
-        $normalizedData = $this->normalize_payment_info($data);
+        $normalizedData = $this->normalizePaymentInfo($data);
 
-        parent::save_payment_info($order, $normalizedData);
+        parent::savePaymentInfo($order, $normalizedData);
 
         $paymentType = $data['PaymentType'] ?? '';
-        $order->add_order_note(
-            sprintf('藍新金流取號成功 (%s)，等待付款', $paymentType)
-        );
+        $this->orders->addNote($order, sprintf('藍新金流取號成功 (%s)，等待付款', $paymentType));
     }
 
     /**
@@ -89,7 +87,7 @@ class NewebPayGateway extends OmnipayGateway
      * @param  array  $data  NewebPay 通知資料
      * @return array 標準化的付款資訊
      */
-    protected function normalize_payment_info(array $data)
+    protected function normalizePaymentInfo(array $data)
     {
         $normalized = [];
         $paymentType = $data['PaymentType'] ?? '';

@@ -66,7 +66,7 @@ class NewebPayTest extends TestCase
         ]));
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         ob_get_clean();
 
         $order = wc_get_order($order->get_id());
@@ -84,7 +84,7 @@ class NewebPayTest extends TestCase
         $this->simulateCallback($data);
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('0|Incorrect TradeSha', $output);
@@ -111,7 +111,7 @@ class NewebPayTest extends TestCase
             'CodeNo' => '9103522175887271',
         ]));
 
-        $url = $this->gateway->get_payment_info();
+        $url = $this->gateway->getPaymentInfo();
 
         $this->assertStringContainsString('order-received', $url);
 
@@ -131,7 +131,7 @@ class NewebPayTest extends TestCase
             'CodeNo' => 'LLL24112512345',
         ]));
 
-        $url = $this->gateway->get_payment_info();
+        $url = $this->gateway->getPaymentInfo();
 
         $this->assertStringContainsString('order-received', $url);
 

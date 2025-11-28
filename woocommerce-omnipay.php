@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Omnipay Gateway
  * Plugin URI: https://github.com/recca0120/woocommerce-omnipay
  * Description: WooCommerce payment gateway integration using Omnipay library
- * Version: 1.0.0
+ * Version: 0.0.1
  * Author: Recca Tsai
  * Author URI: https://github.com/recca0120
  * License: MIT
@@ -18,7 +18,7 @@
 defined('ABSPATH') || exit;
 
 // Define plugin constants
-define('WOOCOMMERCE_OMNIPAY_VERSION', '1.0.0');
+define('WOOCOMMERCE_OMNIPAY_VERSION', '0.0.1');
 define('WOOCOMMERCE_OMNIPAY_PLUGIN_FILE', __FILE__);
 define('WOOCOMMERCE_OMNIPAY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WOOCOMMERCE_OMNIPAY_PLUGIN_URL', plugin_dir_url(__FILE__));

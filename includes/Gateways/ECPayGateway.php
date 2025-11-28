@@ -27,7 +27,7 @@ class ECPayGateway extends OmnipayGateway
      * @param  \WC_Order  $order  訂單
      * @return string
      */
-    protected function get_payment_info_url($order)
+    protected function getPaymentInfoUrl($order)
     {
         return WC()->api_request_url($this->id.'_notify');
     }
@@ -40,25 +40,25 @@ class ECPayGateway extends OmnipayGateway
      *
      * @param  NotificationInterface  $notification
      */
-    protected function handle_notification($notification)
+    protected function handleNotification($notification)
     {
         $data = $notification->getData();
 
         // 檢查是否為取號結果通知
-        if ($this->is_payment_info_notification($data)) {
+        if ($this->isPaymentInfoNotification($data)) {
             $order = $this->orders->findByTransactionId($notification->getTransactionId());
 
             if ($order) {
-                $this->save_payment_info($order, $data);
+                $this->savePaymentInfo($order, $data);
             }
 
-            $this->send_notification_response($notification);
+            $this->sendNotificationResponse($notification);
 
             return;
         }
 
         // 付款完成通知交給父類處理
-        parent::handle_notification($notification);
+        parent::handleNotification($notification);
     }
 
     /**
@@ -69,7 +69,7 @@ class ECPayGateway extends OmnipayGateway
      * @param  array  $data  通知資料
      * @return bool
      */
-    protected function is_payment_info_notification(array $data)
+    protected function isPaymentInfoNotification(array $data)
     {
         $rtnCode = $data['RtnCode'] ?? '';
 
@@ -82,13 +82,11 @@ class ECPayGateway extends OmnipayGateway
      * @param  \WC_Order  $order  訂單
      * @param  array  $data  通知資料
      */
-    protected function save_payment_info($order, array $data)
+    protected function savePaymentInfo($order, array $data)
     {
-        parent::save_payment_info($order, $data);
+        parent::savePaymentInfo($order, $data);
 
         $paymentType = $data['PaymentType'] ?? '';
-        $order->add_order_note(
-            sprintf('ECPay 取號成功 (%s)，等待付款', $paymentType)
-        );
+        $this->orders->addNote($order, sprintf('ECPay 取號成功 (%s)，等待付款', $paymentType));
     }
 }

@@ -9,9 +9,9 @@ namespace WooCommerceOmnipay\Gateways;
  */
 class DummyGateway extends OmnipayGateway
 {
-    public function __construct(array $gateway_config = [])
+    public function __construct(array $config)
     {
-        parent::__construct($gateway_config);
+        parent::__construct($config);
 
         // Direct Gateway 需要顯示表單
         $this->has_fields = true;
@@ -43,7 +43,7 @@ class DummyGateway extends OmnipayGateway
      */
     public function validate_fields()
     {
-        $required_fields = [
+        $requiredFields = [
             'omnipay_number' => __('Card number', 'woocommerce-omnipay'),
             'omnipay_expiryMonth' => __('Expiry month', 'woocommerce-omnipay'),
             'omnipay_expiryYear' => __('Expiry year', 'woocommerce-omnipay'),
@@ -54,7 +54,7 @@ class DummyGateway extends OmnipayGateway
 
         $valid = true;
 
-        foreach ($required_fields as $field => $label) {
+        foreach ($requiredFields as $field => $label) {
             if (empty($_POST[$field])) {
                 wc_add_notice(
                     sprintf(__('%s is required.', 'woocommerce-omnipay'), $label),

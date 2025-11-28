@@ -159,7 +159,7 @@ class SharedSettingsPage
             return [];
         }
 
-        $option_key = OmnipayBridge::getOptionKey($name);
+        $optionKey = OmnipayBridge::getOptionKey($name);
         $bridge = $this->get_bridge($name);
 
         $fields = [
@@ -172,8 +172,8 @@ class SharedSettingsPage
         ];
 
         // 加入 Omnipay 參數欄位
-        foreach ($bridge->getDefaultParameters() as $key => $default_value) {
-            $fields[] = $this->create_field($option_key, $key, $default_value);
+        foreach ($bridge->getDefaultParameters() as $key => $defaultValue) {
+            $fields[] = $this->createField($optionKey, $key, $defaultValue);
         }
 
         // 加入 Plugin 通用設定
@@ -181,7 +181,7 @@ class SharedSettingsPage
             'title' => __('交易編號前綴', 'woocommerce-omnipay'),
             'type' => 'text',
             'desc' => __('加在交易編號前面的前綴，用於區分不同網站或環境。', 'woocommerce-omnipay'),
-            'id' => $option_key.'[transaction_id_prefix]',
+            'id' => $optionKey.'[transaction_id_prefix]',
             'default' => '',
             'desc_tip' => true,
         ];
@@ -190,7 +190,7 @@ class SharedSettingsPage
             'title' => __('允許重新提交', 'woocommerce-omnipay'),
             'type' => 'checkbox',
             'desc' => __('啟用時使用隨機交易編號，允許重新付款。', 'woocommerce-omnipay'),
-            'id' => $option_key.'[allow_resubmit]',
+            'id' => $optionKey.'[allow_resubmit]',
             'default' => 'no',
         ];
 
@@ -238,21 +238,21 @@ class SharedSettingsPage
     /**
      * 建立欄位
      *
-     * @param  string  $option_key
+     * @param  string  $optionKey
      * @param  string  $key
-     * @param  mixed  $default_value
+     * @param  mixed  $defaultValue
      * @return array
      */
-    private function create_field($option_key, $key, $default_value)
+    private function createField($optionKey, $key, $defaultValue)
     {
         $field = [
             'title' => ucwords(str_replace('_', ' ', $key)),
-            'id' => $option_key.'['.$key.']',
-            'default' => is_bool($default_value) ? ($default_value ? 'yes' : 'no') : (string) $default_value,
+            'id' => $optionKey.'['.$key.']',
+            'default' => is_bool($defaultValue) ? ($defaultValue ? 'yes' : 'no') : (string) $defaultValue,
             'desc_tip' => true,
         ];
 
-        if (is_bool($default_value)) {
+        if (is_bool($defaultValue)) {
             $field['type'] = 'checkbox';
             $field['desc'] = sprintf('Omnipay parameter: %s', $key);
         } else {

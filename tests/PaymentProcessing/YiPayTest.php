@@ -66,7 +66,7 @@ class YiPayTest extends TestCase
         ]));
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('OK', $output);
@@ -86,7 +86,7 @@ class YiPayTest extends TestCase
         $this->simulateCallback($data);
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('0|Incorrect checkCode', $output);
@@ -118,7 +118,7 @@ class YiPayTest extends TestCase
         ]));
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         ob_get_clean();
 
         $order = wc_get_order($order->get_id());
@@ -150,7 +150,7 @@ class YiPayTest extends TestCase
         ]));
 
         ob_start();
-        $this->gateway->get_payment_info();
+        $this->gateway->getPaymentInfo();
         ob_get_clean();
 
         $order = wc_get_order($order->get_id());

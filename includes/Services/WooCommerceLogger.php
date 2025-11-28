@@ -100,8 +100,8 @@ class WooCommerceLogger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
-        $formatted_message = $this->formatMessage($message, $context);
-        $this->logger->log($level, $formatted_message, ['source' => $this->source]);
+        $formattedMessage = $this->formatMessage($message, $context);
+        $this->logger->log($level, $formattedMessage, ['source' => $this->source]);
     }
 
     /**

@@ -55,7 +55,7 @@ class BankTransferTest extends TestCase
         $_POST = $this->makeNotification($transactionId, 1000);
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('OK', $output);
@@ -78,7 +78,7 @@ class BankTransferTest extends TestCase
         ];
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertStringContainsString('0|', $output);
@@ -97,7 +97,7 @@ class BankTransferTest extends TestCase
         $_POST = $this->makeNotification($transactionId, 1000);
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('1|OK', $output);
@@ -112,7 +112,7 @@ class BankTransferTest extends TestCase
         $order->update_meta_data('_omnipay_bank_account', '1234567890');
         $order->save();
 
-        $output = $this->gateway->get_payment_info_output($order);
+        $output = $this->gateway->getPaymentInfoOutput($order);
 
         $this->assertStringContainsString('012', $output);
         $this->assertStringContainsString('1234567890', $output);
@@ -136,7 +136,7 @@ class BankTransferTest extends TestCase
         ];
 
         ob_start();
-        $this->gateway->handle_remittance();
+        $this->gateway->handleRemittance();
         $response = json_decode(ob_get_clean(), true);
 
         $this->assertTrue($response['success']);
@@ -157,7 +157,7 @@ class BankTransferTest extends TestCase
         ];
 
         ob_start();
-        $this->gateway->handle_remittance();
+        $this->gateway->handleRemittance();
         $response = json_decode(ob_get_clean(), true);
 
         $this->assertFalse($response['success']);
@@ -177,7 +177,7 @@ class BankTransferTest extends TestCase
         ];
 
         ob_start();
-        $this->gateway->handle_remittance();
+        $this->gateway->handleRemittance();
         $response = json_decode(ob_get_clean(), true);
 
         $this->assertFalse($response['success']);

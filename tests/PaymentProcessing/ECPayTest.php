@@ -114,7 +114,7 @@ class ECPayTest extends TestCase
         ]));
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('1|OK', $output);
@@ -135,7 +135,7 @@ class ECPayTest extends TestCase
         ]));
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('0|交易失敗', $output);
@@ -154,7 +154,7 @@ class ECPayTest extends TestCase
         $this->simulateCallback($data);
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('0|CheckMacValue verify failed', $output);
@@ -172,7 +172,7 @@ class ECPayTest extends TestCase
         $this->simulateCallback($this->makeCallbackData($order, ['RtnCode' => '1']));
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         $output = ob_get_clean();
 
         $this->assertEquals('1|OK', $output);
@@ -202,7 +202,7 @@ class ECPayTest extends TestCase
             'TradeNo' => '2024112500001234',
         ]));
 
-        $url = $this->gateway->complete_purchase();
+        $url = $this->gateway->completePurchase();
 
         $this->assertStringContainsString('order-received', $url);
         $this->assertEquals($expectedStatus, wc_get_order($order->get_id())->get_status());
@@ -218,7 +218,7 @@ class ECPayTest extends TestCase
             'RtnMsg' => '交易失敗',
         ]));
 
-        $url = $this->gateway->complete_purchase();
+        $url = $this->gateway->completePurchase();
 
         $this->assertStringNotContainsString('order-received', $url);
     }
@@ -284,7 +284,7 @@ class ECPayTest extends TestCase
         $this->simulateCallback($this->makeCallbackData($order, $callbackData));
 
         ob_start();
-        $this->gateway->accept_notification();
+        $this->gateway->acceptNotification();
         ob_get_clean();
 
         $order = wc_get_order($order->get_id());
@@ -325,7 +325,7 @@ class ECPayTest extends TestCase
         }
         $order->save();
 
-        $html = $this->gateway->get_payment_info_output($order);
+        $html = $this->gateway->getPaymentInfoOutput($order);
 
         foreach ($expected as $value) {
             $this->assertStringContainsString($value, $html);
@@ -335,7 +335,7 @@ class ECPayTest extends TestCase
     public function test_get_payment_info_output_empty()
     {
         $order = $this->createOrder(100);
-        $this->assertEmpty($this->gateway->get_payment_info_output($order));
+        $this->assertEmpty($this->gateway->getPaymentInfoOutput($order));
     }
 
     public static function paymentInfoDisplayProvider()

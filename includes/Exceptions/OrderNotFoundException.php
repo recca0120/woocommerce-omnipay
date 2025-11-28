@@ -6,10 +6,10 @@ use Exception;
 
 class OrderNotFoundException extends Exception
 {
-    public function __construct($transaction_id = null)
+    public function __construct($transactionId = null)
     {
-        $message = $transaction_id
-            ? sprintf('Order not found for transaction ID: %s', $transaction_id)
+        $message = $transactionId
+            ? sprintf('Order not found for transaction ID: %s', $transactionId)
             : 'Order not found';
 
         parent::__construct($message);
