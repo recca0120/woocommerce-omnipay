@@ -156,7 +156,7 @@ class SettingsTest extends WP_UnitTestCase
 
         // 重新載入 gateway 以讀取儲存的設定
         $reloaded_gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
-            'gateway_id' => 'omnipay_ecpay',
+            'gateway_id' => 'ecpay',
             'title' => 'ECPay',
             'description' => '綠界金流',
             'omnipay_name' => 'ECPay',
@@ -192,7 +192,7 @@ class SettingsTest extends WP_UnitTestCase
 
         $gateway->process_admin_options();
         $reloaded_gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
-            'gateway_id' => 'omnipay_ecpay',
+            'gateway_id' => 'ecpay',
             'omnipay_name' => 'ECPay',
         ]);
         $this->assertEquals('yes', $reloaded_gateway->get_option('testMode'));
@@ -202,7 +202,7 @@ class SettingsTest extends WP_UnitTestCase
 
         $gateway->process_admin_options();
         $reloaded_gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
-            'gateway_id' => 'omnipay_ecpay',
+            'gateway_id' => 'ecpay',
             'omnipay_name' => 'ECPay',
         ]);
         $this->assertEquals('no', $reloaded_gateway->get_option('testMode'));
@@ -227,7 +227,7 @@ class SettingsTest extends WP_UnitTestCase
 
         // 重新建立 gateway
         $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
-            'gateway_id' => 'omnipay_ecpay',
+            'gateway_id' => 'ecpay',
             'omnipay_name' => 'ECPay',
         ]);
         $omnipayGateway = $gateway->get_omnipay_gateway();
@@ -259,11 +259,11 @@ class SettingsTest extends WP_UnitTestCase
 
         // 建立兩個 gateway 實例
         $dummyGateway = new \WooCommerceOmnipay\Gateways\DummyGateway([
-            'gateway_id' => 'omnipay_dummy',
+            'gateway_id' => 'dummy',
             'omnipay_name' => 'Dummy',
         ]);
         $ecpayGateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
-            'gateway_id' => 'omnipay_ecpay',
+            'gateway_id' => 'ecpay',
             'omnipay_name' => 'ECPay',
         ]);
 

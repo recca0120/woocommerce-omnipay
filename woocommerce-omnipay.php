@@ -176,10 +176,8 @@ function woocommerce_omnipay_add_gateways($gateways)
         woocommerce_omnipay_get_config()
     );
 
-    $enabled_gateways = $registry->getEnabledGateways();
-
     // 為每個已配置的 gateway 建立實例並註冊
-    foreach ($enabled_gateways as $gateway_info) {
+    foreach ($registry->getGateways() as $gateway_info) {
         $omnipay_name = $gateway_info['omnipay_name'] ?? '';
         $gateway_class = "\\WooCommerceOmnipay\\Gateways\\{$omnipay_name}Gateway";
 
@@ -201,32 +199,36 @@ function woocommerce_omnipay_add_gateways($gateways)
 function woocommerce_omnipay_get_config()
 {
     // 預設 gateways 配置
-    // composer require 後在這裡新增配置即可
-    // omnipay_name, gateway_id 由 GatewayRegistry 自動產生
+    // 純陣列格式，必須指定 omnipay_name 和 gateway_id
     $default_config = [
         'gateways' => [
-            'BankTransfer' => [
-                'enabled' => true,
+            [
+                'omnipay_name' => 'BankTransfer',
+                'gateway_id' => 'banktransfer',
                 'title' => '銀行轉帳',
                 'description' => '使用銀行轉帳付款',
             ],
-            'Dummy' => [
-                'enabled' => true,
+            [
+                'omnipay_name' => 'Dummy',
+                'gateway_id' => 'dummy',
                 'title' => 'Dummy Gateway',
                 'description' => 'Dummy payment gateway for testing',
             ],
-            'ECPay' => [
-                'enabled' => true,
+            [
+                'omnipay_name' => 'ECPay',
+                'gateway_id' => 'ecpay',
                 'title' => '綠界金流',
                 'description' => '使用綠界金流付款',
             ],
-            'NewebPay' => [
-                'enabled' => true,
+            [
+                'omnipay_name' => 'NewebPay',
+                'gateway_id' => 'newebpay',
                 'title' => '藍新金流',
                 'description' => '使用藍新金流付款',
             ],
-            'YiPay' => [
-                'enabled' => true,
+            [
+                'omnipay_name' => 'YiPay',
+                'gateway_id' => 'yipay',
                 'title' => 'YiPay 乙禾金流',
                 'description' => '使用 YiPay 乙禾金流付款',
             ],

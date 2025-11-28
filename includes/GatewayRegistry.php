@@ -6,6 +6,12 @@ namespace WooCommerceOmnipay;
  * Gateway Registry
  *
  * 從配置檔載入並註冊 Omnipay gateways
+ *
+ * 配置格式：純陣列，每個元素包含：
+ * - omnipay_name: 必須指定的 Omnipay gateway 名稱
+ * - gateway_id: 必須指定的 WooCommerce gateway ID
+ * - title: 選填，預設使用 omnipay_name
+ * - description: 選填，自動產生
  */
 class GatewayRegistry
 {
@@ -46,94 +52,77 @@ class GatewayRegistry
     }
 
     /**
-     * 取得啟用的 gateways
+     * 取得所有 gateways
      *
      * 從配置檔讀取並驗證 gateway 是否可用
      *
      * @return array
      */
-    public function getEnabledGateways()
+    public function getGateways()
     {
         $gateways = [];
 
-        foreach ($this->config['gateways'] as $gateway_name => $gateway_config) {
-            // 檢查是否啟用
-            if (empty($gateway_config['enabled'])) {
+        foreach ($this->config['gateways'] as $gateway_config) {
+            // 必須有 omnipay_name
+            if (empty($gateway_config['omnipay_name'])) {
                 continue;
             }
 
-            // 驗證 gateway 是否真的可用
-            if (! $this->isGatewayAvailable($gateway_name)) {
+            // 必須有 gateway_id
+            if (empty($gateway_config['gateway_id'])) {
                 continue;
             }
 
-            // 建立 gateway 資訊（使用配置或預設值）
-            $gateways[$gateway_name] = $this->createGatewayInfo($gateway_name, $gateway_config);
+            // 驗證 Omnipay gateway 是否可用
+            if (! $this->isGatewayAvailable($gateway_config['omnipay_name'])) {
+                continue;
+            }
+
+            // 補上預設值
+            $gateways[] = $this->createGatewayInfo($gateway_config);
         }
 
         return $gateways;
     }
 
     /**
+     * 取得啟用的 gateways（已棄用，回傳同 getGateways）
+     *
+     * @return array
+     *
+     * @deprecated 使用 getGateways() 代替
+     */
+    public function getEnabledGateways()
+    {
+        return $this->getGateways();
+    }
+
+    /**
      * 建立 gateway 資訊
      *
-     * @param  string  $omnipay_name  Omnipay gateway 名稱
-     * @param  array  $config  配置（可選）
+     * @param  array  $config  配置
      * @return array
      */
-    protected function createGatewayInfo($omnipay_name, array $config = [])
+    protected function createGatewayInfo(array $config)
     {
+        $omnipay_name = $config['omnipay_name'];
+
         $defaults = [
-            'omnipay_name' => $omnipay_name,
-            'gateway_id' => $this->generateGatewayId($omnipay_name),
-            'title' => $this->generateTitle($omnipay_name),
-            'description' => $this->generateDescription($omnipay_name),
+            'title' => $omnipay_name,
+            'description' => $this->generateDescription($config['title'] ?? $omnipay_name),
         ];
 
-        // 合併配置，配置優先
-        return array_merge($defaults, $config, [
-            'omnipay_name' => $omnipay_name, // omnipay_name 不可覆寫
-        ]);
-    }
-
-    /**
-     * 產生 WooCommerce gateway ID
-     *
-     * 格式：omnipay_{lowercase_name_with_underscores}
-     *
-     * @param  string  $omnipay_name
-     * @return string
-     */
-    protected function generateGatewayId($omnipay_name)
-    {
-        // 將 PayPal_Express 轉換為 paypal_express
-        $id = strtolower($omnipay_name);
-        // 確保只包含字母、數字和底線
-        $id = preg_replace('/[^a-z0-9_]/', '_', $id);
-
-        return 'omnipay_'.$id;
-    }
-
-    /**
-     * 產生預設 title
-     *
-     * @param  string  $omnipay_name
-     * @return string
-     */
-    protected function generateTitle($omnipay_name)
-    {
-        // PayPal_Express -> PayPal Express
-        return str_replace('_', ' ', $omnipay_name);
+        return array_merge($defaults, $config);
     }
 
     /**
      * 產生預設 description
      *
-     * @param  string  $omnipay_name
+     * @param  string  $title
      * @return string
      */
-    protected function generateDescription($omnipay_name)
+    protected function generateDescription($title)
     {
-        return sprintf('Pay with %s', $this->generateTitle($omnipay_name));
+        return sprintf('Pay with %s', $title);
     }
 }

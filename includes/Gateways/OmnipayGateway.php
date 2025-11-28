@@ -6,6 +6,7 @@ use Omnipay\Common\Message\NotificationInterface;
 use Psr\Log\LoggerInterface;
 use WC_Payment_Gateway;
 use WooCommerceOmnipay\Exceptions\OrderNotFoundException;
+use WooCommerceOmnipay\Gateways\Traits\DisplaysPaymentInfo;
 use WooCommerceOmnipay\Repositories\OrderRepository;
 use WooCommerceOmnipay\Services\OmnipayBridge;
 use WooCommerceOmnipay\Services\WooCommerceLogger;
@@ -18,6 +19,8 @@ use WooCommerceOmnipay\Services\WooCommerceLogger;
  */
 class OmnipayGateway extends WC_Payment_Gateway
 {
+    use DisplaysPaymentInfo;
+
     /**
      * 訂單狀態常數
      */
@@ -58,7 +61,9 @@ class OmnipayGateway extends WC_Payment_Gateway
     {
         // 如果提供了配置，使用配置初始化
         if (! empty($gateway_config)) {
-            $this->id = $gateway_config['gateway_id'] ?? '';
+            // gateway_id 自動加上 omnipay_ 前綴
+            $gateway_id = $gateway_config['gateway_id'] ?? '';
+            $this->id = 'omnipay_'.$gateway_id;
             $this->method_title = $gateway_config['title'] ?? '';
             $this->method_description = $gateway_config['description'] ?? '';
             $this->omnipay_gateway_name = $gateway_config['omnipay_name'] ?? '';
@@ -88,12 +93,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         add_action('woocommerce_api_'.$this->id.'_complete', [$this, 'complete_purchase']);
 
         // 註冊付款資訊顯示 hooks（ATM/CVS/BARCODE 等離線付款）
-        // 感謝頁：付款資訊在訂單詳情之前
-        add_action('woocommerce_order_details_before_order_table', [$this, 'display_payment_info_on_thankyou']);
-        // view-order：付款資訊在訂單詳情之後
-        add_action('woocommerce_order_details_after_order_table', [$this, 'display_payment_info_on_view_order']);
-        add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'display_payment_info']);
-        add_action('woocommerce_email_after_order_table', [$this, 'display_payment_info_on_email'], 10, 3);
+        $this->register_payment_info_hooks();
     }
 
     /**
@@ -859,83 +859,5 @@ class OmnipayGateway extends WC_Payment_Gateway
         }
 
         return $data;
-    }
-
-    // ==================== 付款資訊顯示 ====================
-
-    /**
-     * 在感謝頁顯示付款資訊（訂單詳情之前）
-     *
-     * @param  \WC_Order  $order
-     */
-    public function display_payment_info_on_thankyou($order)
-    {
-        if (! is_wc_endpoint_url('order-received')) {
-            return;
-        }
-
-        $this->display_payment_info($order);
-    }
-
-    /**
-     * 在 view-order 頁顯示付款資訊（訂單詳情之後）
-     *
-     * @param  \WC_Order  $order
-     */
-    public function display_payment_info_on_view_order($order)
-    {
-        if (! is_wc_endpoint_url('view-order')) {
-            return;
-        }
-
-        $this->display_payment_info($order);
-    }
-
-    /**
-     * 顯示付款資訊（管理後台）
-     *
-     * @param  \WC_Order  $order
-     */
-    public function display_payment_info($order)
-    {
-        if ($order->get_payment_method() !== $this->id) {
-            return;
-        }
-
-        echo $this->get_payment_info_output($order);
-    }
-
-    /**
-     * 在 Email 通知顯示付款資訊
-     *
-     * @param  \WC_Order  $order
-     * @param  bool  $sent_to_admin
-     * @param  bool  $plain_text
-     */
-    public function display_payment_info_on_email($order, $sent_to_admin, $plain_text)
-    {
-        if ($order->get_payment_method() !== $this->id) {
-            return;
-        }
-
-        echo $this->get_payment_info_output($order, $plain_text);
-    }
-
-    /**
-     * 取得付款資訊輸出
-     *
-     * @param  \WC_Order  $order
-     * @param  bool  $plain_text  是否為純文字格式
-     * @return string
-     */
-    public function get_payment_info_output($order, $plain_text = false)
-    {
-        $payment_info = $this->order_repository->getPaymentInfo($order);
-        $template = $plain_text ? 'order/payment-info-plain.php' : 'order/payment-info.php';
-
-        return woocommerce_omnipay_get_template($template, [
-            'payment_info' => $payment_info,
-            'labels' => OrderRepository::getPaymentInfoLabels(),
-        ]);
     }
 }
