@@ -56,15 +56,21 @@ class NewebPayDCAGatewayTest extends TestCase
         $this->assertEquals('success', $result['result']);
 
         $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertArrayHasKey('TradeInfo', $redirectData['data']);
+
+        // 定期定額使用 PostData_，不是 TradeInfo
+        $this->assertArrayHasKey('PostData_', $redirectData['data']);
 
         $encryptor = new Encryptor($this->hashKey, $this->hashIV);
-        $tradeInfo = $encryptor->decrypt($redirectData['data']['TradeInfo']);
-        if (is_string($tradeInfo)) {
-            parse_str($tradeInfo, $tradeInfo);
+        $periodData = $encryptor->decrypt($redirectData['data']['PostData_']);
+        if (is_string($periodData)) {
+            parse_str($periodData, $periodData);
         }
-        // 注意：omnipay-newebpay 套件目前不支援定期定額參數 (PeriodAmt, PeriodType, PeriodTimes)
-        // 只驗證 CREDIT 參數有傳送
-        $this->assertEquals('1', $tradeInfo['CREDIT']);
+
+        // 驗證定期定額參數（omnipay-newebpay v1.0.2+ 支援）
+        $this->assertEquals('M', $periodData['PeriodType']);
+        $this->assertEquals('12', $periodData['PeriodTimes']);
+        $this->assertEquals('500', $periodData['PeriodAmt']);
+        $this->assertEquals('2', $periodData['PeriodStartType']);
+        $this->assertNotEmpty($periodData['PayerEmail']);
     }
 }

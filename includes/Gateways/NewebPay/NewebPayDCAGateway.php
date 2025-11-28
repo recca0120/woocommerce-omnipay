@@ -69,6 +69,19 @@ class NewebPayDCAGateway extends NewebPayGateway
             ],
             'desc_tip' => true,
         ];
+
+        $this->form_fields['period_start_type'] = [
+            'title' => __('交易模式', 'woocommerce-omnipay'),
+            'type' => 'select',
+            'description' => __('定期定額首次授權模式', 'woocommerce-omnipay'),
+            'default' => '2',
+            'options' => [
+                '1' => __('立即執行十元授權', 'woocommerce-omnipay'),
+                '2' => __('立即執行委託金額授權', 'woocommerce-omnipay'),
+                '3' => __('不檢查信用卡資訊，不授權', 'woocommerce-omnipay'),
+            ],
+            'desc_tip' => true,
+        ];
     }
 
     /**
@@ -87,6 +100,15 @@ class NewebPayDCAGateway extends NewebPayGateway
         $data['PeriodType'] = $this->get_option('period_type', 'M');
         $data['PeriodPoint'] = $this->get_option('period_point', '');
         $data['PeriodTimes'] = (int) $this->get_option('period_times', '12');
+        $data['PeriodStartType'] = (int) $this->get_option('period_start_type', '2');
+
+        // PayerEmail 是定期定額的必填欄位
+        $payerEmail = $order->get_billing_email();
+        if (empty($payerEmail)) {
+            // 如果訂單沒有 email，使用客戶 email 或網站管理員 email
+            $payerEmail = $order->get_billing_email() ?: get_bloginfo('admin_email');
+        }
+        $data['PayerEmail'] = $payerEmail;
 
         return $data;
     }
