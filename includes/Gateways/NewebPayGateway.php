@@ -26,6 +26,20 @@ class NewebPayGateway extends OmnipayGateway
     protected const PAYMENT_TYPE_BARCODE = 'BARCODE';
 
     /**
+     * 驗證回調金額是否與訂單金額相符
+     *
+     * @param  \WC_Order  $order  訂單
+     * @param  array  $data  回調資料
+     * @return bool
+     */
+    protected function validateAmount($order, array $data)
+    {
+        $amt = isset($data['Amt']) ? (int) $data['Amt'] : 0;
+
+        return $amt === (int) $order->get_total();
+    }
+
+    /**
      * 處理付款資訊的核心邏輯
      *
      * NewebPay 的 CustomerURL 是使用者端導向（不同於背景 POST），需要：

@@ -8,14 +8,15 @@ use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * YiPay 超商代碼 Gateway 測試
+ *
+ * 測試子類別的差異點：gateway_id、title、type、CVS 特有的 meta 儲存
+ * 基本 callback 行為已在 YiPayTest 中測試
  */
 class YiPayCVSGatewayTest extends TestCase
 {
     protected $gatewayId = 'yipay_cvs';
 
     protected $gatewayName = 'YiPay';
-
-    protected $gatewayClass = YiPayCVSGateway::class;
 
     private $merchantId = '1234567890';
 
@@ -41,13 +42,9 @@ class YiPayCVSGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id()
+    public function test_gateway_has_correct_id_and_title()
     {
         $this->assertEquals('omnipay_yipay_cvs', $this->gateway->id);
-    }
-
-    public function test_gateway_has_correct_title()
-    {
         $this->assertEquals('乙禾超商代碼', $this->gateway->method_title);
     }
 
@@ -79,6 +76,12 @@ class YiPayCVSGatewayTest extends TestCase
 
         $order = wc_get_order($order->get_id());
         $this->assertEquals('CVS24112512345', $order->get_meta('_omnipay_payment_no'));
+    }
+
+    public function test_form_fields_has_amount_settings()
+    {
+        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
+        $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
     }
 
     private function makePaymentInfoData($order, array $overrides = [])

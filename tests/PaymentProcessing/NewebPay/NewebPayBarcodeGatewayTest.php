@@ -8,14 +8,15 @@ use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * NewebPay 超商條碼 Gateway 測試
+ *
+ * 只測試子類別的差異點（gateway_id、title、BARCODE 參數）
+ * 其他行為已在 NewebPayTest 中測試
  */
 class NewebPayBarcodeGatewayTest extends TestCase
 {
     protected $gatewayId = 'newebpay_barcode';
 
     protected $gatewayName = 'NewebPay';
-
-    protected $gatewayClass = NewebPayBarcodeGateway::class;
 
     private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
 
@@ -30,7 +31,6 @@ class NewebPayBarcodeGatewayTest extends TestCase
             'HashIV' => $this->hashIV,
             'MerchantID' => $this->merchantId,
             'testMode' => 'yes',
-            'allow_resubmit' => 'no',
         ];
         parent::setUp();
 
@@ -41,13 +41,9 @@ class NewebPayBarcodeGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id()
+    public function test_gateway_has_correct_id_and_title()
     {
         $this->assertEquals('omnipay_newebpay_barcode', $this->gateway->id);
-    }
-
-    public function test_gateway_has_correct_title()
-    {
         $this->assertEquals('藍新超商條碼', $this->gateway->method_title);
     }
 
@@ -68,5 +64,11 @@ class NewebPayBarcodeGatewayTest extends TestCase
             parse_str($tradeInfo, $tradeInfo);
         }
         $this->assertEquals('1', $tradeInfo['BARCODE']);
+    }
+
+    public function test_form_fields_has_amount_settings()
+    {
+        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
+        $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
     }
 }

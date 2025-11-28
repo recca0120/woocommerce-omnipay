@@ -31,6 +31,20 @@ class YiPayGateway extends OmnipayGateway
     protected const TYPE_ATM = 4;
 
     /**
+     * 驗證回調金額是否與訂單金額相符
+     *
+     * @param  \WC_Order  $order  訂單
+     * @param  array  $data  回調資料
+     * @return bool
+     */
+    protected function validateAmount($order, array $data)
+    {
+        $amount = isset($data['amount']) ? (int) $data['amount'] : 0;
+
+        return $amount === (int) $order->get_total();
+    }
+
+    /**
      * 取得 callback 參數
      *
      * YiPay 需要 returnUrl 和 notifyUrl 來驗證 checkCode 簽章

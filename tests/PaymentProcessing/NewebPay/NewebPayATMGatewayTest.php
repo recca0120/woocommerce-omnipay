@@ -8,14 +8,15 @@ use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * NewebPay ATM Gateway 測試
+ *
+ * 測試子類別的差異點：gateway_id、title、VACC 參數、ATM 特有的 meta 儲存
+ * 基本 callback 行為已在 NewebPayTest 中測試
  */
 class NewebPayATMGatewayTest extends TestCase
 {
     protected $gatewayId = 'newebpay_atm';
 
     protected $gatewayName = 'NewebPay';
-
-    protected $gatewayClass = NewebPayATMGateway::class;
 
     private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
 
@@ -41,13 +42,9 @@ class NewebPayATMGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id()
+    public function test_gateway_has_correct_id_and_title()
     {
         $this->assertEquals('omnipay_newebpay_atm', $this->gateway->id);
-    }
-
-    public function test_gateway_has_correct_title()
-    {
         $this->assertEquals('藍新 ATM', $this->gateway->method_title);
     }
 
@@ -88,6 +85,12 @@ class NewebPayATMGatewayTest extends TestCase
         $order = wc_get_order($order->get_id());
         $this->assertEquals('012', $order->get_meta('_omnipay_bank_code'));
         $this->assertEquals('9103522175887271', $order->get_meta('_omnipay_virtual_account'));
+    }
+
+    public function test_form_fields_has_amount_settings()
+    {
+        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
+        $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
     }
 
     private function makePaymentInfoData($order, array $overrides = [])

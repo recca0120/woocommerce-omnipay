@@ -8,14 +8,15 @@ use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * NewebPay 信用卡分期 Gateway 測試
+ *
+ * 只測試子類別的差異點（gateway_id、title、CREDIT、InstFlag 參數）
+ * 其他行為已在 NewebPayTest 中測試
  */
 class NewebPayCreditInstallmentGatewayTest extends TestCase
 {
     protected $gatewayId = 'newebpay_credit_installment';
 
     protected $gatewayName = 'NewebPay';
-
-    protected $gatewayClass = NewebPayCreditInstallmentGateway::class;
 
     private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
 
@@ -30,7 +31,6 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
             'HashIV' => $this->hashIV,
             'MerchantID' => $this->merchantId,
             'testMode' => 'yes',
-            'allow_resubmit' => 'no',
         ];
         parent::setUp();
 
@@ -41,13 +41,9 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id()
+    public function test_gateway_has_correct_id_and_title()
     {
         $this->assertEquals('omnipay_newebpay_credit_installment', $this->gateway->id);
-    }
-
-    public function test_gateway_has_correct_title()
-    {
         $this->assertEquals('藍新信用卡分期', $this->gateway->method_title);
     }
 

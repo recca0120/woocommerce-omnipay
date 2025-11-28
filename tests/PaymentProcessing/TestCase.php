@@ -115,4 +115,17 @@ abstract class TestCase extends WP_UnitTestCase
         $_POST = $data;
         $_REQUEST = $data;
     }
+
+    /**
+     * 建立測試產品
+     */
+    protected function createProduct($price = 100)
+    {
+        $product = new \WC_Product_Simple;
+        $product->set_name('Test Product');
+        $product->set_regular_price($price);
+        $product->save();
+
+        return $product;
+    }
 }

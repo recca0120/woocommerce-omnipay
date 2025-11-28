@@ -169,6 +169,29 @@ class YiPayTest extends TestCase
         ];
     }
 
+    // ==================== 金額驗證測試 ====================
+
+    public function test_accept_notification_rejects_amount_mismatch()
+    {
+        $order = $this->createOrder(100);
+        $this->gateway->process_payment($order->get_id());
+
+        $this->simulateCallback($this->makeCallbackData($order, [
+            'statusCode' => '00',
+            'type' => '2',
+            'amount' => '999',  // 金額不符
+        ]));
+
+        ob_start();
+        $this->gateway->acceptNotification();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('0|', $output);
+
+        $order = wc_get_order($order->get_id());
+        $this->assertEquals('on-hold', $order->get_status());
+    }
+
     // ==================== Helper ====================
 
     private function makeCallbackData($order, array $overrides = [])

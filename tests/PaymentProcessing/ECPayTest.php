@@ -271,6 +271,118 @@ class ECPayTest extends TestCase
         ];
     }
 
+    // ==================== 金額驗證測試 ====================
+
+    public function test_accept_notification_rejects_amount_mismatch()
+    {
+        $order = $this->createOrder(100);
+        $this->gateway->process_payment($order->get_id());
+
+        $this->simulateCallback($this->makeCallbackData($order, [
+            'RtnCode' => '1',
+            'TradeAmt' => '999',  // 金額不符
+        ]));
+
+        ob_start();
+        $this->gateway->acceptNotification();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('0|', $output);
+
+        $order = wc_get_order($order->get_id());
+        $this->assertEquals('on-hold', $order->get_status());  // 狀態不變
+    }
+
+    // ==================== 模擬付款測試 ====================
+
+    public function test_accept_notification_handles_simulated_payment()
+    {
+        $order = $this->createOrder(100);
+        $this->gateway->process_payment($order->get_id());
+
+        $this->simulateCallback($this->makeCallbackData($order, [
+            'RtnCode' => '1',
+            'SimulatePaid' => '1',
+        ]));
+
+        ob_start();
+        $this->gateway->acceptNotification();
+        $output = ob_get_clean();
+
+        $this->assertEquals('1|OK', $output);
+
+        $order = wc_get_order($order->get_id());
+        // 模擬付款只記錄備註，不改訂單狀態
+        $this->assertEquals('on-hold', $order->get_status());
+
+        // 確認有記錄備註
+        $notes = wc_get_order_notes(['order_id' => $order->get_id()]);
+        $hasSimulateNote = false;
+        foreach ($notes as $note) {
+            if (strpos($note->content, '模擬付款') !== false || strpos($note->content, 'Simulate') !== false) {
+                $hasSimulateNote = true;
+                break;
+            }
+        }
+        $this->assertTrue($hasSimulateNote);
+    }
+
+    // ==================== 信用卡資訊儲存測試 ====================
+
+    public function test_accept_notification_stores_credit_card_info()
+    {
+        $order = $this->createOrder(100);
+        $this->gateway->process_payment($order->get_id());
+
+        $this->simulateCallback($this->makeCallbackData($order, [
+            'RtnCode' => '1',
+            'PaymentType' => 'Credit_CreditCard',
+            'card6no' => '431195',
+            'card4no' => '1234',
+        ]));
+
+        ob_start();
+        $this->gateway->acceptNotification();
+        ob_get_clean();
+
+        $order = wc_get_order($order->get_id());
+        $this->assertEquals('431195', $order->get_meta('_omnipay_card6no'));
+        $this->assertEquals('1234', $order->get_meta('_omnipay_card4no'));
+    }
+
+    // ==================== 付款超時失敗 RtnCode 測試 ====================
+
+    /**
+     * @dataProvider expiredRtnCodeProvider
+     */
+    public function test_accept_notification_handles_expired_payment($rtnCode, $rtnMsg)
+    {
+        $order = $this->createOrder(100);
+        $this->gateway->process_payment($order->get_id());
+
+        $this->simulateCallback($this->makeCallbackData($order, [
+            'RtnCode' => $rtnCode,
+            'RtnMsg' => $rtnMsg,
+        ]));
+
+        ob_start();
+        $this->gateway->acceptNotification();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('0|', $output);
+
+        $order = wc_get_order($order->get_id());
+        $this->assertEquals('failed', $order->get_status());
+    }
+
+    public static function expiredRtnCodeProvider()
+    {
+        return [
+            'CVS expired' => ['10100058', '超商代碼繳費超過期限'],
+            'Barcode expired' => ['10200163', '條碼繳費超過期限'],
+        ];
+    }
+
     // ==================== Payment Info 回調測試 ====================
 
     /**

@@ -57,8 +57,96 @@ class ECPayGateway extends OmnipayGateway
             return;
         }
 
-        // 付款完成通知交給父類處理
-        parent::handleNotification($notification);
+        $order = $this->orders->findByTransactionIdOrFail($notification->getTransactionId());
+
+        // 金額驗證
+        if (! $this->validateAmount($order, $data)) {
+            $this->sendCallbackResponse(false, 'Amount mismatch');
+
+            return;
+        }
+
+        // 儲存信用卡資訊
+        $this->saveCreditCardInfo($order, $data);
+
+        // 模擬付款處理
+        if ($this->isSimulatedPayment($data)) {
+            $this->orders->addNote($order, __('ECPay 模擬付款 (SimulatePaid=1)', 'woocommerce-omnipay'));
+            $this->sendNotificationResponse($notification);
+
+            return;
+        }
+
+        // 檢查訂單是否需要處理
+        if (! $this->shouldProcessOrder($order)) {
+            $this->sendCallbackResponse(true);
+
+            return;
+        }
+
+        $status = $notification->getTransactionStatus();
+
+        if ($status !== NotificationInterface::STATUS_COMPLETED) {
+            $errorMessage = $notification->getMessage() ?: 'Payment failed';
+            $this->onPaymentFailed($order, $errorMessage, 'callback', false);
+            $this->sendCallbackResponse(false, $errorMessage);
+
+            return;
+        }
+
+        $this->completeOrderPayment($order, $notification->getTransactionReference(), 'callback');
+        $this->sendNotificationResponse($notification);
+    }
+
+    /**
+     * 驗證金額是否正確
+     *
+     * @param  \WC_Order  $order  訂單
+     * @param  array  $data  通知資料
+     * @return bool
+     */
+    protected function validateAmount($order, array $data)
+    {
+        $tradeAmt = isset($data['TradeAmt']) ? (int) $data['TradeAmt'] : 0;
+        $orderTotal = (int) $order->get_total();
+
+        return $tradeAmt === $orderTotal;
+    }
+
+    /**
+     * 檢查是否為模擬付款
+     *
+     * @param  array  $data  通知資料
+     * @return bool
+     */
+    protected function isSimulatedPayment(array $data)
+    {
+        return isset($data['SimulatePaid']) && $data['SimulatePaid'] === '1';
+    }
+
+    /**
+     * 儲存信用卡資訊
+     *
+     * @param  \WC_Order  $order  訂單
+     * @param  array  $data  通知資料
+     */
+    protected function saveCreditCardInfo($order, array $data)
+    {
+        $hasCardInfo = false;
+
+        if (! empty($data['card6no'])) {
+            $order->update_meta_data('_omnipay_card6no', $data['card6no']);
+            $hasCardInfo = true;
+        }
+
+        if (! empty($data['card4no'])) {
+            $order->update_meta_data('_omnipay_card4no', $data['card4no']);
+            $hasCardInfo = true;
+        }
+
+        if ($hasCardInfo) {
+            $order->save();
+        }
     }
 
     /**

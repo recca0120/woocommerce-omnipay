@@ -8,14 +8,15 @@ use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * NewebPay 定期定額 Gateway 測試
+ *
+ * 只測試子類別的差異點（gateway_id、title、CREDIT、Period 參數）
+ * 其他行為已在 NewebPayTest 中測試
  */
 class NewebPayDCAGatewayTest extends TestCase
 {
     protected $gatewayId = 'newebpay_dca';
 
     protected $gatewayName = 'NewebPay';
-
-    protected $gatewayClass = NewebPayDCAGateway::class;
 
     private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
 
@@ -30,7 +31,6 @@ class NewebPayDCAGatewayTest extends TestCase
             'HashIV' => $this->hashIV,
             'MerchantID' => $this->merchantId,
             'testMode' => 'yes',
-            'allow_resubmit' => 'no',
         ];
         parent::setUp();
 
@@ -41,13 +41,9 @@ class NewebPayDCAGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id()
+    public function test_gateway_has_correct_id_and_title()
     {
         $this->assertEquals('omnipay_newebpay_dca', $this->gateway->id);
-    }
-
-    public function test_gateway_has_correct_title()
-    {
         $this->assertEquals('藍新定期定額', $this->gateway->method_title);
     }
 
@@ -69,7 +65,6 @@ class NewebPayDCAGatewayTest extends TestCase
         }
         $this->assertEquals('1', $tradeInfo['CREDIT']);
         // 驗證定期定額參數存在（Gateway 有傳送）
-        // 注意：實際參數名稱可能因 Omnipay 驅動而異
         $hasPeriodParams = isset($tradeInfo['PeriodAmt']) ||
                            isset($tradeInfo['PeriodType']) ||
                            isset($tradeInfo['PeriodTimes']);
