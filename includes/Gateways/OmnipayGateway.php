@@ -204,17 +204,8 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     public function process_payment($order_id)
     {
-        $order = $this->order_repository->findById($order_id);
-
-        if (! $order) {
-            wc_add_notice('Invalid order.', 'error');
-
-            return [
-                'result' => 'failure',
-            ];
-        }
-
         try {
+            $order = $this->order_repository->findByIdOrFail($order_id);
             // 建立 Omnipay gateway
             $gateway = $this->get_omnipay_gateway();
 
@@ -253,21 +244,23 @@ class OmnipayGateway extends WC_Payment_Gateway
 
                 return $this->on_payment_failed($order, $error_message);
             }
+        } catch (OrderNotFoundException $e) {
+            $this->logger->error('process_payment: Order not found', [
+                'order_id' => $order_id,
+                'error' => $e->getMessage(),
+            ]);
+            wc_add_notice($e->getMessage(), 'error');
+
+            return ['result' => 'failure'];
         } catch (\Exception $e) {
             $this->logger->error('process_payment: Exception', [
                 'order_id' => $order_id,
                 'error' => $e->getMessage(),
             ]);
-
-            // 例外處理
-            $order->add_order_note(
-                sprintf('Payment error: %s', $e->getMessage())
-            );
+            $order->add_order_note(sprintf('Payment error: %s', $e->getMessage()));
             wc_add_notice('Payment error: '.$e->getMessage(), 'error');
 
-            return [
-                'result' => 'failure',
-            ];
+            return ['result' => 'failure'];
         }
     }
 

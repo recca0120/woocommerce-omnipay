@@ -66,6 +66,25 @@ class OrderRepository
     }
 
     /**
+     * 用 order ID 查詢訂單，找不到則丟出例外
+     *
+     * @param  int|null  $order_id
+     * @return \WC_Order
+     *
+     * @throws OrderNotFoundException
+     */
+    public function findByIdOrFail($order_id)
+    {
+        $order = $this->findById($order_id);
+
+        if (! $order) {
+            throw new OrderNotFoundException($order_id);
+        }
+
+        return $order;
+    }
+
+    /**
      * 用 transactionId 查詢訂單
      *
      * @param  string|null  $transaction_id
