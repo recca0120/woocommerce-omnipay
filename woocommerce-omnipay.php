@@ -52,6 +52,9 @@ function woocommerce_omnipay_init()
     // Register payment gateways
     add_filter('woocommerce_payment_gateways', 'woocommerce_omnipay_add_gateways');
 
+    // Register shared settings pages
+    woocommerce_omnipay_register_shared_settings();
+
     // Handle redirect form rendering
     add_action('template_redirect', 'woocommerce_omnipay_maybe_render_redirect_form');
 
@@ -59,6 +62,29 @@ function woocommerce_omnipay_init()
     add_action('wp_enqueue_scripts', 'woocommerce_omnipay_register_scripts');
 }
 add_action('plugins_loaded', 'woocommerce_omnipay_init');
+
+/**
+ * Register shared settings pages for each Omnipay gateway
+ */
+function woocommerce_omnipay_register_shared_settings()
+{
+    $config = woocommerce_omnipay_get_config();
+    $registered = [];
+
+    foreach ($config['gateways'] as $gateway) {
+        $omnipay_name = $gateway['omnipay_name'] ?? '';
+
+        // 每個 omnipay_name 只註冊一次
+        if (empty($omnipay_name) || isset($registered[$omnipay_name])) {
+            continue;
+        }
+
+        $page = new \WooCommerceOmnipay\SharedSettingsPage($omnipay_name);
+        $page->register();
+
+        $registered[$omnipay_name] = true;
+    }
+}
 
 /**
  * Register plugin scripts and styles

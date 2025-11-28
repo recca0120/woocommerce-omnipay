@@ -111,6 +111,28 @@ class OmnipayGateway extends WC_Payment_Gateway
     }
 
     /**
+     * 取得有效的設定值（Gateway 設定 > 共用設定）
+     *
+     * 用於 transaction_id_prefix, allow_resubmit 等 Plugin 設定
+     *
+     * @param  string  $key  設定鍵
+     * @param  mixed  $default  預設值
+     * @return string
+     */
+    public function get_effective_option($key, $default = '')
+    {
+        // 優先使用 Gateway 自己的設定
+        $value = $this->get_option($key);
+
+        if (! empty($value)) {
+            return $value;
+        }
+
+        // Fallback 到共用設定
+        return \WooCommerceOmnipay\SharedSettings::getValue($this->omnipay_gateway_name, $key, $default);
+    }
+
+    /**
      * Initialize Gateway Settings Form Fields
      *
      * 自動從 Omnipay gateway 參數產生設定欄位
@@ -177,14 +199,23 @@ class OmnipayGateway extends WC_Payment_Gateway
     /**
      * 從 WooCommerce 設定取得 Omnipay 參數
      *
+     * 優先順序：Gateway 設定 > 共用設定 > Omnipay 預設值
+     *
      * @return array
      */
     protected function get_omnipay_parameters()
     {
         $parameters = [];
+        $shared_settings = \WooCommerceOmnipay\SharedSettings::get($this->omnipay_gateway_name);
 
         foreach ($this->omnipay_bridge->getDefaultParameters() as $key => $default_value) {
-            $setting_value = $this->get_option($key);
+            // 優先使用共用設定
+            if (isset($shared_settings[$key]) && $shared_settings[$key] !== '') {
+                $setting_value = $shared_settings[$key];
+            } else {
+                // 否則使用 Gateway 自己的設定
+                $setting_value = $this->get_option($key);
+            }
 
             if (! empty($setting_value)) {
                 $parameters[$key] = OmnipayBridge::convertOptionValue($setting_value, $default_value);
@@ -340,8 +371,8 @@ class OmnipayGateway extends WC_Payment_Gateway
     {
         return $this->order_repository->createTransactionId(
             $order,
-            $this->get_option('transaction_id_prefix'),
-            $this->get_option('allow_resubmit') === 'yes'
+            $this->get_effective_option('transaction_id_prefix'),
+            $this->get_effective_option('allow_resubmit') === 'yes'
         );
     }
 
@@ -420,7 +451,7 @@ class OmnipayGateway extends WC_Payment_Gateway
     protected function on_payment_redirect($order, $response)
     {
         // allow_resubmit = no 時，將訂單改為 on-hold 避免重複提交
-        if ($this->get_option('allow_resubmit') !== 'yes') {
+        if ($this->get_effective_option('allow_resubmit') !== 'yes') {
             $order->update_status(self::STATUS_ON_HOLD, sprintf('Awaiting %s payment.', $this->method_title));
         } else {
             $order->add_order_note(
@@ -764,7 +795,7 @@ class OmnipayGateway extends WC_Payment_Gateway
     {
         // allow_resubmit = no 時，訂單應該是 on-hold
         // allow_resubmit = yes 時，訂單應該是 pending
-        return $this->get_option('allow_resubmit') === 'yes' ? self::STATUS_PENDING : self::STATUS_ON_HOLD;
+        return $this->get_effective_option('allow_resubmit') === 'yes' ? self::STATUS_PENDING : self::STATUS_ON_HOLD;
     }
 
     /**
