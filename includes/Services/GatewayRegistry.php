@@ -126,4 +126,34 @@ class GatewayRegistry
     {
         return sprintf('Pay with %s', $title);
     }
+
+    /**
+     * 解析 Gateway 類別
+     *
+     * 優先順序：
+     * 1. 配置中指定的 class
+     * 2. 自動偵測的具體 Gateway 類別
+     * 3. 使用 OmnipayGateway 動態建立
+     *
+     * @param  array  $gatewayInfo  Gateway 配置資訊
+     * @return string Gateway 類別名稱
+     */
+    public function resolveGatewayClass(array $gatewayInfo)
+    {
+        // 1. 優先使用配置中指定的 class
+        if (! empty($gatewayInfo['class']) && class_exists($gatewayInfo['class'])) {
+            return $gatewayInfo['class'];
+        }
+
+        $name = $gatewayInfo['gateway'] ?? '';
+
+        // 2. 嘗試自動偵測具體 Gateway 類別
+        $gatewayClass = "\\WooCommerceOmnipay\\Gateways\\{$name}Gateway";
+        if (class_exists($gatewayClass)) {
+            return $gatewayClass;
+        }
+
+        // 3. 使用 OmnipayGateway 動態建立
+        return \WooCommerceOmnipay\Gateways\OmnipayGateway::class;
+    }
 }
