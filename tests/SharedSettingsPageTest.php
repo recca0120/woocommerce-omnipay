@@ -40,7 +40,7 @@ class SharedSettingsPageTest extends WP_UnitTestCase
         $this->assertArrayHasKey('', $sections);
         $this->assertArrayHasKey('ecpay', $sections);
         $this->assertArrayHasKey('newebpay', $sections);
-        $this->assertEquals('通用設定', $sections['']);
+        $this->assertEquals('General Settings', $sections['']);
         $this->assertEquals('ECPay', $sections['ecpay']);
         $this->assertEquals('NewebPay', $sections['newebpay']);
     }
