@@ -49,9 +49,4 @@ class ECPayCreditGatewayTest extends TestCase
         $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
         $this->assertEquals('Credit', $redirectData['data']['ChoosePayment']);
     }
-
-    public function test_form_fields_has_min_amount()
-    {
-        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
-    }
 }

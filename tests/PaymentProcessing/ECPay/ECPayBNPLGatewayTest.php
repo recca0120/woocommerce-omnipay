@@ -53,19 +53,6 @@ class ECPayBNPLGatewayTest extends TestCase
         $this->assertEquals('BNPL', $redirectData['data']['ChoosePayment']);
     }
 
-    public function test_payment_data_includes_amount_limits()
-    {
-        $order = $this->createOrder(50000);
-
-        $result = $this->gateway->process_payment($order->get_id());
-
-        $this->assertEquals('success', $result['result']);
-
-        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertArrayHasKey('ChoosePayment', $redirectData['data']);
-        $this->assertEquals('BNPL', $redirectData['data']['ChoosePayment']);
-    }
-
     public function test_is_available_returns_false_when_below_min_amount()
     {
         $this->setGatewaySettings(['min_amount' => '100000']);
