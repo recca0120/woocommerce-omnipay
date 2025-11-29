@@ -70,15 +70,37 @@ class SharedSettingsPage
      */
     public function get_sections()
     {
-        $sections = [];
+        $sections = [
+            '' => __('General Settings', 'woocommerce-omnipay'),
+        ];
 
         foreach ($this->gateways as $gateway) {
             $name = $gateway['gateway'];
             $key = strtolower($name);
-            $sections[$key] = $name;
+            // Translate gateway name for display
+            $sections[$key] = $this->translateGatewayName($name);
         }
 
         return $sections;
+    }
+
+    /**
+     * Translate gateway name for display
+     *
+     * @param  string  $name  Gateway name
+     * @return string
+     */
+    private function translateGatewayName($name)
+    {
+        $translations = [
+            'ECPay' => __('ECPay', 'woocommerce-omnipay'),
+            'NewebPay' => __('NewebPay', 'woocommerce-omnipay'),
+            'YiPay' => __('YiPay', 'woocommerce-omnipay'),
+            'BankTransfer' => __('Bank Transfer', 'woocommerce-omnipay'),
+            'Dummy' => __('Dummy Gateway', 'woocommerce-omnipay'),
+        ];
+
+        return $translations[$name] ?? $name;
     }
 
     /**
@@ -153,6 +175,11 @@ class SharedSettingsPage
      */
     public function get_settings($section)
     {
+        // 通用設定
+        if ($section === '') {
+            return $this->get_general_settings();
+        }
+
         $name = $this->get_name_by_section($section);
 
         if (! $name) {
@@ -164,35 +191,24 @@ class SharedSettingsPage
 
         $fields = [
             [
-                'title' => sprintf('%s 共用設定', $name),
+                'title' => sprintf(__('%s Shared Settings', 'woocommerce-omnipay'), $name),
                 'type' => 'title',
-                'desc' => sprintf('設定 %s 的共用參數，這些設定會套用到所有 %s 付款方式。', $name, $name),
+                'desc' => sprintf(__('Configure %s shared parameters. These settings apply to all %s payment methods.', 'woocommerce-omnipay'), $name, $name),
                 'id' => 'omnipay_'.$section.'_options',
             ],
         ];
 
-        // 加入 Omnipay 參數欄位
+        // 加入 Omnipay 參數欄位（排除通用設定中的欄位）
+        $generalFields = ['testMode', 'transaction_id_prefix', 'allow_resubmit'];
+
         foreach ($bridge->getDefaultParameters() as $key => $defaultValue) {
+            // 跳過通用設定中的欄位
+            if (in_array($key, $generalFields, true)) {
+                continue;
+            }
+
             $fields[] = $this->createField($optionKey, $key, $defaultValue);
         }
-
-        // 加入 Plugin 通用設定
-        $fields[] = [
-            'title' => __('交易編號前綴', 'woocommerce-omnipay'),
-            'type' => 'text',
-            'desc' => __('加在交易編號前面的前綴，用於區分不同網站或環境。', 'woocommerce-omnipay'),
-            'id' => $optionKey.'[transaction_id_prefix]',
-            'default' => '',
-            'desc_tip' => true,
-        ];
-
-        $fields[] = [
-            'title' => __('允許重新提交', 'woocommerce-omnipay'),
-            'type' => 'checkbox',
-            'desc' => __('啟用時使用隨機交易編號，允許重新付款。', 'woocommerce-omnipay'),
-            'id' => $optionKey.'[allow_resubmit]',
-            'default' => 'no',
-        ];
 
         $fields[] = [
             'type' => 'sectionend',
@@ -200,6 +216,51 @@ class SharedSettingsPage
         ];
 
         return $fields;
+    }
+
+    /**
+     * 取得通用設定欄位
+     *
+     * @return array
+     */
+    private function get_general_settings()
+    {
+        $optionKey = 'woocommerce_omnipay_general_settings';
+
+        return [
+            [
+                'title' => __('Omnipay General Settings', 'woocommerce-omnipay'),
+                'type' => 'title',
+                'desc' => __('These settings apply to all Omnipay payment methods.', 'woocommerce-omnipay'),
+                'id' => 'omnipay_general_options',
+            ],
+            [
+                'title' => __('Test Mode', 'woocommerce-omnipay'),
+                'type' => 'checkbox',
+                'desc' => __('Enable test mode for development and testing.', 'woocommerce-omnipay'),
+                'id' => $optionKey.'[testMode]',
+                'default' => 'no',
+            ],
+            [
+                'title' => __('Transaction ID Prefix', 'woocommerce-omnipay'),
+                'type' => 'text',
+                'desc' => __('Prefix added to transaction IDs to distinguish different sites or environments.', 'woocommerce-omnipay'),
+                'id' => $optionKey.'[transaction_id_prefix]',
+                'default' => '',
+                'desc_tip' => true,
+            ],
+            [
+                'title' => __('Allow Resubmit', 'woocommerce-omnipay'),
+                'type' => 'checkbox',
+                'desc' => __('When enabled, use random transaction IDs to allow payment retry.', 'woocommerce-omnipay'),
+                'id' => $optionKey.'[allow_resubmit]',
+                'default' => 'no',
+            ],
+            [
+                'type' => 'sectionend',
+                'id' => 'omnipay_general_options',
+            ],
+        ];
     }
 
     /**

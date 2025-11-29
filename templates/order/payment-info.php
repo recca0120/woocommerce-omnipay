@@ -23,7 +23,7 @@ $barcode_fields = [
 ];
 ?>
 <section class="omnipay-payment-info">
-    <h2><?php esc_html_e('付款資訊', 'woocommerce-omnipay'); ?></h2>
+    <h2><?php esc_html_e('Payment Information', 'woocommerce-omnipay'); ?></h2>
     <table class="woocommerce-table">
         <?php foreach ($payment_info as $meta_key => $value) { ?>
             <?php if (isset($labels[$meta_key])) { ?>

@@ -1,0 +1,172 @@
+# Translation file for WooCommerce Omnipay
+# Copyright (C) 2025
+# This file is distributed under the same license as the WooCommerce Omnipay package.
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Omnipay\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-29 00:00+0000\n"
+"PO-Revision-Date: 2025-01-29 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Chinese (Taiwan)\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+# Gateway Titles and Descriptions
+msgid "Bank Transfer"
+msgstr "銀行轉帳"
+
+msgid "Pay via bank transfer"
+msgstr "使用銀行轉帳付款"
+
+msgid "Dummy Gateway"
+msgstr "測試閘道"
+
+msgid "Dummy payment gateway for testing"
+msgstr "用於測試的虛擬付款閘道"
+
+msgid "ECPay"
+msgstr "綠界金流"
+
+msgid "Pay via ECPay payment gateway"
+msgstr "使用綠界金流付款"
+
+msgid "ECPay Credit Card"
+msgstr "綠界信用卡"
+
+msgid "Pay with credit card"
+msgstr "使用信用卡付款"
+
+msgid "ECPay Credit Card Installment"
+msgstr "綠界信用卡分期"
+
+msgid "Pay with credit card installment"
+msgstr "使用信用卡分期付款"
+
+msgid "ECPay Recurring Payment"
+msgstr "綠界定期定額"
+
+msgid "Pay with credit card recurring payment"
+msgstr "使用信用卡定期定額付款"
+
+msgid "ECPay WebATM"
+msgstr "綠界網路 ATM"
+
+msgid "Pay via WebATM"
+msgstr "使用網路 ATM 付款"
+
+msgid "ECPay ATM"
+msgstr "綠界 ATM"
+
+msgid "Pay via ATM virtual account"
+msgstr "使用 ATM 虛擬帳號付款"
+
+msgid "ECPay CVS"
+msgstr "綠界超商代碼"
+
+msgid "Pay at convenience store"
+msgstr "使用超商代碼付款"
+
+msgid "ECPay Barcode"
+msgstr "綠界超商條碼"
+
+msgid "Pay with barcode at convenience store"
+msgstr "使用超商條碼付款"
+
+msgid "NewebPay"
+msgstr "藍新金流"
+
+msgid "Pay via NewebPay payment gateway"
+msgstr "使用藍新金流付款"
+
+msgid "NewebPay Credit Card"
+msgstr "藍新信用卡"
+
+msgid "NewebPay Credit Card Installment"
+msgstr "藍新信用卡分期"
+
+msgid "NewebPay Recurring Payment"
+msgstr "藍新定期定額"
+
+msgid "NewebPay WebATM"
+msgstr "藍新網路 ATM"
+
+msgid "NewebPay ATM"
+msgstr "藍新 ATM"
+
+msgid "NewebPay CVS"
+msgstr "藍新超商代碼"
+
+msgid "NewebPay Barcode"
+msgstr "藍新超商條碼"
+
+msgid "YiPay"
+msgstr "乙禾金流"
+
+msgid "Pay via YiPay payment gateway"
+msgstr "使用乙禾金流付款"
+
+msgid "YiPay Credit Card"
+msgstr "乙禾信用卡"
+
+msgid "YiPay ATM"
+msgstr "乙禾 ATM"
+
+msgid "YiPay CVS"
+msgstr "乙禾超商代碼"
+
+# Settings Page
+msgid "General Settings"
+msgstr "通用設定"
+
+msgid "Omnipay General Settings"
+msgstr "Omnipay 通用設定"
+
+msgid "These settings apply to all Omnipay payment methods."
+msgstr "這些設定會套用到所有 Omnipay 付款方式。"
+
+msgid "Test Mode"
+msgstr "測試模式"
+
+msgid "Enable test mode for development and testing."
+msgstr "啟用測試模式進行開發和測試。"
+
+msgid "Transaction ID Prefix"
+msgstr "交易編號前綴"
+
+msgid "Prefix added to transaction IDs to distinguish different sites or environments."
+msgstr "加在交易編號前面的前綴，用於區分不同網站或環境。"
+
+msgid "Allow Resubmit"
+msgstr "允許重新提交"
+
+msgid "When enabled, use random transaction IDs to allow payment retry."
+msgstr "啟用時使用隨機交易編號，允許重新付款。"
+
+msgid "%s Shared Settings"
+msgstr "%s 共用設定"
+
+msgid "Configure %s shared parameters. These settings apply to all %s payment methods."
+msgstr "設定 %s 的共用參數，這些設定會套用到所有 %s 付款方式。"
+
+# Template Strings
+msgid "Payment Information"
+msgstr "付款資訊"
+
+msgid "Remittance Confirmation"
+msgstr "匯款確認"
+
+msgid "Last 5 digits of remittance account submitted:"
+msgstr "已填寫匯款帳號後5碼："
+
+msgid "Please enter the last 5 digits of your remittance account after payment to help us confirm the transaction."
+msgstr "請於匯款後填寫您的匯款帳號後5碼，以便我們確認款項。"
+
+msgid "Last 5 Digits of Remittance Account"
+msgstr "匯款帳號後5碼"
+
+msgid "Submit"
+msgstr "確認送出"

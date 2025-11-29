@@ -16,7 +16,7 @@ if (empty($payment_info)) {
     return;
 }
 
-echo "\n".__('付款資訊', 'woocommerce-omnipay')."\n";
+echo "\n".__('Payment Information', 'woocommerce-omnipay')."\n";
 echo str_repeat('-', 40)."\n";
 
 foreach ($payment_info as $meta_key => $value) {

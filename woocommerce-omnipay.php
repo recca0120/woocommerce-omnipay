@@ -38,6 +38,15 @@ add_action('before_woocommerce_init', function () {
 });
 
 /**
+ * Load plugin textdomain for translations
+ */
+function woocommerce_omnipay_load_textdomain()
+{
+    load_plugin_textdomain('woocommerce-omnipay', false, dirname(plugin_basename(__FILE__)).'/languages');
+}
+add_action('init', 'woocommerce_omnipay_load_textdomain');
+
+/**
  * Initialize the plugin
  */
 function woocommerce_omnipay_init()
