@@ -21,7 +21,7 @@ use WooCommerceOmnipay\Gateways\YiPay\YiPayCVSGateway;
 // Icon URLs
 $ecpayIcon = plugins_url('assets/images/payment-icons/ecpay.png', dirname(__DIR__).'/woocommerce-omnipay.php');
 $newebpayIcon = plugins_url('assets/images/payment-icons/newebpay.png', dirname(__DIR__).'/woocommerce-omnipay.php');
-$yipayIcon = plugins_url('assets/images/payment-icons/yipay-color.png', dirname(__DIR__).'/woocommerce-omnipay.php');
+$yipayIcon = plugins_url('assets/images/payment-icons/yipay.png', dirname(__DIR__).'/woocommerce-omnipay.php');
 
 return [
     // Bank Transfer
