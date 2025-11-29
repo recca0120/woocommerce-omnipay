@@ -91,6 +91,8 @@ class NewebPayCreditInstallmentGateway extends NewebPayGateway
      */
     public function payment_fields()
     {
+        parent::payment_fields();
+
         $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
 
         // Ensure installments is an array
@@ -98,22 +100,15 @@ class NewebPayCreditInstallmentGateway extends NewebPayGateway
             $installments = ['3', '6', '12', '18', '24'];
         }
 
-        // Convert array values to labels
-        $installmentOptions = [];
+        echo '<p>'._x('Number of periods', 'Checkout info', 'woocommerce-omnipay');
+        echo '<select name="omnipay_installment">';
+
         foreach ($installments as $period) {
-            $installmentOptions[$period] = sprintf(__('%s Installments', 'woocommerce-omnipay'), $period);
+            echo '<option value="'.esc_attr($period).'">'.wp_kses_post($period).'</option>';
         }
 
-        wc_get_template(
-            'checkout/installment-form.php',
-            [
-                'gateway_id' => $this->id,
-                'installments' => $installmentOptions,
-                'description' => $this->get_description(),
-            ],
-            '',
-            plugin_dir_path(dirname(dirname(__DIR__))).'/templates/'
-        );
+        echo '</select>';
+        echo '</p>';
     }
 
     /**

@@ -293,3 +293,7 @@ msgstr "NT$ %d / %s，最多 %s 次"
 
 msgid "You will use ECPay recurring credit card payment. Please note that the products you purchased are non-single payment products."
 msgstr "你將使用<strong>綠界科技定期定額信用卡付款</strong>，請留意你所購買的商品為<strong>非單次扣款</strong>商品。"
+
+msgctxt "Checkout info"
+msgid "Number of periods"
+msgstr "分期期數"

@@ -277,12 +277,12 @@ class ECPayDCAGateway extends ECPayGateway
             $total = WC()->cart ? WC()->cart->total : 0;
 
             $periodTypeLabels = [
-                'Y' => __('year', 'woocommerce-omnipay'),
-                'M' => __('month', 'woocommerce-omnipay'),
-                'D' => __('day', 'woocommerce-omnipay'),
+                'Y' => ' '.__('year', 'woocommerce-omnipay'),
+                'M' => ' '.__('month', 'woocommerce-omnipay'),
+                'D' => ' '.__('day', 'woocommerce-omnipay'),
             ];
 
-            echo '<p><select id="omnipay_dca_period" name="omnipay_dca_period">';
+            echo '<select id="omnipay_dca_period" name="omnipay_dca_period">';
 
             foreach ($this->dca_periods as $period) {
                 $value = $period['periodType'].'_'.$period['frequency'].'_'.$period['execTimes'];
@@ -296,7 +296,8 @@ class ECPayDCAGateway extends ECPayGateway
                 echo '<option value="'.esc_attr($value).'">'.esc_html($label).'</option>';
             }
 
-            echo '</select></p>';
+            echo '</select>';
+            echo '<div id="omnipay_dca_show"></div>';
             echo '<hr style="margin: 12px 0px;background-color: #eeeeee;">';
             echo '<p style="font-size: 0.8em;color: #c9302c;">';
             echo esc_html__('You will use ECPay recurring credit card payment. Please note that the products you purchased are non-single payment products.', 'woocommerce-omnipay');
