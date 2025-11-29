@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
 use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * ECPay 超商代碼 Gateway
  */
 class ECPayCVSGateway extends ECPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款方式
      *
@@ -36,24 +39,8 @@ class ECPayCVSGateway extends ECPayGateway
     public function init_form_fields()
     {
         parent::init_form_fields();
-
-        $this->form_fields['min_amount'] = [
-            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
-
-        $this->form_fields['max_amount'] = [
-            'title' => __('Maximum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Maximum order amount for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
+        $this->initMinAmountField();
+        $this->initMaxAmountField();
 
         $this->form_fields['expire_date'] = [
             'title' => __('Payment Expiry Minutes', 'woocommerce-omnipay'),
@@ -76,19 +63,7 @@ class ECPayCVSGateway extends ECPayGateway
             return false;
         }
 
-        $total = $this->get_order_total();
-        $minAmount = (int) $this->get_option('min_amount', 0);
-        $maxAmount = (int) $this->get_option('max_amount', 0);
-
-        if ($minAmount > 0 && $total < $minAmount) {
-            return false;
-        }
-
-        if ($maxAmount > 0 && $total > $maxAmount) {
-            return false;
-        }
-
-        return true;
+        return $this->validateMinAmount() && $this->validateMaxAmount();
     }
 
     /**

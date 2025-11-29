@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\YiPay;
 
 use WooCommerceOmnipay\Gateways\YiPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * YiPay 信用卡 Gateway
  */
 class YiPayCreditGateway extends YiPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款類型
      * type=2: 信用卡 3D 付款
@@ -37,15 +40,7 @@ class YiPayCreditGateway extends YiPayGateway
     public function init_form_fields()
     {
         parent::init_form_fields();
-
-        $this->form_fields['min_amount'] = [
-            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
+        $this->initMinAmountField();
     }
 
     /**
@@ -59,15 +54,7 @@ class YiPayCreditGateway extends YiPayGateway
             return false;
         }
 
-        $minAmount = (int) $this->get_option('min_amount', 0);
-        if ($minAmount > 0) {
-            $total = $this->get_order_total();
-            if ($total < $minAmount) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->validateMinAmount();
     }
 
     /**

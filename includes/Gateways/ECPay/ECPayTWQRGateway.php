@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
 use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * ECPay TWQR (台灣 Pay) Gateway
  */
 class ECPayTWQRGateway extends ECPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款方式
      *

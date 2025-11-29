@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\NewebPay;
 
 use WooCommerceOmnipay\Gateways\NewebPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * NewebPay 網路 ATM Gateway
  */
 class NewebPayWebATMGateway extends NewebPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款方式
      *

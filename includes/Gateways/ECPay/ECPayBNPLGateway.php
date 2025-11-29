@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
 use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * ECPay BNPL (無卡分期) Gateway
  */
 class ECPayBNPLGateway extends ECPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款方式
      *

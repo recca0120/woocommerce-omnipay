@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
 use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * ECPay WeiXin (微信支付) Gateway
  */
 class ECPayWeiXinGateway extends ECPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款方式
      *

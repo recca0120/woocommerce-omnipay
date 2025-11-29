@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\NewebPay;
 
 use WooCommerceOmnipay\Gateways\NewebPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * NewebPay 信用卡 Gateway
  */
 class NewebPayCreditGateway extends NewebPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款方式
      *
@@ -36,15 +39,7 @@ class NewebPayCreditGateway extends NewebPayGateway
     public function init_form_fields()
     {
         parent::init_form_fields();
-
-        $this->form_fields['min_amount'] = [
-            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
+        $this->initMinAmountField();
     }
 
     /**
@@ -58,15 +53,7 @@ class NewebPayCreditGateway extends NewebPayGateway
             return false;
         }
 
-        $minAmount = (int) $this->get_option('min_amount', 0);
-        if ($minAmount > 0) {
-            $total = $this->get_order_total();
-            if ($total < $minAmount) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->validateMinAmount();
     }
 
     /**

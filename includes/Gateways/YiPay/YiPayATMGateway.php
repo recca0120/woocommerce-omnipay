@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\YiPay;
 
 use WooCommerceOmnipay\Gateways\YiPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * YiPay ATM Gateway
  */
 class YiPayATMGateway extends YiPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款類型
      * type=4: ATM 虛擬帳號繳款
@@ -37,24 +40,8 @@ class YiPayATMGateway extends YiPayGateway
     public function init_form_fields()
     {
         parent::init_form_fields();
-
-        $this->form_fields['min_amount'] = [
-            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
-
-        $this->form_fields['max_amount'] = [
-            'title' => __('Maximum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Maximum order amount for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
+        $this->initMinAmountField();
+        $this->initMaxAmountField();
     }
 
     /**
@@ -68,19 +55,7 @@ class YiPayATMGateway extends YiPayGateway
             return false;
         }
 
-        $total = $this->get_order_total();
-        $minAmount = (int) $this->get_option('min_amount', 0);
-        $maxAmount = (int) $this->get_option('max_amount', 0);
-
-        if ($minAmount > 0 && $total < $minAmount) {
-            return false;
-        }
-
-        if ($maxAmount > 0 && $total > $maxAmount) {
-            return false;
-        }
-
-        return true;
+        return $this->validateMinAmount() && $this->validateMaxAmount();
     }
 
     /**

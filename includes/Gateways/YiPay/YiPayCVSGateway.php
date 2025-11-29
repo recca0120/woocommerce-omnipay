@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\YiPay;
 
 use WooCommerceOmnipay\Gateways\YiPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * YiPay 超商代碼 Gateway
  */
 class YiPayCVSGateway extends YiPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款類型
      * type=3: 超商代碼繳費

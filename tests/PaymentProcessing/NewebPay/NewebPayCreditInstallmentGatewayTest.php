@@ -139,4 +139,70 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
         $this->assertStringContainsString('value="6"', $output);
         $this->assertStringContainsString('value="12"', $output);
     }
+
+    public function test_process_payment_keeps_30_as_is_not_30_n()
+    {
+        // Set up installments including 30 period
+        $this->gateway->update_option('installments', ['3', '6', '12', '30']);
+
+        $order = $this->createOrder(25000);
+
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $encryptor = new Encryptor($this->hashKey, $this->hashIV);
+        $tradeInfo = $encryptor->decrypt($redirectData['data']['TradeInfo']);
+        if (is_string($tradeInfo)) {
+            parse_str($tradeInfo, $tradeInfo);
+        }
+
+        // NewebPay should keep '30' as is (not convert to '30N')
+        $this->assertEquals('3,6,12,30', $tradeInfo['InstFlag']);
+    }
+
+    public function test_process_payment_keeps_selected_30_as_is()
+    {
+        $order = $this->createOrder(25000);
+
+        // Simulate user selecting 30 installments
+        $_POST['omnipay_installment'] = '30';
+
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $encryptor = new Encryptor($this->hashKey, $this->hashIV);
+        $tradeInfo = $encryptor->decrypt($redirectData['data']['TradeInfo']);
+        if (is_string($tradeInfo)) {
+            parse_str($tradeInfo, $tradeInfo);
+        }
+
+        // NewebPay should keep selected '30' as is
+        $this->assertEquals('30', $tradeInfo['InstFlag']);
+
+        unset($_POST['omnipay_installment']);
+    }
+
+    public function test_payment_fields_shows_30_period_regardless_of_amount()
+    {
+        $this->gateway->update_option('installments', ['3', '6', '12', '30']);
+        $this->gateway->init_settings();
+
+        // Test with amount below 20000
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(5000)->get_id());
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // NewebPay should show 30 period even when amount < 20000
+        $this->assertStringContainsString('value="3"', $output);
+        $this->assertStringContainsString('value="6"', $output);
+        $this->assertStringContainsString('value="12"', $output);
+        $this->assertStringContainsString('value="30"', $output);
+    }
 }
