@@ -183,8 +183,6 @@ class NewebPayDCAGateway extends NewebPayGateway
                 'periodPoint' => '',
                 'periodTimes' => 12,
                 'periodStartType' => 2,
-                'frequency' => 1,
-                'execTimes' => 12,
             ],
             'table_width' => 700,
         ]);
@@ -226,15 +224,11 @@ class NewebPayDCAGateway extends NewebPayGateway
 
             foreach ($periodTypes as $i => $periodType) {
                 if (! empty($periodType)) {
-                    $times = $periodTimes[$i] ?? 0;
                     $dcaPeriods[] = [
                         'periodType' => $periodType,
                         'periodPoint' => $periodPoints[$i] ?? '',
-                        'periodTimes' => $times,
+                        'periodTimes' => $periodTimes[$i] ?? 0,
                         'periodStartType' => $periodStartTypes[$i] ?? 0,
-                        // Add unified fields for template display
-                        'frequency' => 1,
-                        'execTimes' => $times,
                     ];
                 }
             }
@@ -363,14 +357,8 @@ class NewebPayDCAGateway extends NewebPayGateway
             echo woocommerce_omnipay_get_template('checkout/dca-form.php', [
                 'periods' => $this->dcaPeriods,
                 'total' => $total,
-                'period_type_labels' => [
-                    'Y' => __('year', 'woocommerce-omnipay'),
-                    'M' => __('month', 'woocommerce-omnipay'),
-                    'W' => __('week', 'woocommerce-omnipay'),
-                    'D' => __('day', 'woocommerce-omnipay'),
-                ],
-                'period_fields' => ['periodType', 'periodPoint', 'periodTimes', 'periodStartType'],
-                'warning_message' => __('You will use <strong>NewebPay recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
+                'periodFields' => ['periodType', 'periodPoint', 'periodTimes', 'periodStartType'],
+                'warningMessage' => __('You will use <strong>NewebPay recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
             ]);
         }
     }

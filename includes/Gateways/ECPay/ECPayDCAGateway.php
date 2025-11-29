@@ -347,13 +347,8 @@ class ECPayDCAGateway extends ECPayGateway
             echo woocommerce_omnipay_get_template('checkout/dca-form.php', [
                 'periods' => $this->dcaPeriods,
                 'total' => $total,
-                'period_type_labels' => [
-                    'Y' => __('year', 'woocommerce-omnipay'),
-                    'M' => __('month', 'woocommerce-omnipay'),
-                    'D' => __('day', 'woocommerce-omnipay'),
-                ],
-                'period_fields' => ['periodType', 'frequency', 'execTimes'],
-                'warning_message' => __('You will use <strong>ECPay recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
+                'periodFields' => ['periodType', 'frequency', 'execTimes'],
+                'warningMessage' => __('You will use <strong>ECPay recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
             ]);
         }
     }
