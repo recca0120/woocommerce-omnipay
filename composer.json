@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=7.4",
+        "php": ">=7.3",
         "omnipay/common": "^3.0",
         "omnipay-taiwan/omnipay-bank-transfer": "^1.0",
         "omnipay-taiwan/omnipay-ecpay": "^1.1",
