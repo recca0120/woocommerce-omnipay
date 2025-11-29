@@ -131,4 +131,78 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
         $this->assertStringContainsString('value="6"', $output);
         $this->assertStringContainsString('value="12"', $output);
     }
+
+    public function test_process_payment_converts_30_to_30_n_for_dream_installment()
+    {
+        // Set up installments including 30 period
+        $this->gateway->update_option('installments', ['3', '6', '12', '30']);
+
+        $order = $this->createOrder(25000);
+
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        // ECPay should convert '30' to '30N' for Dream Installment
+        $this->assertEquals('3,6,12,30N', $redirectData['data']['CreditInstallment']);
+    }
+
+    public function test_process_payment_converts_selected_30_to_30_n()
+    {
+        $order = $this->createOrder(25000);
+
+        // Simulate user selecting 30 installments
+        $_POST['omnipay_installment'] = '30';
+
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        // ECPay should convert selected '30' to '30N'
+        $this->assertEquals('30N', $redirectData['data']['CreditInstallment']);
+
+        unset($_POST['omnipay_installment']);
+    }
+
+    public function test_payment_fields_hides_30_period_when_amount_below_20000()
+    {
+        $this->gateway->update_option('installments', ['3', '6', '12', '30']);
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(15000)->get_id());
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Should show 3, 6, 12 period options
+        $this->assertStringContainsString('value="3"', $output);
+        $this->assertStringContainsString('value="6"', $output);
+        $this->assertStringContainsString('value="12"', $output);
+
+        // Should NOT show 30 period when amount < 20000
+        $this->assertStringNotContainsString('value="30"', $output);
+    }
+
+    public function test_payment_fields_shows_30_period_when_amount_above_20000()
+    {
+        $this->gateway->update_option('installments', ['3', '6', '12', '30']);
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(25000)->get_id());
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Should show all period options including 30
+        $this->assertStringContainsString('value="3"', $output);
+        $this->assertStringContainsString('value="6"', $output);
+        $this->assertStringContainsString('value="12"', $output);
+        $this->assertStringContainsString('value="30"', $output);
+    }
 }

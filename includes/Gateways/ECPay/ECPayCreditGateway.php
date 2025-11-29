@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
 use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * ECPay 信用卡 Gateway
  */
 class ECPayCreditGateway extends ECPayGateway
 {
+    use HasAmountLimits;
+
     /**
      * 付款方式
      *
@@ -36,17 +39,7 @@ class ECPayCreditGateway extends ECPayGateway
     public function init_form_fields()
     {
         parent::init_form_fields();
-
-        $this->form_fields['min_amount'] = [
-            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => [
-                'min' => '0',
-            ],
-        ];
+        $this->initMinAmountField();
     }
 
     /**
@@ -60,15 +53,7 @@ class ECPayCreditGateway extends ECPayGateway
             return false;
         }
 
-        $minAmount = (int) $this->get_option('min_amount', 0);
-        if ($minAmount > 0) {
-            $total = $this->get_order_total();
-            if ($total < $minAmount) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->validateMinAmount();
     }
 
     /**
