@@ -13,6 +13,11 @@ class ECPayBNPLGateway extends ECPayGateway
     use HasAmountLimits;
 
     /**
+     * 最大金額限制
+     */
+    public const MAX_AMOUNT_LIMIT = 300000;
+
+    /**
      * 付款方式
      *
      * @var string
@@ -57,12 +62,15 @@ class ECPayBNPLGateway extends ECPayGateway
         $this->form_fields['max_amount'] = [
             'title' => __('Maximum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('Maximum order amount for this payment method (max: 300000)', 'woocommerce-omnipay'),
-            'default' => 300000,
+            'description' => sprintf(
+                __('Maximum order amount for this payment method (max: %d)', 'woocommerce-omnipay'),
+                self::MAX_AMOUNT_LIMIT
+            ),
+            'default' => self::MAX_AMOUNT_LIMIT,
             'desc_tip' => true,
             'custom_attributes' => [
                 'min' => 0,
-                'max' => 300000,
+                'max' => self::MAX_AMOUNT_LIMIT,
                 'step' => 1,
             ],
         ];

@@ -13,6 +13,11 @@ use WooCommerceOmnipay\Repositories\OrderRepository;
 class BankTransferGateway extends OmnipayGateway
 {
     /**
+     * 匯款帳號後碼位數
+     */
+    public const REMITTANCE_LAST_DIGITS = 5;
+
+    /**
      * Constructor
      */
     public function __construct(array $config)
@@ -102,6 +107,7 @@ class BankTransferGateway extends OmnipayGateway
             'order' => $order,
             'submitted_last5' => $order->get_meta(OrderRepository::META_REMITTANCE_LAST5),
             'submit_url' => WC()->api_request_url($this->id.'_remittance'),
+            'last_digits' => self::REMITTANCE_LAST_DIGITS,
         ]);
     }
 
@@ -130,9 +136,13 @@ class BankTransferGateway extends OmnipayGateway
             return;
         }
 
-        // 驗證格式（必須是5位數字）
-        if (! preg_match('/^\d{5}$/', $last5)) {
-            $this->sendJsonResponse(false, __('Please enter 5 digits', 'woocommerce-omnipay'));
+        // 驗證格式（必須是指定位數的數字）
+        $pattern = sprintf('/^\d{%d}$/', self::REMITTANCE_LAST_DIGITS);
+        if (! preg_match($pattern, $last5)) {
+            $this->sendJsonResponse(
+                false,
+                sprintf(__('Please enter %d digits', 'woocommerce-omnipay'), self::REMITTANCE_LAST_DIGITS)
+            );
 
             return;
         }

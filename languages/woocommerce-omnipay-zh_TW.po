@@ -185,8 +185,8 @@ msgstr "此付款方式所需的最小訂單金額"
 msgid "Maximum Amount"
 msgstr "最大金額"
 
-msgid "Maximum order amount for this payment method (max: 300000)"
-msgstr "此付款方式的最大訂單金額（最大：300000）"
+msgid "Maximum order amount for this payment method (max: %d)"
+msgstr "此付款方式的最大訂單金額（最大：%d）"
 
 # Template Strings
 msgid "Payment Information"
@@ -195,14 +195,14 @@ msgstr "付款資訊"
 msgid "Remittance Confirmation"
 msgstr "匯款確認"
 
-msgid "Last 5 digits of remittance account submitted:"
-msgstr "已填寫匯款帳號後5碼："
+msgid "Last %d digits of remittance account submitted:"
+msgstr "已填寫匯款帳號後%d碼："
 
-msgid "Please enter the last 5 digits of your remittance account after payment to help us confirm the transaction."
-msgstr "請於匯款後填寫您的匯款帳號後5碼，以便我們確認款項。"
+msgid "Please enter the last %d digits of your remittance account after payment to help us confirm the transaction."
+msgstr "請於匯款後填寫您的匯款帳號後%d碼，以便我們確認款項。"
 
-msgid "Last 5 Digits of Remittance Account"
-msgstr "匯款帳號後5碼"
+msgid "Last %d Digits of Remittance Account"
+msgstr "匯款帳號後%d碼"
 
 msgid "Submit"
 msgstr "確認送出"
@@ -213,8 +213,8 @@ msgstr "安全驗證失敗"
 msgid "Order verification failed"
 msgstr "訂單驗證失敗"
 
-msgid "Please enter 5 digits"
-msgstr "請輸入5位數字"
+msgid "Please enter %d digits"
+msgstr "請輸入%d位數字"
 
 msgid "Successfully submitted"
 msgstr "已成功送出"
