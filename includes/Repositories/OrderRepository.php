@@ -2,8 +2,8 @@
 
 namespace WooCommerceOmnipay\Repositories;
 
+use WooCommerceOmnipay\Constants;
 use WooCommerceOmnipay\Exceptions\OrderNotFoundException;
-use WooCommerceOmnipay\Gateways\BankTransferGateway;
 
 /**
  * Order Repository
@@ -308,7 +308,7 @@ class OrderRepository
         $order->update_meta_data(self::META_REMITTANCE_LAST5, $last5);
         $order->add_order_note(sprintf(
             __('Customer submitted last %d digits of remittance account: %s', 'woocommerce-omnipay'),
-            BankTransferGateway::REMITTANCE_LAST_DIGITS,
+            Constants::REMITTANCE_LAST_DIGITS,
             $last5
         ));
         $order->save();
