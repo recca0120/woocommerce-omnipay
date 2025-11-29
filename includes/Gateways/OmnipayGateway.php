@@ -129,23 +129,23 @@ class OmnipayGateway extends WC_Payment_Gateway
         // 基本欄位
         $this->form_fields = [
             'enabled' => [
-                'title' => 'Enable/Disable',
+                'title' => __('Enable/Disable', 'woocommerce-omnipay'),
                 'type' => 'checkbox',
-                'label' => sprintf('Enable %s', $this->method_title),
+                'label' => sprintf(__('Enable %s', 'woocommerce-omnipay'), $this->method_title),
                 'default' => 'no',
             ],
             'title' => [
-                'title' => 'Title',
+                'title' => __('Title', 'woocommerce-omnipay'),
                 'type' => 'text',
-                'description' => 'Payment method title that users will see during checkout.',
+                'description' => __('Payment method title that users will see during checkout.', 'woocommerce-omnipay'),
                 'default' => $this->method_title,
                 'desc_tip' => true,
             ],
             'description' => [
-                'title' => 'Description',
+                'title' => __('Description', 'woocommerce-omnipay'),
                 'type' => 'textarea',
-                'description' => 'Payment method description that users will see during checkout.',
-                'default' => sprintf('Pay with %s', $this->method_title),
+                'description' => __('Payment method description that users will see during checkout.', 'woocommerce-omnipay'),
+                'default' => sprintf(__('Pay with %s', 'woocommerce-omnipay'), $this->method_title),
                 'desc_tip' => true,
             ],
         ];

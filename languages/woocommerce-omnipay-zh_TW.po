@@ -142,6 +142,28 @@ msgstr "乙禾 ATM"
 msgid "YiPay CVS"
 msgstr "乙禾超商代碼"
 
+# Gateway Common Fields
+msgid "Enable/Disable"
+msgstr "啟用/停用"
+
+msgid "Enable %s"
+msgstr "啟用 %s"
+
+msgid "Title"
+msgstr "標題"
+
+msgid "Payment method title that users will see during checkout."
+msgstr "用戶在結帳時會看到的付款方式標題。"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Payment method description that users will see during checkout."
+msgstr "用戶在結帳時會看到的付款方式描述。"
+
+msgid "Pay with %s"
+msgstr "使用 %s 付款"
+
 # Settings Page
 msgid "General Settings"
 msgstr "通用設定"
@@ -243,8 +265,14 @@ msgstr "請選擇付款方案"
 msgid "You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products."
 msgstr "你將使用<strong>%s定期定額信用卡付款</strong>，請留意你所購買的商品為<strong>非單次扣款</strong>商品。"
 
-msgid "%s / %s %s, up to a maximum of %s times"
-msgstr "%s / 每 %s %s，最多 %s 次"
+msgid "charge every %s year(s)"
+msgstr "每 %s 年扣款"
+
+msgid "charge every %s month(s)"
+msgstr "每 %s 個月扣款"
+
+msgid "charge every %s day(s)"
+msgstr "每 %s 天扣款"
 
 # Period units (lowercase for display)
 msgid "year"
