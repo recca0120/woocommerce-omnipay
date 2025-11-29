@@ -85,10 +85,26 @@ class NewebPayCVSGatewayTest extends TestCase
         $this->assertEquals('LLL24112512345', $order->get_meta('_omnipay_payment_no'));
     }
 
-    public function test_form_fields_has_amount_settings()
+    public function test_is_available_returns_false_when_below_min_amount()
     {
-        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
-        $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
+        $this->gateway->update_option('min_amount', '100');
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(50)->get_id());
+
+        $this->assertFalse($this->gateway->is_available());
+    }
+
+    public function test_is_available_returns_false_when_above_max_amount()
+    {
+        $this->gateway->update_option('max_amount', '10000');
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(15000)->get_id());
+
+        $this->assertFalse($this->gateway->is_available());
     }
 
     private function makePaymentInfoData($order, array $overrides = [])

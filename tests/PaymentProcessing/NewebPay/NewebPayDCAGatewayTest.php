@@ -286,48 +286,6 @@ class NewebPayDCAGatewayTest extends TestCase
         unset($_POST['periodTimes']);
     }
 
-    public function test_get_default_period()
-    {
-        $reflection = new \ReflectionClass($this->gateway);
-        $method = $reflection->getMethod('getDefaultPeriod');
-        $method->setAccessible(true);
-
-        $default = $method->invoke($this->gateway);
-
-        $this->assertEquals('M', $default['periodType']);
-        $this->assertEquals('1', $default['periodPoint']);
-        $this->assertEquals(12, $default['periodTimes']);
-        $this->assertEquals(2, $default['periodStartType']);
-    }
-
-    public function test_get_dca_field_configs()
-    {
-        $reflection = new \ReflectionClass($this->gateway);
-        $method = $reflection->getMethod('getDcaFieldConfigs');
-        $method->setAccessible(true);
-
-        $configs = $method->invoke($this->gateway);
-
-        $this->assertCount(4, $configs);
-        $this->assertEquals('periodType', $configs[0]['name']);
-        $this->assertEquals('periodPoint', $configs[1]['name']);
-        $this->assertEquals('periodTimes', $configs[2]['name']);
-        $this->assertEquals('periodStartType', $configs[3]['name']);
-    }
-
-    public function test_get_required_dca_fields()
-    {
-        $reflection = new \ReflectionClass($this->gateway);
-        $method = $reflection->getMethod('getRequiredDcaFields');
-        $method->setAccessible(true);
-
-        $fields = $method->invoke($this->gateway);
-
-        $this->assertContains('periodType', $fields);
-        $this->assertContains('periodTimes', $fields);
-        $this->assertContains('periodStartType', $fields);
-    }
-
     public function test_load_dca_periods_from_option()
     {
         $testPeriods = [

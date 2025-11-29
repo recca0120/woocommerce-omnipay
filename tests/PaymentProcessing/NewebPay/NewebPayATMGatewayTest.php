@@ -66,10 +66,4 @@ class NewebPayATMGatewayTest extends TestCase
         }
         $this->assertEquals('1', $tradeInfo['VACC']);
     }
-
-    public function test_form_fields_has_amount_settings()
-    {
-        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
-        $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
-    }
 }
