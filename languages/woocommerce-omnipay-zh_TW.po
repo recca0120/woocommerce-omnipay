@@ -161,9 +161,6 @@ msgstr "描述"
 msgid "Payment method description that users will see during checkout."
 msgstr "用戶在結帳時會看到的付款方式描述。"
 
-msgid "Pay with %s"
-msgstr "使用 %s 付款"
-
 # Settings Page
 msgid "General Settings"
 msgstr "通用設定"

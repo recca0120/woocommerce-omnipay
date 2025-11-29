@@ -145,7 +145,7 @@ class OmnipayGateway extends WC_Payment_Gateway
                 'title' => __('Description', 'woocommerce-omnipay'),
                 'type' => 'textarea',
                 'description' => __('Payment method description that users will see during checkout.', 'woocommerce-omnipay'),
-                'default' => sprintf(__('Pay with %s', 'woocommerce-omnipay'), $this->method_title),
+                'default' => '',
                 'desc_tip' => true,
             ],
         ];
