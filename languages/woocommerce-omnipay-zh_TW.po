@@ -305,14 +305,14 @@ msgstr "週期次數"
 msgid "Period Start Type"
 msgstr "週期啟動方式"
 
-msgid "%d - Authorize and start immediately"
-msgstr "%d - 立即授權並啟動"
+msgid "1 - Authorize and start immediately"
+msgstr "1 - 立即授權並啟動"
 
-msgid "%d - Authorize only, start manually"
-msgstr "%d - 僅授權，手動啟動"
+msgid "2 - Authorize only, start manually"
+msgstr "2 - 僅授權，手動啟動"
 
-msgid "%d - Delegate to merchant"
-msgstr "%d - 委託商家處理"
+msgid "3 - Delegate to merchant"
+msgstr "3 - 委託商家處理"
 
 msgid "DCA Periods"
 msgstr "定期定額方案"

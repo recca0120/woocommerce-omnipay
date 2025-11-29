@@ -83,9 +83,9 @@ class NewebPayDCAGateway extends NewebPayGateway
             'default' => '2',
             'description' => '',
             'options' => [
-                '1' => sprintf(__('%d - Authorize and start immediately', 'woocommerce-omnipay'), 1),
-                '2' => sprintf(__('%d - Authorize only, start manually', 'woocommerce-omnipay'), 2),
-                '3' => sprintf(__('%d - Delegate to merchant', 'woocommerce-omnipay'), 3),
+                '1' => __('1 - Authorize and start immediately', 'woocommerce-omnipay'),
+                '2' => __('2 - Authorize only, start manually', 'woocommerce-omnipay'),
+                '3' => __('3 - Delegate to merchant', 'woocommerce-omnipay'),
             ],
         ];
 
