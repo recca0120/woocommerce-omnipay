@@ -65,6 +65,11 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->name = $config['gateway'] ?? '';
         $this->overrideSettings = $config['override_settings'] ?? false;
 
+        // 設定 icon
+        if (! empty($config['icon'])) {
+            $this->icon = $config['icon'];
+        }
+
         $this->bridge = new OmnipayBridge($this->name);
         $this->orders = new OrderRepository;
         $this->logger = new WooCommerceLogger($this->id);

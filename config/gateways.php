@@ -39,6 +39,7 @@ return [
         'gateway_id' => 'ecpay',
         'title' => '綠界金流',
         'description' => '使用綠界金流付款',
+        'icon' => plugins_url('assets/images/payment-icons/ecpay.png', dirname(__DIR__).'/woocommerce-omnipay.php'),
     ],
     // ECPay 子 Gateway
     [
@@ -96,6 +97,7 @@ return [
         'gateway_id' => 'newebpay',
         'title' => '藍新金流',
         'description' => '使用藍新金流付款',
+        'icon' => plugins_url('assets/images/payment-icons/newebpay.png', dirname(__DIR__).'/woocommerce-omnipay.php'),
     ],
     // NewebPay 子 Gateway
     [
@@ -153,6 +155,7 @@ return [
         'gateway_id' => 'yipay',
         'title' => 'YiPay 乙禾金流',
         'description' => '使用 YiPay 乙禾金流付款',
+        'icon' => plugins_url('assets/images/payment-icons/yipay-color.png', dirname(__DIR__).'/woocommerce-omnipay.php'),
     ],
     // YiPay 子 Gateway
     [
