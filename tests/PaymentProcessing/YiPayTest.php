@@ -266,11 +266,8 @@ class YiPayTest extends TestCase
     private function sign(int $type, array $data)
     {
         $keys = ['merchantId', 'amount', 'orderNo', 'returnURL', 'cancelURL', 'backgroundURL', 'transactionNo', 'statusCode'];
-        $keys[] = match ($type) {
-            3 => 'pinCode',
-            4 => 'account',
-            default => 'approvalCode',
-        };
+        $typeKeys = [3 => 'pinCode', 4 => 'account'];
+        $keys[] = $typeKeys[$type] ?? 'approvalCode';
 
         $signed = [];
         foreach ($keys as $key) {
