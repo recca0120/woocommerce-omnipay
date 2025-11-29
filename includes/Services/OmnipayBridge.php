@@ -59,7 +59,7 @@ class OmnipayBridge
     }
 
     /**
-     * 合併參數（Gateway 設定 > 共用設定 > Omnipay 預設值）
+     * 合併參數（Gateway 設定 > 共用設定 > 通用設定 > Omnipay 預設值）
      *
      * @param  array  $defaultParameters  Omnipay 預設參數
      * @param  array  $gatewaySettings  Gateway 自身的設定
@@ -69,14 +69,17 @@ class OmnipayBridge
     {
         $parameters = [];
         $sharedSettings = $this->getSharedSettings();
+        $generalSettings = $this->getGeneralSettings();
 
         foreach ($defaultParameters as $key => $defaultValue) {
-            // 優先使用 Gateway 設定，其次共用設定
+            // 優先順序：Gateway 設定 > 共用設定 > 通用設定
             $settingValue = '';
             if (isset($gatewaySettings[$key]) && $gatewaySettings[$key] !== '') {
                 $settingValue = $gatewaySettings[$key];
             } elseif (isset($sharedSettings[$key]) && $sharedSettings[$key] !== '') {
                 $settingValue = $sharedSettings[$key];
+            } elseif (isset($generalSettings[$key]) && $generalSettings[$key] !== '') {
+                $settingValue = $generalSettings[$key];
             }
 
             if ($settingValue !== '') {
@@ -114,6 +117,16 @@ class OmnipayBridge
     }
 
     /**
+     * 取得通用設定
+     *
+     * @return array
+     */
+    public function getGeneralSettings()
+    {
+        return get_option('woocommerce_omnipay_general_settings', []);
+    }
+
+    /**
      * 取得單一共用設定值
      *
      * @param  string  $key  設定鍵
@@ -123,8 +136,10 @@ class OmnipayBridge
     public function getSharedValue($key, $default = '')
     {
         $settings = $this->getSharedSettings();
+        $generalSettings = $this->getGeneralSettings();
 
-        return $settings[$key] ?? $default;
+        // 優先使用共用設定，其次通用設定
+        return $settings[$key] ?? $generalSettings[$key] ?? $default;
     }
 
     /**

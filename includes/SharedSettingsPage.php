@@ -178,28 +178,17 @@ class SharedSettingsPage
             ],
         ];
 
-        // 加入 Omnipay 參數欄位
+        // 加入 Omnipay 參數欄位（排除通用設定中的欄位）
+        $generalFields = ['testMode', 'transaction_id_prefix', 'allow_resubmit'];
+
         foreach ($bridge->getDefaultParameters() as $key => $defaultValue) {
+            // 跳過通用設定中的欄位
+            if (in_array($key, $generalFields, true)) {
+                continue;
+            }
+
             $fields[] = $this->createField($optionKey, $key, $defaultValue);
         }
-
-        // 加入 Plugin 通用設定
-        $fields[] = [
-            'title' => __('交易編號前綴', 'woocommerce-omnipay'),
-            'type' => 'text',
-            'desc' => __('加在交易編號前面的前綴，用於區分不同網站或環境。', 'woocommerce-omnipay'),
-            'id' => $optionKey.'[transaction_id_prefix]',
-            'default' => '',
-            'desc_tip' => true,
-        ];
-
-        $fields[] = [
-            'title' => __('允許重新提交', 'woocommerce-omnipay'),
-            'type' => 'checkbox',
-            'desc' => __('啟用時使用隨機交易編號，允許重新付款。', 'woocommerce-omnipay'),
-            'id' => $optionKey.'[allow_resubmit]',
-            'default' => 'no',
-        ];
 
         $fields[] = [
             'type' => 'sectionend',

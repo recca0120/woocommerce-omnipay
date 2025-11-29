@@ -56,14 +56,16 @@ class SharedSettingsPageTest extends WP_UnitTestCase
         $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[HashIV]', $fieldIds);
     }
 
-    public function test_get_settings_returns_plugin_fields()
+    public function test_get_settings_for_gateway_excludes_general_fields()
     {
         $settings = $this->page->get_settings('ecpay');
 
         $fieldIds = array_column($settings, 'id');
 
-        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[transaction_id_prefix]', $fieldIds);
-        $this->assertContains('woocommerce_omnipay_ecpay_shared_settings[allow_resubmit]', $fieldIds);
+        // 這些欄位應該只在通用設定中，不應該在個別 gateway 設定中
+        $this->assertNotContains('woocommerce_omnipay_ecpay_shared_settings[testMode]', $fieldIds);
+        $this->assertNotContains('woocommerce_omnipay_ecpay_shared_settings[transaction_id_prefix]', $fieldIds);
+        $this->assertNotContains('woocommerce_omnipay_ecpay_shared_settings[allow_resubmit]', $fieldIds);
     }
 
     public function test_get_settings_returns_empty_for_unknown_section()
