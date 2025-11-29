@@ -38,28 +38,28 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
         parent::init_form_fields();
 
         $this->form_fields['min_amount'] = [
-            'title' => __('最小訂單金額', 'woocommerce-omnipay'),
+            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('訂單金額低於此值時不顯示此付款方式（0 = 無限制）', 'woocommerce-omnipay'),
+            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
             'default' => '0',
             'desc_tip' => true,
             'custom_attributes' => ['min' => '0'],
         ];
 
         $this->form_fields['installments'] = [
-            'title' => __('分期期數', 'woocommerce-omnipay'),
+            'title' => __('Installment Periods', 'woocommerce-omnipay'),
             'type' => 'multiselect',
             'class' => 'wc-enhanced-select',
-            'description' => __('選擇可用的分期期數', 'woocommerce-omnipay'),
+            'description' => __('Select available installment periods', 'woocommerce-omnipay'),
             'default' => ['3', '6', '12', '18', '24'],
             'desc_tip' => true,
             'options' => [
-                '3' => __('3 期', 'woocommerce-omnipay'),
-                '6' => __('6 期', 'woocommerce-omnipay'),
-                '12' => __('12 期', 'woocommerce-omnipay'),
-                '18' => __('18 期', 'woocommerce-omnipay'),
-                '24' => __('24 期', 'woocommerce-omnipay'),
-                '30N' => __('30 期（圓夢分期）', 'woocommerce-omnipay'),
+                '3' => __('3 installments', 'woocommerce-omnipay'),
+                '6' => __('6 installments', 'woocommerce-omnipay'),
+                '12' => __('12 installments', 'woocommerce-omnipay'),
+                '18' => __('18 installments', 'woocommerce-omnipay'),
+                '24' => __('24 installments', 'woocommerce-omnipay'),
+                '30N' => __('30 installments (Dream Installment)', 'woocommerce-omnipay'),
             ],
         ];
     }
