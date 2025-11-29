@@ -240,33 +240,6 @@ class NewebPayDCAGateway extends NewebPayGateway
     }
 
     /**
-     * Get required DCA fields for Blocks mode validation
-     */
-    protected function getRequiredDcaFields(): array
-    {
-        return ['periodType', 'periodPoint', 'periodTimes', 'periodStartType'];
-    }
-
-    /**
-     * Get period fields for template
-     */
-    protected function getPeriodFields(): array
-    {
-        return ['periodType', 'periodPoint', 'periodTimes', 'periodStartType'];
-    }
-
-    /**
-     * Get warning message for checkout
-     */
-    protected function getWarningMessage(): string
-    {
-        return sprintf(
-            __('You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
-            __('NewebPay', 'woocommerce-omnipay')
-        );
-    }
-
-    /**
      * 準備付款資料
      *
      * @param  \WC_Order  $order  訂單

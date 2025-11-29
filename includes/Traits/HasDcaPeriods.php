@@ -92,6 +92,56 @@ trait HasDcaPeriods
     }
 
     /**
+     * Get localized provider name for display
+     *
+     * @return string Localized provider name
+     */
+    protected function getLocalizedProviderName(): string
+    {
+        $providerMap = [
+            'ecpay' => __('ECPay', 'woocommerce-omnipay'),
+            'newebpay' => __('NewebPay', 'woocommerce-omnipay'),
+        ];
+
+        $provider = $this->getProviderName();
+
+        return $providerMap[$provider] ?? ucfirst($provider);
+    }
+
+    /**
+     * Get required DCA fields for Blocks mode validation
+     *
+     * @return array Field names required for validation
+     */
+    protected function getRequiredDcaFields(): array
+    {
+        return array_column($this->getDcaFieldConfigs(), 'name');
+    }
+
+    /**
+     * Get period fields for template
+     *
+     * @return array Field names for template rendering
+     */
+    protected function getPeriodFields(): array
+    {
+        return array_column($this->getDcaFieldConfigs(), 'name');
+    }
+
+    /**
+     * Get warning message for checkout
+     *
+     * @return string Localized warning message
+     */
+    protected function getWarningMessage(): string
+    {
+        return sprintf(
+            __('You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
+            $this->getLocalizedProviderName()
+        );
+    }
+
+    /**
      * 生成 DCA 設定表格 HTML
      */
     public function generate_periods_html($key, $data)
@@ -298,11 +348,6 @@ trait HasDcaPeriods
     }
 
     /**
-     * Get required DCA fields for Blocks mode validation
-     */
-    abstract protected function getRequiredDcaFields(): array;
-
-    /**
      * Get DCA field configurations
      */
     abstract protected function getDcaFieldConfigs(): array;
@@ -311,16 +356,6 @@ trait HasDcaPeriods
      * Get default period data
      */
     abstract protected function getDefaultPeriod(): array;
-
-    /**
-     * Get period fields for template
-     */
-    abstract protected function getPeriodFields(): array;
-
-    /**
-     * Get warning message for checkout
-     */
-    abstract protected function getWarningMessage(): string;
 
     /**
      * Validate period constraints

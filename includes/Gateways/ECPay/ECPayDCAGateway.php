@@ -174,33 +174,6 @@ class ECPayDCAGateway extends ECPayGateway
     }
 
     /**
-     * Get required DCA fields for Blocks mode validation
-     */
-    protected function getRequiredDcaFields(): array
-    {
-        return ['periodType', 'frequency', 'execTimes'];
-    }
-
-    /**
-     * Get period fields for template
-     */
-    protected function getPeriodFields(): array
-    {
-        return ['periodType', 'frequency', 'execTimes'];
-    }
-
-    /**
-     * Get warning message for checkout
-     */
-    protected function getWarningMessage(): string
-    {
-        return sprintf(
-            __('You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
-            __('ECPay', 'woocommerce-omnipay')
-        );
-    }
-
-    /**
      * 準備付款資料
      *
      * @param  \WC_Order  $order  訂單
