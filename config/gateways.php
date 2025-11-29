@@ -1,5 +1,6 @@
 <?php
 
+use WooCommerceOmnipay\Gateways\ECPay\ECPayApplePayGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayATMGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayBarcodeGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayBNPLGateway;
@@ -7,7 +8,9 @@ use WooCommerceOmnipay\Gateways\ECPay\ECPayCreditGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayCreditInstallmentGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayCVSGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayDCAGateway;
+use WooCommerceOmnipay\Gateways\ECPay\ECPayTWQRGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayWebATMGateway;
+use WooCommerceOmnipay\Gateways\ECPay\ECPayWeiXinGateway;
 use WooCommerceOmnipay\Gateways\NewebPay\NewebPayATMGateway;
 use WooCommerceOmnipay\Gateways\NewebPay\NewebPayBarcodeGateway;
 use WooCommerceOmnipay\Gateways\NewebPay\NewebPayCreditGateway;
@@ -110,6 +113,30 @@ return [
         'class' => ECPayBarcodeGateway::class,
         'title' => __('ECPay Barcode', 'woocommerce-omnipay'),
         'description' => __('Pay with barcode at convenience store', 'woocommerce-omnipay'),
+        'icon' => $ecpayIcon,
+    ],
+    [
+        'gateway' => 'ECPay',
+        'gateway_id' => 'ecpay_applepay',
+        'class' => ECPayApplePayGateway::class,
+        'title' => __('ECPay Apple Pay', 'woocommerce-omnipay'),
+        'description' => __('Pay with Apple Pay', 'woocommerce-omnipay'),
+        'icon' => $ecpayIcon,
+    ],
+    [
+        'gateway' => 'ECPay',
+        'gateway_id' => 'ecpay_twqr',
+        'class' => ECPayTWQRGateway::class,
+        'title' => __('ECPay Taiwan Pay', 'woocommerce-omnipay'),
+        'description' => __('Pay with Taiwan Pay (TWQR)', 'woocommerce-omnipay'),
+        'icon' => $ecpayIcon,
+    ],
+    [
+        'gateway' => 'ECPay',
+        'gateway_id' => 'ecpay_weixin',
+        'class' => ECPayWeiXinGateway::class,
+        'title' => __('ECPay WeChat Pay', 'woocommerce-omnipay'),
+        'description' => __('Pay with WeChat Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     // NewebPay (All-in-one)

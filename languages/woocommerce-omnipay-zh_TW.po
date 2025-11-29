@@ -315,3 +315,21 @@ msgstr "最大金額"
 
 msgid "Maximum order amount for this payment method (max: 300000)"
 msgstr "此付款方式的最大訂單金額（最大：300000）"
+
+msgid "ECPay Apple Pay"
+msgstr "綠界 Apple Pay"
+
+msgid "Pay with Apple Pay"
+msgstr "使用 Apple Pay 付款"
+
+msgid "ECPay Taiwan Pay"
+msgstr "綠界台灣 Pay"
+
+msgid "Pay with Taiwan Pay (TWQR)"
+msgstr "使用台灣 Pay 付款"
+
+msgid "ECPay WeChat Pay"
+msgstr "綠界微信支付"
+
+msgid "Pay with WeChat Pay"
+msgstr "使用微信支付"
