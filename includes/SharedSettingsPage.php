@@ -70,7 +70,9 @@ class SharedSettingsPage
      */
     public function get_sections()
     {
-        $sections = [];
+        $sections = [
+            '' => __('通用設定', 'woocommerce-omnipay'),
+        ];
 
         foreach ($this->gateways as $gateway) {
             $name = $gateway['gateway'];
@@ -153,6 +155,11 @@ class SharedSettingsPage
      */
     public function get_settings($section)
     {
+        // 通用設定
+        if ($section === '') {
+            return $this->get_general_settings();
+        }
+
         $name = $this->get_name_by_section($section);
 
         if (! $name) {
@@ -200,6 +207,51 @@ class SharedSettingsPage
         ];
 
         return $fields;
+    }
+
+    /**
+     * 取得通用設定欄位
+     *
+     * @return array
+     */
+    private function get_general_settings()
+    {
+        $optionKey = 'woocommerce_omnipay_general_settings';
+
+        return [
+            [
+                'title' => __('Omnipay 通用設定', 'woocommerce-omnipay'),
+                'type' => 'title',
+                'desc' => __('這些設定會套用到所有 Omnipay 付款方式。', 'woocommerce-omnipay'),
+                'id' => 'omnipay_general_options',
+            ],
+            [
+                'title' => __('測試模式', 'woocommerce-omnipay'),
+                'type' => 'checkbox',
+                'desc' => __('啟用測試模式進行開發和測試。', 'woocommerce-omnipay'),
+                'id' => $optionKey.'[testMode]',
+                'default' => 'no',
+            ],
+            [
+                'title' => __('交易編號前綴', 'woocommerce-omnipay'),
+                'type' => 'text',
+                'desc' => __('加在交易編號前面的前綴，用於區分不同網站或環境。', 'woocommerce-omnipay'),
+                'id' => $optionKey.'[transaction_id_prefix]',
+                'default' => '',
+                'desc_tip' => true,
+            ],
+            [
+                'title' => __('允許重新提交', 'woocommerce-omnipay'),
+                'type' => 'checkbox',
+                'desc' => __('啟用時使用隨機交易編號，允許重新付款。', 'woocommerce-omnipay'),
+                'id' => $optionKey.'[allow_resubmit]',
+                'default' => 'no',
+            ],
+            [
+                'type' => 'sectionend',
+                'id' => 'omnipay_general_options',
+            ],
+        ];
     }
 
     /**
