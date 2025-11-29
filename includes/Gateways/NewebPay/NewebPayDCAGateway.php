@@ -236,7 +236,7 @@ class NewebPayDCAGateway extends NewebPayGateway
         return [
             'PeriodType' => $this->get_option('periodType', 'M'),
             'PeriodPoint' => $this->get_option('periodPoint', '1'),
-            'PeriodTimes' => (int) $this->get_option('periodTimes', 12),
+            'PeriodTimes' => (int) $this->get_option('periodTimes', 2),
             'PeriodStartType' => (int) $this->get_option('periodStartType', 2),
         ];
     }
