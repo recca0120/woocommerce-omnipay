@@ -17,12 +17,28 @@ $data = wp_parse_args($data, $defaults);
 
 // Helper function to render a single row
 $render_row = function ($index, $period_type, $frequency, $exec_times) {
+    // Set constraints based on period type
+    // Year (Y): frequency=1, execTimes=1-9
+    // Month (M): frequency=1-12, execTimes=1-99
+    // Day (D): frequency=1-365, execTimes=1-999
+    $freq_min = 1;
+    $freq_max = 365;
+    $exec_min = 1;
+    $exec_max = 999;
+
+    if ($period_type === 'Y') {
+        $freq_max = 1;  // Year: frequency must be 1
+        $exec_max = 9;  // Year: execTimes 1-9
+    } elseif ($period_type === 'M') {
+        $freq_max = 12; // Month: frequency 1-12
+        $exec_max = 99; // Month: execTimes 1-99
+    }
     ?>
     <tr class="account">
         <td class="sort"></td>
         <td><input type="text" value="<?php echo esc_attr($period_type); ?>" name="dca_periodType[<?php echo esc_attr($index); ?>]" maxlength="1" required /></td>
-        <td><input type="number" value="<?php echo esc_attr($frequency); ?>" name="dca_frequency[<?php echo esc_attr($index); ?>]" min="1" max="365" required /></td>
-        <td><input type="number" value="<?php echo esc_attr($exec_times); ?>" name="dca_execTimes[<?php echo esc_attr($index); ?>]" min="2" max="999" required /></td>
+        <td><input type="number" value="<?php echo esc_attr($frequency); ?>" name="dca_frequency[<?php echo esc_attr($index); ?>]" min="<?php echo esc_attr($freq_min); ?>" max="<?php echo esc_attr($freq_max); ?>" required /></td>
+        <td><input type="number" value="<?php echo esc_attr($exec_times); ?>" name="dca_execTimes[<?php echo esc_attr($index); ?>]" min="<?php echo esc_attr($exec_min); ?>" max="<?php echo esc_attr($exec_max); ?>" required /></td>
     </tr>
     <?php
 };

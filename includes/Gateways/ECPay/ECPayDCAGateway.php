@@ -68,7 +68,7 @@ class ECPayDCAGateway extends ECPayGateway
         $this->form_fields['dca_periodType'] = [
             'title' => __('Period Type', 'woocommerce-omnipay'),
             'type' => 'select',
-            'default' => 'M',
+            'default' => 'Y',
             'description' => __('Support WooCommerce checkout blocks', 'woocommerce-omnipay'),
             'options' => [
                 'Y' => __('Year', 'woocommerce-omnipay'),
@@ -94,7 +94,7 @@ class ECPayDCAGateway extends ECPayGateway
             'default' => 2,
             'description' => __('Support WooCommerce checkout blocks', 'woocommerce-omnipay'),
             'custom_attributes' => [
-                'min' => 2,
+                'min' => 1,
                 'step' => 1,
             ],
         ];
@@ -136,6 +136,11 @@ class ECPayDCAGateway extends ECPayGateway
      */
     public function process_admin_options()
     {
+        // Validate DCA settings
+        if (! $this->validate_dca_fields()) {
+            return false;
+        }
+
         // Save DCA periods
         $dca_periods = [];
         if (isset($_POST['dca_periodType'])) {
@@ -156,6 +161,85 @@ class ECPayDCAGateway extends ECPayGateway
         update_option('woocommerce_omnipay_ecpay_dca_periods', $dca_periods);
 
         return parent::process_admin_options();
+    }
+
+    /**
+     * 驗證 DCA 欄位
+     */
+    protected function validate_dca_fields()
+    {
+        $errorMsg = '';
+
+        // Validate Blocks mode settings
+        if (isset($_POST[$this->plugin_id.$this->id.'_dca_periodType'])) {
+            $periodType = sanitize_text_field($_POST[$this->plugin_id.$this->id.'_dca_periodType']);
+            $frequency = absint($_POST[$this->plugin_id.$this->id.'_dca_frequency'] ?? 0);
+            $execTimes = absint($_POST[$this->plugin_id.$this->id.'_dca_execTimes'] ?? 0);
+
+            $errorMsg .= $this->validate_period_constraints($periodType, $frequency, $execTimes);
+        }
+
+        // Validate Shortcode mode periods
+        if (isset($_POST['dca_periodType']) && is_array($_POST['dca_periodType'])) {
+            $periodTypes = array_map('sanitize_text_field', $_POST['dca_periodType']);
+            $frequencies = array_map('absint', $_POST['dca_frequency'] ?? []);
+            $execTimes = array_map('absint', $_POST['dca_execTimes'] ?? []);
+
+            foreach ($periodTypes as $i => $periodType) {
+                if (! empty($periodType)) {
+                    $errorMsg .= $this->validate_period_constraints(
+                        $periodType,
+                        $frequencies[$i] ?? 0,
+                        $execTimes[$i] ?? 0
+                    );
+                }
+            }
+        }
+
+        if (! empty($errorMsg)) {
+            \WC_Admin_Settings::add_error($errorMsg);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 驗證週期限制
+     */
+    protected function validate_period_constraints($periodType, $frequency, $execTimes)
+    {
+        $errors = [];
+
+        switch ($periodType) {
+            case 'Y':
+                if ($frequency != 1) {
+                    $errors[] = __('When the periodType field is set to year, the execution frequency field can only be set to 1.', 'woocommerce-omnipay');
+                }
+                if ($execTimes < 1 || $execTimes > 9) {
+                    $errors[] = __('When the periodType field is set to year, The execTimes field can only be between 1 and 9.', 'woocommerce-omnipay');
+                }
+                break;
+            case 'M':
+                if ($frequency < 1 || $frequency > 12) {
+                    $errors[] = __('When the periodType field is set to month, The frequency field can only be between 1 and 12.', 'woocommerce-omnipay');
+                }
+                if ($execTimes < 1 || $execTimes > 99) {
+                    $errors[] = __('When the periodType field is set to month, The execTimes field can only be between 1 and 99.', 'woocommerce-omnipay');
+                }
+                break;
+            case 'D':
+                if ($frequency < 1 || $frequency > 365) {
+                    $errors[] = __('When the periodType field is set to day, The frequency field can only be between 1 and 365.', 'woocommerce-omnipay');
+                }
+                if ($execTimes < 1 || $execTimes > 999) {
+                    $errors[] = __('When the periodType field is set to day, The execTimes field can only be between 1 and 999.', 'woocommerce-omnipay');
+                }
+                break;
+        }
+
+        return implode(' ', $errors);
     }
 
     /**

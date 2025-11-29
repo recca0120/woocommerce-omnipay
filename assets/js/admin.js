@@ -7,6 +7,41 @@
     'use strict';
 
     /**
+     * 根據週期類型更新欄位限制
+     * Year (Y): frequency=1, execTimes=1-9
+     * Month (M): frequency=1-12, execTimes=1-99
+     * Day (D): frequency=1-365, execTimes=1-999
+     */
+    function updatePeriodConstraints(periodTypeInput) {
+        const row = periodTypeInput.closest('tr');
+        const frequencyInput = row.querySelector('input[name^="dca_frequency"]');
+        const execTimesInput = row.querySelector('input[name^="dca_execTimes"]');
+        const periodType = periodTypeInput.value.toUpperCase();
+
+        let freqMax = 365;
+        let execMax = 999;
+
+        if (periodType === 'Y') {
+            freqMax = 1;
+            execMax = 9;
+        } else if (periodType === 'M') {
+            freqMax = 12;
+            execMax = 99;
+        }
+
+        frequencyInput.setAttribute('max', freqMax);
+        execTimesInput.setAttribute('max', execMax);
+
+        // 調整超出範圍的值
+        if (parseInt(frequencyInput.value) > freqMax) {
+            frequencyInput.value = freqMax;
+        }
+        if (parseInt(execTimesInput.value) > execMax) {
+            execTimesInput.value = execMax;
+        }
+    }
+
+    /**
      * 初始化 DCA Periods Table
      *
      * @param {string} fieldKey 欄位 key
@@ -34,6 +69,19 @@
                 e.preventDefault();
                 tbody.innerHTML = '';
             }
+        });
+
+        // 監聽 periodType 變更，動態更新限制
+        container.addEventListener('input', function(e) {
+            if (e.target.name && e.target.name.startsWith('dca_periodType')) {
+                updatePeriodConstraints(e.target);
+            }
+        });
+
+        // 初始化現有 rows 的限制
+        const periodTypeInputs = tbody.querySelectorAll('input[name^="dca_periodType"]');
+        periodTypeInputs.forEach(function(input) {
+            updatePeriodConstraints(input);
         });
     }
 
