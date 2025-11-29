@@ -176,7 +176,7 @@ class ECPayDCAGateway extends ECPayGateway
             $frequency = absint($_POST[$this->plugin_id.$this->id.'_dca_frequency'] ?? 0);
             $execTimes = absint($_POST[$this->plugin_id.$this->id.'_dca_execTimes'] ?? 0);
 
-            $errorMsg .= $this->validate_period_constraints($periodType, $frequency, $execTimes);
+            $errorMsg .= $this->validatePeriodConstraints($periodType, $frequency, $execTimes);
         }
 
         // Validate Shortcode mode periods
@@ -187,7 +187,7 @@ class ECPayDCAGateway extends ECPayGateway
 
             foreach ($periodTypes as $i => $periodType) {
                 if (! empty($periodType)) {
-                    $errorMsg .= $this->validate_period_constraints(
+                    $errorMsg .= $this->validatePeriodConstraints(
                         $periodType,
                         $frequencies[$i] ?? 0,
                         $execTimes[$i] ?? 0
@@ -208,35 +208,50 @@ class ECPayDCAGateway extends ECPayGateway
     /**
      * 驗證週期限制
      */
-    protected function validate_period_constraints($periodType, $frequency, $execTimes)
+    protected function validatePeriodConstraints($periodType, $frequency, $execTimes)
     {
+        $constraints = [
+            'Y' => [
+                'frequency' => [1, 1],
+                'execTimes' => [1, 9],
+                'messages' => [
+                    'frequency' => __('When the periodType field is set to year, the execution frequency field can only be set to 1.', 'woocommerce-omnipay'),
+                    'execTimes' => __('When the periodType field is set to year, The execTimes field can only be between 1 and 9.', 'woocommerce-omnipay'),
+                ],
+            ],
+            'M' => [
+                'frequency' => [1, 12],
+                'execTimes' => [1, 99],
+                'messages' => [
+                    'frequency' => __('When the periodType field is set to month, The frequency field can only be between 1 and 12.', 'woocommerce-omnipay'),
+                    'execTimes' => __('When the periodType field is set to month, The execTimes field can only be between 1 and 99.', 'woocommerce-omnipay'),
+                ],
+            ],
+            'D' => [
+                'frequency' => [1, 365],
+                'execTimes' => [1, 999],
+                'messages' => [
+                    'frequency' => __('When the periodType field is set to day, The frequency field can only be between 1 and 365.', 'woocommerce-omnipay'),
+                    'execTimes' => __('When the periodType field is set to day, The execTimes field can only be between 1 and 999.', 'woocommerce-omnipay'),
+                ],
+            ],
+        ];
+
+        if (! isset($constraints[$periodType])) {
+            return '';
+        }
+
+        $config = $constraints[$periodType];
         $errors = [];
 
-        switch ($periodType) {
-            case 'Y':
-                if ($frequency != 1) {
-                    $errors[] = __('When the periodType field is set to year, the execution frequency field can only be set to 1.', 'woocommerce-omnipay');
-                }
-                if ($execTimes < 1 || $execTimes > 9) {
-                    $errors[] = __('When the periodType field is set to year, The execTimes field can only be between 1 and 9.', 'woocommerce-omnipay');
-                }
-                break;
-            case 'M':
-                if ($frequency < 1 || $frequency > 12) {
-                    $errors[] = __('When the periodType field is set to month, The frequency field can only be between 1 and 12.', 'woocommerce-omnipay');
-                }
-                if ($execTimes < 1 || $execTimes > 99) {
-                    $errors[] = __('When the periodType field is set to month, The execTimes field can only be between 1 and 99.', 'woocommerce-omnipay');
-                }
-                break;
-            case 'D':
-                if ($frequency < 1 || $frequency > 365) {
-                    $errors[] = __('When the periodType field is set to day, The frequency field can only be between 1 and 365.', 'woocommerce-omnipay');
-                }
-                if ($execTimes < 1 || $execTimes > 999) {
-                    $errors[] = __('When the periodType field is set to day, The execTimes field can only be between 1 and 999.', 'woocommerce-omnipay');
-                }
-                break;
+        [$minFreq, $maxFreq] = $config['frequency'];
+        if ($frequency < $minFreq || $frequency > $maxFreq) {
+            $errors[] = $config['messages']['frequency'];
+        }
+
+        [$minExec, $maxExec] = $config['execTimes'];
+        if ($execTimes < $minExec || $execTimes > $maxExec) {
+            $errors[] = $config['messages']['execTimes'];
         }
 
         return implode(' ', $errors);
@@ -252,25 +267,19 @@ class ECPayDCAGateway extends ECPayGateway
         }
 
         // 未設定定期定額選項時，不開放此付款方式
-        if (function_exists('is_checkout') && is_checkout()) {
-            if (function_exists('has_block') && has_block('woocommerce/checkout')) {
-                // 新版 WooCommerce Blocks - 檢查單一方案設定
-                $periodType = $this->get_option('dca_periodType');
-                $frequency = $this->get_option('dca_frequency');
-                $execTimes = $this->get_option('dca_execTimes');
-
-                if (empty($periodType) || empty($frequency) || empty($execTimes)) {
-                    return false;
-                }
-            } else {
-                // 舊版傳統結帳 - 檢查多組方案設定
-                if (empty($this->dca_periods)) {
-                    return false;
-                }
-            }
+        if (! (function_exists('is_checkout') && is_checkout())) {
+            return true;
         }
 
-        return true;
+        // 新版 WooCommerce Blocks - 檢查單一方案設定
+        if (function_exists('has_block') && has_block('woocommerce/checkout')) {
+            return ! (empty($this->get_option('dca_periodType'))
+                || empty($this->get_option('dca_frequency'))
+                || empty($this->get_option('dca_execTimes')));
+        }
+
+        // 舊版傳統結帳 - 檢查多組方案設定
+        return ! empty($this->dca_periods);
     }
 
     /**

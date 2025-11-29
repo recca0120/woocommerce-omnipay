@@ -785,11 +785,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function sendCallbackResponse($success, $message = '')
     {
-        if ($success) {
-            echo '1|OK';
-        } else {
-            echo '0|'.$message;
-        }
+        echo $success ? '1|OK' : '0|'.$message;
         Helper::terminate();
     }
 

@@ -256,25 +256,19 @@ class NewebPayDCAGateway extends NewebPayGateway
         }
 
         // 未設定定期定額選項時，不開放此付款方式
-        if (function_exists('is_checkout') && is_checkout()) {
-            if (function_exists('has_block') && has_block('woocommerce/checkout')) {
-                // 新版 WooCommerce Blocks - 檢查單一方案設定
-                $periodType = $this->get_option('dca_periodType');
-                $periodTimes = $this->get_option('dca_periodTimes');
-                $periodStartType = $this->get_option('dca_periodStartType');
-
-                if (empty($periodType) || empty($periodTimes) || empty($periodStartType)) {
-                    return false;
-                }
-            } else {
-                // 舊版傳統結帳 - 檢查多組方案設定
-                if (empty($this->dca_periods)) {
-                    return false;
-                }
-            }
+        if (! (function_exists('is_checkout') && is_checkout())) {
+            return true;
         }
 
-        return true;
+        // 新版 WooCommerce Blocks - 檢查單一方案設定
+        if (function_exists('has_block') && has_block('woocommerce/checkout')) {
+            return ! (empty($this->get_option('dca_periodType'))
+                || empty($this->get_option('dca_periodTimes'))
+                || empty($this->get_option('dca_periodStartType')));
+        }
+
+        // 舊版傳統結帳 - 檢查多組方案設定
+        return ! empty($this->dca_periods);
     }
 
     /**

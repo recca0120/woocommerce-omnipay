@@ -76,11 +76,8 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
         }
 
         $minAmount = (int) $this->get_option('min_amount', 0);
-        if ($minAmount > 0) {
-            $total = $this->get_order_total();
-            if ($total < $minAmount) {
-                return false;
-            }
+        if ($minAmount > 0 && $this->get_order_total() < $minAmount) {
+            return false;
         }
 
         return true;
@@ -118,16 +115,16 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
         $data = parent::preparePaymentData($order);
         $data['ChoosePayment'] = $this->paymentType;
 
-        // Use the installment period selected by the user
         $selectedInstallment = isset($_POST['omnipay_installment']) ? sanitize_text_field($_POST['omnipay_installment']) : '';
 
-        // If no installment is selected from POST, use all available installments
-        if (empty($selectedInstallment)) {
-            $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
-            $data['CreditInstallment'] = is_array($installments) ? implode(',', $installments) : $installments;
-        } else {
+        if (! empty($selectedInstallment)) {
             $data['CreditInstallment'] = $selectedInstallment;
+
+            return $data;
         }
+
+        $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
+        $data['CreditInstallment'] = is_array($installments) ? implode(',', $installments) : $installments;
 
         return $data;
     }
