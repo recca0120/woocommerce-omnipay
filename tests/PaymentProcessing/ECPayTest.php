@@ -502,8 +502,12 @@ class ECPayTest extends TestCase
     public static function paymentInfoHooksProvider()
     {
         return [
-            'admin' => ['woocommerce_admin_order_data_after_billing_address', fn ($order) => [$order]],
-            'email' => ['woocommerce_email_after_order_table', fn ($order) => [$order, true, false]],
+            'admin' => ['woocommerce_admin_order_data_after_billing_address', function ($order) {
+                return [$order];
+            }],
+            'email' => ['woocommerce_email_after_order_table', function ($order) {
+                return [$order, true, false];
+            }],
         ];
     }
 

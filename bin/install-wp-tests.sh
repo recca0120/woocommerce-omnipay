@@ -48,7 +48,27 @@ curl -sL https://wordpress.org/latest.tar.gz | tar xz --strip-components=1 -C "$
 # Download WooCommerce
 echo "Downloading WooCommerce..."
 cd "${WP_PLUGINS_DIR}"
-curl -sL https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip -o woocommerce.zip
+
+# Determine WooCommerce version based on PHP version
+PHP_VERSION=$(php -r "echo PHP_VERSION;")
+PHP_MAJOR_MINOR=$(php -r "echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;")
+
+if [ "$(php -r "echo version_compare('${PHP_MAJOR_MINOR}', '7.3', '<');")" = "1" ]; then
+    # PHP < 7.3: Use WooCommerce 6.4.x (last version supporting PHP 7.2)
+    WC_VERSION="6.4.1"
+    echo "PHP ${PHP_VERSION} detected. Using WooCommerce ${WC_VERSION} (last version supporting PHP 7.0-7.2)"
+    curl -sL "https://downloads.wordpress.org/plugin/woocommerce.${WC_VERSION}.zip" -o woocommerce.zip
+elif [ "$(php -r "echo version_compare('${PHP_MAJOR_MINOR}', '7.4', '<');")" = "1" ]; then
+    # PHP 7.3: Use WooCommerce 8.1.x (last version supporting PHP 7.3)
+    WC_VERSION="8.1.1"
+    echo "PHP ${PHP_VERSION} detected. Using WooCommerce ${WC_VERSION} (last version supporting PHP 7.3)"
+    curl -sL "https://downloads.wordpress.org/plugin/woocommerce.${WC_VERSION}.zip" -o woocommerce.zip
+else
+    # PHP >= 7.4: Use latest stable
+    echo "PHP ${PHP_VERSION} detected. Using latest stable WooCommerce"
+    curl -sL https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip -o woocommerce.zip
+fi
+
 unzip -q woocommerce.zip
 rm woocommerce.zip
 

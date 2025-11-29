@@ -98,20 +98,6 @@ class OmnipayGateway extends WC_Payment_Gateway
     }
 
     /**
-     * Override get_option to ensure no array values are returned
-     *
-     * @param  string  $key  Option key
-     * @param  mixed  $empty_value  Default value if option is empty
-     * @return string
-     */
-    public function get_option($key, $empty_value = null)
-    {
-        $value = parent::get_option($key, $empty_value);
-
-        return Helper::sanitizeOptionValue($value);
-    }
-
-    /**
      * 取得有效的設定值（Gateway 設定 > 共用設定）
      *
      * 用於 transaction_id_prefix, allow_resubmit 等 Plugin 設定
@@ -799,11 +785,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function sendCallbackResponse($success, $message = '')
     {
-        if ($success) {
-            echo '1|OK';
-        } else {
-            echo '0|'.$message;
-        }
+        echo $success ? '1|OK' : '0|'.$message;
         Helper::terminate();
     }
 

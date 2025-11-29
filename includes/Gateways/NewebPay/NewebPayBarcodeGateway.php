@@ -38,18 +38,18 @@ class NewebPayBarcodeGateway extends NewebPayGateway
         parent::init_form_fields();
 
         $this->form_fields['min_amount'] = [
-            'title' => __('最小訂單金額', 'woocommerce-omnipay'),
+            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('訂單金額低於此值時不顯示此付款方式（0 = 無限制）', 'woocommerce-omnipay'),
+            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
             'default' => '0',
             'desc_tip' => true,
             'custom_attributes' => ['min' => '0'],
         ];
 
         $this->form_fields['max_amount'] = [
-            'title' => __('最大訂單金額', 'woocommerce-omnipay'),
+            'title' => __('Maximum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('訂單金額高於此值時不顯示此付款方式（0 = 無限制）', 'woocommerce-omnipay'),
+            'description' => __('Maximum order amount for this payment method (0 = no limit)', 'woocommerce-omnipay'),
             'default' => '0',
             'desc_tip' => true,
             'custom_attributes' => ['min' => '0'],

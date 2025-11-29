@@ -5,16 +5,16 @@ namespace WooCommerceOmnipay\Gateways\ECPay;
 use WooCommerceOmnipay\Gateways\ECPayGateway;
 
 /**
- * ECPay 信用卡 Gateway
+ * ECPay WeiXin (微信支付) Gateway
  */
-class ECPayCreditGateway extends ECPayGateway
+class ECPayWeiXinGateway extends ECPayGateway
 {
     /**
      * 付款方式
      *
      * @var string
      */
-    protected $paymentType = 'Credit';
+    protected $paymentType = 'WeiXin';
 
     /**
      * Constructor
@@ -23,9 +23,9 @@ class ECPayCreditGateway extends ECPayGateway
      */
     public function __construct(array $config)
     {
-        $config['gateway_id'] = $config['gateway_id'] ?? 'ecpay_credit';
-        $config['title'] = $config['title'] ?? '綠界信用卡';
-        $config['description'] = $config['description'] ?? '使用信用卡付款';
+        $config['gateway_id'] = $config['gateway_id'] ?? 'ecpay_weixin';
+        $config['title'] = $config['title'] ?? __('ECPay WeChat Pay', 'woocommerce-omnipay');
+        $config['description'] = $config['description'] ?? __('Pay with WeChat Pay', 'woocommerce-omnipay');
 
         parent::__construct($config);
     }
@@ -37,22 +37,22 @@ class ECPayCreditGateway extends ECPayGateway
     {
         parent::init_form_fields();
 
+        // 添加最小金額設定
         $this->form_fields['min_amount'] = [
             'title' => __('Minimum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
+            'description' => __('Minimum order amount required for this payment method', 'woocommerce-omnipay'),
+            'default' => 0,
             'desc_tip' => true,
             'custom_attributes' => [
-                'min' => '0',
+                'min' => 0,
+                'step' => 1,
             ],
         ];
     }
 
     /**
      * 檢查付款方式是否可用
-     *
-     * @return bool
      */
     public function is_available()
     {
@@ -60,10 +60,11 @@ class ECPayCreditGateway extends ECPayGateway
             return false;
         }
 
-        $minAmount = (int) $this->get_option('min_amount', 0);
-        if ($minAmount > 0) {
+        if (WC()->cart) {
             $total = $this->get_order_total();
-            if ($total < $minAmount) {
+            $minAmount = (int) $this->get_option('min_amount', 0);
+
+            if ($total > 0 && $minAmount > 0 && $total < $minAmount) {
                 return false;
             }
         }

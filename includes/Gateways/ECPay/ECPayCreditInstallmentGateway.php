@@ -24,8 +24,8 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
     public function __construct(array $config)
     {
         $config['gateway_id'] = $config['gateway_id'] ?? 'ecpay_credit_installment';
-        $config['title'] = $config['title'] ?? '綠界信用卡分期';
-        $config['description'] = $config['description'] ?? '使用信用卡分期付款';
+        $config['title'] = $config['title'] ?? __('ECPay Credit Card Installment', 'woocommerce-omnipay');
+        $config['description'] = $config['description'] ?? __('Pay with credit card installment', 'woocommerce-omnipay');
 
         parent::__construct($config);
     }
@@ -38,28 +38,28 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
         parent::init_form_fields();
 
         $this->form_fields['min_amount'] = [
-            'title' => __('最小訂單金額', 'woocommerce-omnipay'),
+            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('訂單金額低於此值時不顯示此付款方式（0 = 無限制）', 'woocommerce-omnipay'),
+            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
             'default' => '0',
             'desc_tip' => true,
             'custom_attributes' => ['min' => '0'],
         ];
 
         $this->form_fields['installments'] = [
-            'title' => __('分期期數', 'woocommerce-omnipay'),
+            'title' => __('Installment Periods', 'woocommerce-omnipay'),
             'type' => 'multiselect',
             'class' => 'wc-enhanced-select',
-            'description' => __('選擇可用的分期期數', 'woocommerce-omnipay'),
+            'description' => __('Select available installment periods', 'woocommerce-omnipay'),
             'default' => ['3', '6', '12', '18', '24'],
             'desc_tip' => true,
             'options' => [
-                '3' => __('3 期', 'woocommerce-omnipay'),
-                '6' => __('6 期', 'woocommerce-omnipay'),
-                '12' => __('12 期', 'woocommerce-omnipay'),
-                '18' => __('18 期', 'woocommerce-omnipay'),
-                '24' => __('24 期', 'woocommerce-omnipay'),
-                '30N' => __('30 期（圓夢分期）', 'woocommerce-omnipay'),
+                '3' => __('3 installments', 'woocommerce-omnipay'),
+                '6' => __('6 installments', 'woocommerce-omnipay'),
+                '12' => __('12 installments', 'woocommerce-omnipay'),
+                '18' => __('18 installments', 'woocommerce-omnipay'),
+                '24' => __('24 installments', 'woocommerce-omnipay'),
+                '30N' => __('30 installments (Dream Installment)', 'woocommerce-omnipay'),
             ],
         ];
     }
@@ -76,14 +76,32 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
         }
 
         $minAmount = (int) $this->get_option('min_amount', 0);
-        if ($minAmount > 0) {
-            $total = $this->get_order_total();
-            if ($total < $minAmount) {
-                return false;
-            }
+        if ($minAmount > 0 && $this->get_order_total() < $minAmount) {
+            return false;
         }
 
         return true;
+    }
+
+    /**
+     * 顯示付款欄位
+     */
+    public function payment_fields()
+    {
+        parent::payment_fields();
+
+        $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
+
+        // Ensure installments is an array
+        if (! is_array($installments)) {
+            $installments = ['3', '6', '12', '18', '24'];
+        }
+
+        echo woocommerce_omnipay_get_template('checkout/installment-form.php', [
+            'installments' => $installments,
+            'total' => $this->get_order_total(),
+            'has_30n_validation' => true,
+        ]);
     }
 
     /**
@@ -97,9 +115,15 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
         $data = parent::preparePaymentData($order);
         $data['ChoosePayment'] = $this->paymentType;
 
-        // 加入分期期數參數（multiselect 回傳陣列，需轉為逗號分隔字串）
-        // 使用 WC_Payment_Gateway::get_option 繞過 OmnipayGateway 的 sanitize 處理
-        $installments = \WC_Payment_Gateway::get_option('installments', ['3', '6', '12', '18', '24']);
+        $selectedInstallment = isset($_POST['omnipay_installment']) ? sanitize_text_field($_POST['omnipay_installment']) : '';
+
+        if (! empty($selectedInstallment)) {
+            $data['CreditInstallment'] = $selectedInstallment;
+
+            return $data;
+        }
+
+        $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
         $data['CreditInstallment'] = is_array($installments) ? implode(',', $installments) : $installments;
 
         return $data;

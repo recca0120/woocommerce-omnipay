@@ -67,8 +67,11 @@ function woocommerce_omnipay_init()
     // Handle redirect form rendering
     add_action('template_redirect', 'woocommerce_omnipay_maybe_render_redirect_form');
 
-    // Register barcode scripts
+    // Register frontend scripts
     add_action('wp_enqueue_scripts', 'woocommerce_omnipay_register_scripts');
+
+    // Register admin scripts
+    add_action('admin_enqueue_scripts', 'woocommerce_omnipay_register_admin_scripts');
 }
 add_action('plugins_loaded', 'woocommerce_omnipay_init');
 
@@ -84,7 +87,7 @@ function woocommerce_omnipay_register_shared_settings()
 }
 
 /**
- * Register plugin scripts and styles
+ * Register frontend scripts and styles
  */
 function woocommerce_omnipay_register_scripts()
 {
@@ -121,6 +124,26 @@ function woocommerce_omnipay_register_scripts()
 
     // Enqueue scripts
     wp_enqueue_script('woocommerce-omnipay-barcode');
+}
+
+/**
+ * Register admin scripts
+ */
+function woocommerce_omnipay_register_admin_scripts($hook)
+{
+    // Only load on WooCommerce settings pages
+    if ($hook !== 'woocommerce_page_wc-settings') {
+        return;
+    }
+
+    // Register and enqueue admin scripts
+    wp_enqueue_script(
+        'woocommerce-omnipay-admin',
+        WOOCOMMERCE_OMNIPAY_PLUGIN_URL.'assets/js/admin.js',
+        [],
+        WOOCOMMERCE_OMNIPAY_VERSION,
+        true
+    );
 }
 
 /**

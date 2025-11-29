@@ -10,21 +10,6 @@ namespace WooCommerceOmnipay;
 class Helper
 {
     /**
-     * 確保 option 值為字串
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    public static function sanitizeOptionValue($value)
-    {
-        if (is_array($value)) {
-            return ! empty($value) ? (string) reset($value) : '';
-        }
-
-        return $value !== null ? (string) $value : '';
-    }
-
-    /**
      * 轉換 WooCommerce option 值為 Omnipay 參數值
      *
      * @param  string  $settingValue  WC 設定值

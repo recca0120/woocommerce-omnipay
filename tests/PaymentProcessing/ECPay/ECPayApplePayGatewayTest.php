@@ -2,15 +2,15 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayCreditGateway;
+use WooCommerceOmnipay\Gateways\ECPay\ECPayApplePayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
- * ECPay 信用卡 Gateway 測試
+ * ECPay Apple Pay Gateway 測試
  */
-class ECPayCreditGatewayTest extends TestCase
+class ECPayApplePayGatewayTest extends TestCase
 {
-    protected $gatewayId = 'ecpay_credit';
+    protected $gatewayId = 'ecpay_applepay';
 
     protected $gatewayName = 'ECPay';
 
@@ -25,28 +25,28 @@ class ECPayCreditGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayCreditGateway([
+        $this->gateway = new ECPayApplePayGateway([
             'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_credit',
-            'title' => '綠界信用卡',
+            'gateway_id' => 'ecpay_applepay',
+            'title' => '綠界 Apple Pay',
         ]);
     }
 
     public function test_gateway_has_correct_id_and_title()
     {
-        $this->assertEquals('omnipay_ecpay_credit', $this->gateway->id);
-        $this->assertEquals('綠界信用卡', $this->gateway->method_title);
+        $this->assertEquals('omnipay_ecpay_applepay', $this->gateway->id);
+        $this->assertEquals('綠界 Apple Pay', $this->gateway->method_title);
     }
 
-    public function test_process_payment_sends_credit_payment_type()
+    public function test_process_payment_sends_applepay_payment_type()
     {
-        $order = $this->createOrder(100);
+        $order = $this->createOrder(500);
 
         $result = $this->gateway->process_payment($order->get_id());
 
         $this->assertEquals('success', $result['result']);
 
         $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
-        $this->assertEquals('Credit', $redirectData['data']['ChoosePayment']);
+        $this->assertEquals('ApplePay', $redirectData['data']['ChoosePayment']);
     }
 }

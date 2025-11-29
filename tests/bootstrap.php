@@ -75,7 +75,20 @@ function _install_woocommerce()
     // Include WooCommerce install class
     if (file_exists(WC_ABSPATH.'includes/class-wc-install.php')) {
         include_once WC_ABSPATH.'includes/class-wc-install.php';
+
+        // Suppress database errors for PHP 7.2 with WooCommerce 6.4
+        // SQLite doesn't support FOREIGN KEY constraints syntax used in WooCommerce 6.4
+        global $wpdb;
+        $shouldSuppressErrors = version_compare(PHP_VERSION, '7.3', '<');
+        if ($shouldSuppressErrors) {
+            $wpdb->suppress_errors = true;
+        }
+
         WC_Install::install();
+
+        if ($shouldSuppressErrors) {
+            $wpdb->suppress_errors = false;
+        }
     }
 }
 

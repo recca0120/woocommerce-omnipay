@@ -170,3 +170,166 @@ msgstr "匯款帳號後5碼"
 
 msgid "Submit"
 msgstr "確認送出"
+
+# Installment Payment
+msgid "Installment Period"
+msgstr "分期期數"
+
+msgid "Select installment period"
+msgstr "請選擇分期期數"
+
+msgid "%s Installments"
+msgstr "%s 期"
+
+# DCA Payment
+msgid "Payment Plan"
+msgstr "付款方案"
+
+msgid "Select payment plan"
+msgstr "請選擇付款方案"
+
+msgid "Every %s %s, %s times total"
+msgstr "每 %s %s，共 %s 次"
+
+msgid "Every %s, %s times total"
+msgstr "每 %s，共 %s 次"
+
+msgid "year"
+msgstr "年"
+
+msgid "month"
+msgstr "月"
+
+msgid "week"
+msgstr "週"
+
+msgid "day"
+msgstr "天"
+
+# DCA Settings
+msgid "There are two section fields for DCA settings: WooCommerce Blocks and Woocommerce Shortcode. Please fill out the section that matches your current page configuration. If you are uncertain about which page configuration you are using, input the identical setting in both sections."
+msgstr "定期定額設定分為兩個區塊：WooCommerce Blocks 和 WooCommerce Shortcode。請填寫符合您目前頁面配置的區塊。如果您不確定使用哪種頁面配置，請在兩個區塊中輸入相同的設定。"
+
+msgid "DCA (Support WooCommerce Blocks)"
+msgstr "定期定額（支援 WooCommerce Blocks）"
+
+msgid "The following settings support the WooCommerce Blocks checkout page and do not support the use of the traditional shortcode-based checkout. Please configure carefully"
+msgstr "以下設定支援 WooCommerce Blocks 結帳頁面，不支援使用傳統的 shortcode 結帳。請謹慎設定"
+
+msgid "DCA (Support WooCommerce Shortcode)"
+msgstr "定期定額（支援 WooCommerce Shortcode）"
+
+msgid "The following settings support the traditional shortcode-based checkout page and do not support the use of the WooCommerce Blocks checkout. Please configure carefully"
+msgstr "以下設定支援傳統的 shortcode 結帳頁面，不支援使用 WooCommerce Blocks 結帳。請謹慎設定"
+
+msgid "Period Type"
+msgstr "週期類型"
+
+msgid "Support WooCommerce checkout blocks"
+msgstr "支援 WooCommerce 結帳區塊"
+
+msgid "Year"
+msgstr "年"
+
+msgid "Month"
+msgstr "月"
+
+msgid "Week"
+msgstr "週"
+
+msgid "Day"
+msgstr "天"
+
+msgid "Frequency"
+msgstr "週期頻率"
+
+msgid "Execute Times"
+msgstr "執行次數"
+
+msgid "Period Point"
+msgstr "週期時間點"
+
+msgid "Period Times"
+msgstr "週期次數"
+
+msgid "Period Start Type"
+msgstr "週期啟動方式"
+
+msgid "1 - Authorize and start immediately"
+msgstr "1 - 立即授權並啟動"
+
+msgid "2 - Authorize only, start manually"
+msgstr "2 - 僅授權，手動啟動"
+
+msgid "3 - Delegate to merchant"
+msgstr "3 - 委託商家處理"
+
+msgid "DCA Periods"
+msgstr "定期定額方案"
+
+msgid "DCA Period Settings"
+msgstr "定期定額設定"
+
+msgid "Period Type (Y/M/D)"
+msgstr "週期類型（Y/M/D）"
+
+msgid "Period Type (Y/M/W/D)"
+msgstr "週期類型（Y/M/W/D）"
+
+msgid "Start Type (1/2/3)"
+msgstr "啟動方式（1/2/3）"
+
+msgid "Add Period"
+msgstr "新增方案"
+
+msgid "Remove Selected"
+msgstr "移除所選項目"
+
+msgid "NT$ %d / %s %s, up to a maximum of %s"
+msgstr "NT$ %d / %s %s，最多 %s 次"
+
+msgid "NT$ %d / %s, up to a maximum of %s"
+msgstr "NT$ %d / %s，最多 %s 次"
+
+msgid "You will use <strong>ECPay recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products."
+msgstr "你將使用<strong>綠界科技定期定額信用卡付款</strong>，請留意你所購買的商品為<strong>非單次扣款</strong>商品。"
+
+msgctxt "Checkout info"
+msgid "Number of periods"
+msgstr "分期期數"
+
+msgid "ECPay BNPL"
+msgstr "綠界無卡分期"
+
+msgid "Pay with BNPL (Buy Now Pay Later)"
+msgstr "使用無卡分期付款"
+
+msgid "Minimum Amount"
+msgstr "最小金額"
+
+msgid "Minimum order amount required for this payment method"
+msgstr "此付款方式所需的最小訂單金額"
+
+msgid "Maximum Amount"
+msgstr "最大金額"
+
+msgid "Maximum order amount for this payment method (max: 300000)"
+msgstr "此付款方式的最大訂單金額（最大：300000）"
+
+msgid "ECPay Apple Pay"
+msgstr "綠界 Apple Pay"
+
+msgid "Pay with Apple Pay"
+msgstr "使用 Apple Pay 付款"
+
+msgid "ECPay Taiwan Pay"
+msgstr "綠界台灣 Pay"
+
+msgid "Pay with Taiwan Pay (TWQR)"
+msgstr "使用台灣 Pay 付款"
+
+msgid "ECPay WeChat Pay"
+msgstr "綠界微信支付"
+
+msgid "Pay with WeChat Pay"
+msgstr "使用微信支付"

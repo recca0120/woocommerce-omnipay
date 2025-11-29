@@ -38,27 +38,27 @@ class ECPayCVSGateway extends ECPayGateway
         parent::init_form_fields();
 
         $this->form_fields['min_amount'] = [
-            'title' => __('最小訂單金額', 'woocommerce-omnipay'),
+            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('訂單金額低於此值時不顯示此付款方式（0 = 無限制）', 'woocommerce-omnipay'),
+            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
             'default' => '0',
             'desc_tip' => true,
             'custom_attributes' => ['min' => '0'],
         ];
 
         $this->form_fields['max_amount'] = [
-            'title' => __('最大訂單金額', 'woocommerce-omnipay'),
+            'title' => __('Maximum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('訂單金額高於此值時不顯示此付款方式（0 = 無限制）', 'woocommerce-omnipay'),
+            'description' => __('Maximum order amount for this payment method (0 = no limit)', 'woocommerce-omnipay'),
             'default' => '0',
             'desc_tip' => true,
             'custom_attributes' => ['min' => '0'],
         ];
 
         $this->form_fields['expire_date'] = [
-            'title' => __('付款期限（分鐘）', 'woocommerce-omnipay'),
+            'title' => __('Payment Expiry Minutes', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('超商代碼的付款期限，範圍 1-43200 分鐘（預設 10080 分鐘 = 7 天）', 'woocommerce-omnipay'),
+            'description' => __('Payment expiry period for CVS code, range 1-43200 minutes (default 10080 minutes = 7 days)', 'woocommerce-omnipay'),
             'default' => '10080',
             'desc_tip' => true,
             'custom_attributes' => ['min' => '1', 'max' => '43200'],
