@@ -297,3 +297,21 @@ msgstr "你將使用<strong>綠界科技定期定額信用卡付款</strong>，�
 msgctxt "Checkout info"
 msgid "Number of periods"
 msgstr "分期期數"
+
+msgid "ECPay BNPL"
+msgstr "綠界無卡分期"
+
+msgid "Pay with BNPL (Buy Now Pay Later)"
+msgstr "使用無卡分期付款"
+
+msgid "Minimum Amount"
+msgstr "最小金額"
+
+msgid "Minimum order amount required for this payment method"
+msgstr "此付款方式所需的最小訂單金額"
+
+msgid "Maximum Amount"
+msgstr "最大金額"
+
+msgid "Maximum order amount for this payment method (max: 300000)"
+msgstr "此付款方式的最大訂單金額（最大：300000）"

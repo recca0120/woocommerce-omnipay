@@ -2,6 +2,7 @@
 
 use WooCommerceOmnipay\Gateways\ECPay\ECPayATMGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayBarcodeGateway;
+use WooCommerceOmnipay\Gateways\ECPay\ECPayBNPLGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayCreditGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayCreditInstallmentGateway;
 use WooCommerceOmnipay\Gateways\ECPay\ECPayCVSGateway;
@@ -69,6 +70,14 @@ return [
         'class' => ECPayDCAGateway::class,
         'title' => __('ECPay Recurring Payment', 'woocommerce-omnipay'),
         'description' => __('Pay with credit card recurring payment', 'woocommerce-omnipay'),
+        'icon' => $ecpayIcon,
+    ],
+    [
+        'gateway' => 'ECPay',
+        'gateway_id' => 'ecpay_bnpl',
+        'class' => ECPayBNPLGateway::class,
+        'title' => __('ECPay BNPL', 'woocommerce-omnipay'),
+        'description' => __('Pay with BNPL (Buy Now Pay Later)', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
