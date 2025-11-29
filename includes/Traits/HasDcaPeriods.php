@@ -84,7 +84,7 @@ trait HasDcaPeriods
      */
     public function generate_periods_html($key, $data)
     {
-        return woocommerce_omnipay_get_template('admin/dca-periods-table.php', [
+        return woocommerce_omnipay_get_template($this->getDcaAdminTemplatePath(), [
             'fieldKey' => $this->get_field_key($key),
             'data' => $data,
             'periods' => $this->dcaPeriods,
@@ -152,7 +152,7 @@ trait HasDcaPeriods
         if (is_checkout() && ! is_wc_endpoint_url('order-pay')) {
             $total = WC()->cart ? WC()->cart->total : 0;
 
-            echo woocommerce_omnipay_get_template('checkout/dca-form.php', [
+            echo woocommerce_omnipay_get_template($this->getDcaCheckoutTemplatePath(), [
                 'periods' => $this->dcaPeriods,
                 'total' => $total,
                 'periodFields' => $this->getPeriodFields(),
@@ -220,9 +220,15 @@ trait HasDcaPeriods
         $requiredFields = $this->getRequiredDcaFields();
         if (isset($_POST[$this->plugin_id.$this->id.'_'.$requiredFields[0]])) {
             $values = [];
+            $fieldConfigs = $this->getDcaFieldConfigs();
+            $configMap = [];
+            foreach ($fieldConfigs as $config) {
+                $configMap[$config['name']] = $config;
+            }
+
             foreach ($requiredFields as $field) {
                 $values[$field] = $_POST[$this->plugin_id.$this->id.'_'.$field] ?? null;
-                if (is_numeric($values[$field])) {
+                if (isset($configMap[$field]) && $configMap[$field]['type'] === 'number') {
                     $values[$field] = absint($values[$field]);
                 } else {
                     $values[$field] = sanitize_text_field($values[$field]);
@@ -298,6 +304,16 @@ trait HasDcaPeriods
      * Get warning message for checkout
      */
     abstract protected function getWarningMessage(): string;
+
+    /**
+     * Get DCA admin template path
+     */
+    abstract protected function getDcaAdminTemplatePath(): string;
+
+    /**
+     * Get DCA checkout template path
+     */
+    abstract protected function getDcaCheckoutTemplatePath(): string;
 
     /**
      * Validate period constraints

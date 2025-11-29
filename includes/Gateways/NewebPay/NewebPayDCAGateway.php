@@ -191,43 +191,49 @@ class NewebPayDCAGateway extends NewebPayGateway
      */
     protected function validatePeriodPoint(string $periodType, string $periodPoint): string
     {
-        switch ($periodType) {
-            case 'Y':
-                // MMDD format (4 digits)
-                if (! preg_match('/^\d{4}$/', $periodPoint)) {
-                    return __('For yearly periods, PeriodPoint must be in MMDD format (e.g., 0315 for March 15th).', 'woocommerce-omnipay').' ';
-                }
-                // Validate month (01-12) and day (01-31)
-                $month = (int) substr($periodPoint, 0, 2);
-                $day = (int) substr($periodPoint, 2, 2);
-                if ($month < 1 || $month > 12 || $day < 1 || $day > 31) {
-                    return __('Invalid date in PeriodPoint. Month must be 01-12, day must be 01-31.', 'woocommerce-omnipay').' ';
-                }
-                break;
+        if ($periodType === 'Y') {
+            // MMDD format (4 digits)
+            if (! preg_match('/^\d{4}$/', $periodPoint)) {
+                return __('For yearly periods, PeriodPoint must be in MMDD format (e.g., 0315 for March 15th).', 'woocommerce-omnipay').' ';
+            }
+            // Validate month (01-12) and day (01-31)
+            $month = (int) substr($periodPoint, 0, 2);
+            $day = (int) substr($periodPoint, 2, 2);
+            if ($month < 1 || $month > 12 || $day < 1 || $day > 31) {
+                return __('Invalid date in PeriodPoint. Month must be 01-12, day must be 01-31.', 'woocommerce-omnipay').' ';
+            }
 
-            case 'M':
-                // DD format (01-31)
-                $day = (int) $periodPoint;
-                if ($day < 1 || $day > 31) {
-                    return __('For monthly periods, PeriodPoint must be 1-31 (day of month).', 'woocommerce-omnipay').' ';
-                }
-                break;
+            return '';
+        }
 
-            case 'W':
-                // 1-7 (Monday to Sunday)
-                $weekday = (int) $periodPoint;
-                if ($weekday < 1 || $weekday > 7) {
-                    return __('For weekly periods, PeriodPoint must be 1-7 (1=Monday, 7=Sunday).', 'woocommerce-omnipay').' ';
-                }
-                break;
+        if ($periodType === 'M') {
+            // DD format (01-31)
+            $day = (int) $periodPoint;
+            if ($day < 1 || $day > 31) {
+                return __('For monthly periods, PeriodPoint must be 1-31 (day of month).', 'woocommerce-omnipay').' ';
+            }
 
-            case 'D':
-                // 2-999 (fixed day interval)
-                $interval = (int) $periodPoint;
-                if ($interval < 2 || $interval > 999) {
-                    return __('For daily periods, PeriodPoint must be 2-999 (day interval).', 'woocommerce-omnipay').' ';
-                }
-                break;
+            return '';
+        }
+
+        if ($periodType === 'W') {
+            // 1-7 (Monday to Sunday)
+            $weekday = (int) $periodPoint;
+            if ($weekday < 1 || $weekday > 7) {
+                return __('For weekly periods, PeriodPoint must be 1-7 (1=Monday, 7=Sunday).', 'woocommerce-omnipay').' ';
+            }
+
+            return '';
+        }
+
+        if ($periodType === 'D') {
+            // 2-999 (fixed day interval)
+            $interval = (int) $periodPoint;
+            if ($interval < 2 || $interval > 999) {
+                return __('For daily periods, PeriodPoint must be 2-999 (day interval).', 'woocommerce-omnipay').' ';
+            }
+
+            return '';
         }
 
         return '';
@@ -258,6 +264,22 @@ class NewebPayDCAGateway extends NewebPayGateway
             __('You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
             __('NewebPay', 'woocommerce-omnipay')
         );
+    }
+
+    /**
+     * Get DCA admin template path
+     */
+    protected function getDcaAdminTemplatePath(): string
+    {
+        return 'admin/newebpay-dca-periods-table.php';
+    }
+
+    /**
+     * Get DCA checkout template path
+     */
+    protected function getDcaCheckoutTemplatePath(): string
+    {
+        return 'checkout/newebpay-dca-form.php';
     }
 
     /**

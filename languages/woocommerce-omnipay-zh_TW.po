@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce Omnipay\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-29 00:00+0000\n"
-"PO-Revision-Date: 2025-01-29 00:00+0000\n"
+"POT-Creation-Date: 2025-01-30 00:00+0000\n"
+"PO-Revision-Date: 2025-01-30 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
 "Language: zh_TW\n"
@@ -258,6 +258,49 @@ msgstr "週"
 
 msgid "day"
 msgstr "天"
+
+# NewebPay DCA Display Formats
+msgid "Monday"
+msgstr "週一"
+
+msgid "Tuesday"
+msgstr "週二"
+
+msgid "Wednesday"
+msgstr "週三"
+
+msgid "Thursday"
+msgstr "週四"
+
+msgid "Friday"
+msgstr "週五"
+
+msgid "Saturday"
+msgstr "週六"
+
+msgid "Sunday"
+msgstr "週日"
+
+msgid "%d/%d"
+msgstr "%d/%d"
+
+msgid "%d"
+msgstr "%d"
+
+msgid "every %d days"
+msgstr "每 %d 天"
+
+msgid "charge on %s every year"
+msgstr "每年 %s 扣款"
+
+msgid "charge on day %s every month"
+msgstr "每月 %s 日扣款"
+
+msgid "charge every %s"
+msgstr "每週 %s 扣款"
+
+msgid "%s / %s, %s times total"
+msgstr "%s / %s，共 %s 次"
 
 # DCA Admin Settings
 msgid "Configure settings for both WooCommerce Blocks and Shortcode checkout. Fill in the section matching your checkout page type."
