@@ -21,7 +21,7 @@ class ECPayDCAGateway extends ECPayGateway
      *
      * @var array
      */
-    protected $dca_periods = [];
+    protected $dcaPeriods = [];
 
     /**
      * Constructor
@@ -37,7 +37,7 @@ class ECPayDCAGateway extends ECPayGateway
         parent::__construct($config);
 
         // Load DCA periods from option
-        $this->dca_periods = get_option($this->getDcaPeriodsOptionName(), []);
+        $this->dcaPeriods = get_option($this->getDcaPeriodsOptionName(), []);
     }
 
     /**
@@ -127,7 +127,7 @@ class ECPayDCAGateway extends ECPayGateway
         return woocommerce_omnipay_get_template('admin/dca-periods-table.php', [
             'field_key' => $this->get_field_key($key),
             'data' => $data,
-            'periods' => $this->dca_periods,
+            'periods' => $this->dcaPeriods,
             'headers' => [
                 __('Period Type (Y/M/D)', 'woocommerce-omnipay'),
                 __('Frequency', 'woocommerce-omnipay'),
@@ -165,7 +165,7 @@ class ECPayDCAGateway extends ECPayGateway
     public function process_admin_options()
     {
         // Validate DCA settings
-        if (! $this->validate_dca_fields()) {
+        if (! $this->validateDcaFields()) {
             return false;
         }
 
@@ -180,7 +180,7 @@ class ECPayDCAGateway extends ECPayGateway
      */
     protected function saveDcaPeriods()
     {
-        $dca_periods = [];
+        $dcaPeriods = [];
         if (isset($_POST['dca_periodType'])) {
             $periodTypes = array_map('sanitize_text_field', $_POST['dca_periodType']);
             $frequencies = array_map('absint', $_POST['dca_frequency']);
@@ -188,7 +188,7 @@ class ECPayDCAGateway extends ECPayGateway
 
             foreach ($periodTypes as $i => $periodType) {
                 if (! empty($periodType)) {
-                    $dca_periods[] = [
+                    $dcaPeriods[] = [
                         'periodType' => $periodType,
                         'frequency' => $frequencies[$i],
                         'execTimes' => $execTimes[$i],
@@ -196,7 +196,7 @@ class ECPayDCAGateway extends ECPayGateway
                 }
             }
         }
-        update_option($this->getDcaPeriodsOptionName(), $dca_periods);
+        update_option($this->getDcaPeriodsOptionName(), $dcaPeriods);
     }
 
     /**
@@ -210,7 +210,7 @@ class ECPayDCAGateway extends ECPayGateway
     /**
      * 驗證 DCA 欄位
      */
-    protected function validate_dca_fields()
+    protected function validateDcaFields()
     {
         $errorMsg = '';
 
@@ -327,7 +327,7 @@ class ECPayDCAGateway extends ECPayGateway
         }
 
         // 舊版傳統結帳 - 檢查多組方案設定
-        return ! empty($this->dca_periods);
+        return ! empty($this->dcaPeriods);
     }
 
     /**
@@ -345,7 +345,7 @@ class ECPayDCAGateway extends ECPayGateway
             $total = WC()->cart ? WC()->cart->total : 0;
 
             echo woocommerce_omnipay_get_template('checkout/dca-form.php', [
-                'periods' => $this->dca_periods,
+                'periods' => $this->dcaPeriods,
                 'total' => $total,
                 'period_type_labels' => [
                     'Y' => __('year', 'woocommerce-omnipay'),
