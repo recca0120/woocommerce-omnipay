@@ -41,6 +41,14 @@ class ECPayDCAGateway extends ECPayGateway
     }
 
     /**
+     * Get DCA periods option name
+     */
+    protected function getDcaPeriodsOptionName(): string
+    {
+        return 'woocommerce_'.$this->id.'_periods';
+    }
+
+    /**
      * 初始化表單欄位
      */
     public function init_form_fields()
@@ -125,38 +133,39 @@ class ECPayDCAGateway extends ECPayGateway
     public function generate_dca_periods_html($key, $data)
     {
         return woocommerce_omnipay_get_template('admin/dca-periods-table.php', [
-            'field_key' => $this->get_field_key($key),
+            'fieldKey' => $this->get_field_key($key),
             'data' => $data,
             'periods' => $this->dcaPeriods,
-            'headers' => [
-                __('Period Type (Y/M/D)', 'woocommerce-omnipay'),
-                __('Frequency', 'woocommerce-omnipay'),
-                __('Execute Times', 'woocommerce-omnipay'),
-            ],
-            'field_configs' => [
-                [
-                    'name' => 'periodType',
-                    'type' => 'text',
-                    'default' => 'M',
-                    'attributes' => ['maxlength' => '1', 'required' => 'required'],
-                ],
-                [
-                    'name' => 'frequency',
-                    'type' => 'number',
-                    'default' => 1,
-                    'attributes' => ['min' => '1', 'max' => '365', 'required' => 'required'],
-                ],
-                [
-                    'name' => 'execTimes',
-                    'type' => 'number',
-                    'default' => 12,
-                    'attributes' => ['min' => '1', 'max' => '999', 'required' => 'required'],
-                ],
-            ],
-            'field_prefix' => 'dca_',
-            'default_period' => ['periodType' => 'M', 'frequency' => 1, 'execTimes' => 12],
-            'table_width' => 600,
+            'fieldConfigs' => $this->getDcaFieldConfigs(),
+            'defaultPeriod' => ['periodType' => 'M', 'frequency' => 1, 'execTimes' => 12],
         ]);
+    }
+
+    /**
+     * Get DCA field configurations
+     */
+    protected function getDcaFieldConfigs(): array
+    {
+        return [
+            [
+                'name' => 'periodType',
+                'type' => 'text',
+                'default' => 'M',
+                'attributes' => ['maxlength' => '1', 'required' => 'required'],
+            ],
+            [
+                'name' => 'frequency',
+                'type' => 'number',
+                'default' => 1,
+                'attributes' => ['min' => '1', 'max' => '365', 'required' => 'required'],
+            ],
+            [
+                'name' => 'execTimes',
+                'type' => 'number',
+                'default' => 12,
+                'attributes' => ['min' => '1', 'max' => '999', 'required' => 'required'],
+            ],
+        ];
     }
 
     /**
@@ -181,10 +190,10 @@ class ECPayDCAGateway extends ECPayGateway
     protected function saveDcaPeriods()
     {
         $dcaPeriods = [];
-        if (isset($_POST['dca_periodType'])) {
-            $periodTypes = array_map('sanitize_text_field', $_POST['dca_periodType']);
-            $frequencies = array_map('absint', $_POST['dca_frequency']);
-            $execTimes = array_map('absint', $_POST['dca_execTimes']);
+        if (isset($_POST['periodType'])) {
+            $periodTypes = array_map('sanitize_text_field', $_POST['periodType']);
+            $frequencies = array_map('absint', $_POST['frequency']);
+            $execTimes = array_map('absint', $_POST['execTimes']);
 
             foreach ($periodTypes as $i => $periodType) {
                 if (! empty($periodType)) {
@@ -197,14 +206,6 @@ class ECPayDCAGateway extends ECPayGateway
             }
         }
         update_option($this->getDcaPeriodsOptionName(), $dcaPeriods);
-    }
-
-    /**
-     * Get DCA periods option name
-     */
-    protected function getDcaPeriodsOptionName(): string
-    {
-        return 'woocommerce_omnipay_ecpay_dca_periods';
     }
 
     /**
@@ -224,13 +225,13 @@ class ECPayDCAGateway extends ECPayGateway
         }
 
         // Validate Shortcode mode periods
-        if (isset($_POST['dca_periodType']) && is_array($_POST['dca_periodType'])) {
-            $periodTypes = array_map('sanitize_text_field', $_POST['dca_periodType']);
-            $frequencies = isset($_POST['dca_frequency']) && is_array($_POST['dca_frequency'])
-                ? array_map('absint', $_POST['dca_frequency'])
+        if (isset($_POST['periodType']) && is_array($_POST['periodType'])) {
+            $periodTypes = array_map('sanitize_text_field', $_POST['periodType']);
+            $frequencies = isset($_POST['frequency']) && is_array($_POST['frequency'])
+                ? array_map('absint', $_POST['frequency'])
                 : [];
-            $execTimes = isset($_POST['dca_execTimes']) && is_array($_POST['dca_execTimes'])
-                ? array_map('absint', $_POST['dca_execTimes'])
+            $execTimes = isset($_POST['execTimes']) && is_array($_POST['execTimes'])
+                ? array_map('absint', $_POST['execTimes'])
                 : [];
 
             foreach ($periodTypes as $i => $periodType) {

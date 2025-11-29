@@ -45,7 +45,7 @@ class NewebPayDCAGateway extends NewebPayGateway
      */
     protected function getDcaPeriodsOptionName(): string
     {
-        return 'woocommerce_omnipay_newebpay_dca_periods';
+        return 'woocommerce_'.$this->id.'_periods';
     }
 
     /**
@@ -89,7 +89,7 @@ class NewebPayDCAGateway extends NewebPayGateway
         $this->form_fields['dca_periodPoint'] = [
             'title' => __('Period Point', 'woocommerce-omnipay'),
             'type' => 'text',
-            'default' => '',
+            'default' => '1',
             'description' => __('Support WooCommerce checkout blocks', 'woocommerce-omnipay'),
         ];
 
@@ -142,50 +142,50 @@ class NewebPayDCAGateway extends NewebPayGateway
     public function generate_dca_periods_html($key, $data)
     {
         return woocommerce_omnipay_get_template('admin/dca-periods-table.php', [
-            'field_key' => $this->get_field_key($key),
+            'fieldKey' => $this->get_field_key($key),
             'data' => $data,
             'periods' => $this->dcaPeriods,
-            'headers' => [
-                __('Period Type (Y/M/W/D)', 'woocommerce-omnipay'),
-                __('Period Point', 'woocommerce-omnipay'),
-                __('Period Times', 'woocommerce-omnipay'),
-                __('Start Type (1/2/3)', 'woocommerce-omnipay'),
-            ],
-            'field_configs' => [
-                [
-                    'name' => 'periodType',
-                    'type' => 'text',
-                    'default' => 'M',
-                    'attributes' => ['maxlength' => '1', 'required' => 'required'],
-                ],
-                [
-                    'name' => 'periodPoint',
-                    'type' => 'text',
-                    'default' => '',
-                    'attributes' => [],
-                ],
-                [
-                    'name' => 'periodTimes',
-                    'type' => 'number',
-                    'default' => 12,
-                    'attributes' => ['min' => '1', 'required' => 'required'],
-                ],
-                [
-                    'name' => 'periodStartType',
-                    'type' => 'number',
-                    'default' => 2,
-                    'attributes' => ['min' => '1', 'max' => '3', 'required' => 'required'],
-                ],
-            ],
-            'field_prefix' => 'newebpay_dca_',
-            'default_period' => [
+            'fieldConfigs' => $this->getDcaFieldConfigs(),
+            'defaultPeriod' => [
                 'periodType' => 'M',
-                'periodPoint' => '',
+                'periodPoint' => '1',
                 'periodTimes' => 12,
                 'periodStartType' => 2,
             ],
-            'table_width' => 700,
         ]);
+    }
+
+    /**
+     * Get DCA field configurations
+     */
+    protected function getDcaFieldConfigs(): array
+    {
+        return [
+            [
+                'name' => 'periodType',
+                'type' => 'text',
+                'default' => 'M',
+                'attributes' => ['maxlength' => '1', 'required' => 'required'],
+            ],
+            [
+                'name' => 'periodPoint',
+                'type' => 'text',
+                'default' => '1',
+                'attributes' => ['required' => 'required'],
+            ],
+            [
+                'name' => 'periodTimes',
+                'type' => 'number',
+                'default' => 12,
+                'attributes' => ['min' => '1', 'required' => 'required'],
+            ],
+            [
+                'name' => 'periodStartType',
+                'type' => 'number',
+                'default' => 2,
+                'attributes' => ['min' => '1', 'max' => '3', 'required' => 'required'],
+            ],
+        ];
     }
 
     /**
@@ -210,16 +210,16 @@ class NewebPayDCAGateway extends NewebPayGateway
     protected function saveDcaPeriods()
     {
         $dcaPeriods = [];
-        if (isset($_POST['newebpay_dca_periodType']) && is_array($_POST['newebpay_dca_periodType'])) {
-            $periodTypes = array_map('sanitize_text_field', $_POST['newebpay_dca_periodType']);
-            $periodPoints = isset($_POST['newebpay_dca_periodPoint']) && is_array($_POST['newebpay_dca_periodPoint'])
-                ? array_map('sanitize_text_field', $_POST['newebpay_dca_periodPoint'])
+        if (isset($_POST['periodType']) && is_array($_POST['periodType'])) {
+            $periodTypes = array_map('sanitize_text_field', $_POST['periodType']);
+            $periodPoints = isset($_POST['periodPoint']) && is_array($_POST['periodPoint'])
+                ? array_map('sanitize_text_field', $_POST['periodPoint'])
                 : [];
-            $periodTimes = isset($_POST['newebpay_dca_periodTimes']) && is_array($_POST['newebpay_dca_periodTimes'])
-                ? array_map('absint', $_POST['newebpay_dca_periodTimes'])
+            $periodTimes = isset($_POST['periodTimes']) && is_array($_POST['periodTimes'])
+                ? array_map('absint', $_POST['periodTimes'])
                 : [];
-            $periodStartTypes = isset($_POST['newebpay_dca_periodStartType']) && is_array($_POST['newebpay_dca_periodStartType'])
-                ? array_map('absint', $_POST['newebpay_dca_periodStartType'])
+            $periodStartTypes = isset($_POST['periodStartType']) && is_array($_POST['periodStartType'])
+                ? array_map('absint', $_POST['periodStartType'])
                 : [];
 
             foreach ($periodTypes as $i => $periodType) {
@@ -252,10 +252,10 @@ class NewebPayDCAGateway extends NewebPayGateway
         }
 
         // Validate Shortcode mode periods
-        if (isset($_POST['newebpay_dca_periodType']) && is_array($_POST['newebpay_dca_periodType'])) {
-            $periodTypes = array_map('sanitize_text_field', $_POST['newebpay_dca_periodType']);
-            $periodTimes = isset($_POST['newebpay_dca_periodTimes']) && is_array($_POST['newebpay_dca_periodTimes'])
-                ? array_map('absint', $_POST['newebpay_dca_periodTimes'])
+        if (isset($_POST['periodType']) && is_array($_POST['periodType'])) {
+            $periodTypes = array_map('sanitize_text_field', $_POST['periodType']);
+            $periodTimes = isset($_POST['periodTimes']) && is_array($_POST['periodTimes'])
+                ? array_map('absint', $_POST['periodTimes'])
                 : [];
 
             foreach ($periodTypes as $i => $periodType) {
@@ -403,7 +403,7 @@ class NewebPayDCAGateway extends NewebPayGateway
     {
         return [
             'PeriodType' => $this->get_option('dca_periodType', 'M'),
-            'PeriodPoint' => $this->get_option('dca_periodPoint', ''),
+            'PeriodPoint' => $this->get_option('dca_periodPoint', '1'),
             'PeriodTimes' => (int) $this->get_option('dca_periodTimes', 12),
             'PeriodStartType' => (int) $this->get_option('dca_periodStartType', 2),
         ];
@@ -431,7 +431,7 @@ class NewebPayDCAGateway extends NewebPayGateway
         // Fallback to default values if format is invalid
         return [
             'PeriodType' => 'M',
-            'PeriodPoint' => '',
+            'PeriodPoint' => '1',
             'PeriodTimes' => 12,
             'PeriodStartType' => 2,
         ];
