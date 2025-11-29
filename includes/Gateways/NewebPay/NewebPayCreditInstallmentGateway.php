@@ -123,7 +123,7 @@ class NewebPayCreditInstallmentGateway extends NewebPayGateway
 
         // If no installment is selected from POST, use all available installments
         if (empty($selectedInstallment)) {
-            $installments = \WC_Payment_Gateway::get_option('installments', ['3', '6', '12', '18', '24']);
+            $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
             $data['InstFlag'] = is_array($installments) ? implode(',', $installments) : $installments;
         } else {
             $data['InstFlag'] = $selectedInstallment;

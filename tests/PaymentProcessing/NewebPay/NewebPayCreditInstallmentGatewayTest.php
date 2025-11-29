@@ -47,8 +47,25 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
         $this->assertEquals('藍新信用卡分期', $this->gateway->method_title);
     }
 
+    public function test_multiselect_installments_saved_and_retrieved_as_array()
+    {
+        // Save multiselect value as array
+        $installments = ['3', '6', '12'];
+        $this->gateway->update_option('installments', $installments);
+
+        // Retrieve should return array (not string)
+        $retrieved = $this->gateway->get_option('installments');
+
+        $this->assertIsArray($retrieved, 'installments should be returned as array');
+        $this->assertEquals($installments, $retrieved);
+        $this->assertCount(3, $retrieved);
+    }
+
     public function test_process_payment_sends_credit_with_installment()
     {
+        // Set up installments first
+        $this->gateway->update_option('installments', ['3', '6', '12', '18', '24']);
+
         $order = $this->createOrder(3000);
 
         $result = $this->gateway->process_payment($order->get_id());

@@ -123,7 +123,7 @@ class ECPayCreditInstallmentGateway extends ECPayGateway
 
         // If no installment is selected from POST, use all available installments
         if (empty($selectedInstallment)) {
-            $installments = \WC_Payment_Gateway::get_option('installments', ['3', '6', '12', '18', '24']);
+            $installments = $this->get_option('installments', ['3', '6', '12', '18', '24']);
             $data['CreditInstallment'] = is_array($installments) ? implode(',', $installments) : $installments;
         } else {
             $data['CreditInstallment'] = $selectedInstallment;
