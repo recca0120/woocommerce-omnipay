@@ -108,7 +108,7 @@ class SharedSettingsPage
      */
     public function output_sections()
     {
-        global $current_section;
+        $currentSection = $this->getCurrentSection();
 
         $sections = $this->get_sections();
 
@@ -121,7 +121,7 @@ class SharedSettingsPage
         $links = [];
         foreach ($sections as $id => $label) {
             $url = admin_url('admin.php?page=wc-settings&tab=omnipay&section='.$id);
-            $class = ($current_section === $id || (empty($current_section) && $id === array_key_first($sections))) ? 'current' : '';
+            $class = ($currentSection === $id || (empty($currentSection) && $id === array_key_first($sections))) ? 'current' : '';
             $links[] = '<li><a href="'.esc_url($url).'" class="'.esc_attr($class).'">'.esc_html($label).'</a></li>';
         }
 
@@ -134,9 +134,9 @@ class SharedSettingsPage
      */
     public function output_settings()
     {
-        global $current_section;
+        $currentSection = $this->getCurrentSection();
 
-        $section = $current_section ?: $this->get_default_section();
+        $section = $currentSection ?: $this->get_default_section();
         $settings = $this->get_settings($section);
 
         \WC_Admin_Settings::output_fields($settings);
@@ -147,12 +147,22 @@ class SharedSettingsPage
      */
     public function save_settings()
     {
-        global $current_section;
+        $currentSection = $this->getCurrentSection();
 
-        $section = $current_section ?: $this->get_default_section();
+        $section = $currentSection ?: $this->get_default_section();
         $settings = $this->get_settings($section);
 
         \WC_Admin_Settings::save_fields($settings);
+    }
+
+    /**
+     * 取得當前 section
+     *
+     * @return string
+     */
+    private function getCurrentSection()
+    {
+        return isset($_GET['section']) ? sanitize_text_field($_GET['section']) : '';
     }
 
     /**

@@ -78,16 +78,15 @@ function _install_woocommerce()
 
         // Suppress database errors for PHP 7.2 with WooCommerce 6.4
         // SQLite doesn't support FOREIGN KEY constraints syntax used in WooCommerce 6.4
-        global $wpdb;
         $shouldSuppressErrors = version_compare(PHP_VERSION, '7.3', '<');
-        if ($shouldSuppressErrors) {
-            $wpdb->suppress_errors = true;
+        if ($shouldSuppressErrors && isset($GLOBALS['wpdb'])) {
+            $GLOBALS['wpdb']->suppress_errors = true;
         }
 
         WC_Install::install();
 
-        if ($shouldSuppressErrors) {
-            $wpdb->suppress_errors = false;
+        if ($shouldSuppressErrors && isset($GLOBALS['wpdb'])) {
+            $GLOBALS['wpdb']->suppress_errors = false;
         }
     }
 }
