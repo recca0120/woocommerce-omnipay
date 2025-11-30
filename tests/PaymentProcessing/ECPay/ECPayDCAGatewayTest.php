@@ -328,4 +328,85 @@ class ECPayDCAGatewayTest extends TestCase
         $this->assertStringContainsString('value="1"', $html); // default frequency
         $this->assertStringContainsString('value="12"', $html); // default execTimes
     }
+
+    public function test_payment_fields_displays_description()
+    {
+        $this->gateway->description = 'Test DCA payment description';
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('Test DCA payment description', $output);
+    }
+
+    public function test_payment_fields_displays_period_select_with_configured_periods()
+    {
+        // Set up multiple DCA periods
+        update_option('woocommerce_omnipay_ecpay_dca_periods', [
+            ['periodType' => 'M', 'frequency' => 1, 'execTimes' => 12],
+            ['periodType' => 'M', 'frequency' => 1, 'execTimes' => 24],
+            ['periodType' => 'Y', 'frequency' => 1, 'execTimes' => 3],
+        ]);
+
+        // Recreate gateway to load new periods
+        $this->gateway = new ECPayDCAGateway([
+            'gateway' => 'ECPay',
+            'gateway_id' => 'ecpay_dca',
+            'title' => '綠界定期定額',
+        ]);
+
+        // Mock is_checkout() to return true using filter
+        add_filter('woocommerce_is_checkout', '__return_true');
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Remove filter
+        remove_filter('woocommerce_is_checkout', '__return_true');
+
+        // Verify the select field exists
+        $this->assertStringContainsString('omnipay_period', $output);
+
+        // Verify period options are rendered
+        $this->assertStringContainsString('M_1_12', $output);
+        $this->assertStringContainsString('M_1_24', $output);
+        $this->assertStringContainsString('Y_1_3', $output);
+    }
+
+    public function test_payment_fields_displays_warning_message()
+    {
+        // Mock is_checkout() to return true using filter
+        add_filter('woocommerce_is_checkout', '__return_true');
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Remove filter
+        remove_filter('woocommerce_is_checkout', '__return_true');
+
+        // Verify warning message contains provider name
+        $this->assertStringContainsString('ECPay', $output);
+        $this->assertStringContainsString('recurring credit card payment', $output);
+    }
+
+    public function test_payment_fields_includes_period_select_field()
+    {
+        // Mock is_checkout() to return true using filter
+        add_filter('woocommerce_is_checkout', '__return_true');
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Remove filter
+        remove_filter('woocommerce_is_checkout', '__return_true');
+
+        // Verify the period select field and info div are present
+        $this->assertStringContainsString('id="omnipay_period"', $output);
+        $this->assertStringContainsString('name="omnipay_period"', $output);
+        $this->assertStringContainsString('id="omnipay_period_info"', $output);
+    }
 }

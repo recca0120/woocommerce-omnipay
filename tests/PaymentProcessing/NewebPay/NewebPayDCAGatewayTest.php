@@ -439,4 +439,85 @@ class NewebPayDCAGatewayTest extends TestCase
         $this->assertStringContainsString('value="01"', $html); // default periodPoint
         $this->assertStringContainsString('value="2"', $html); // default periodTimes and periodStartType
     }
+
+    public function test_payment_fields_displays_description()
+    {
+        $this->gateway->description = 'Test NewebPay DCA payment description';
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('Test NewebPay DCA payment description', $output);
+    }
+
+    public function test_payment_fields_displays_period_select_with_configured_periods()
+    {
+        // Set up multiple DCA periods
+        update_option('woocommerce_omnipay_newebpay_dca_periods', [
+            ['periodType' => 'M', 'periodPoint' => '1', 'periodTimes' => 12, 'periodStartType' => 2],
+            ['periodType' => 'W', 'periodPoint' => '2', 'periodTimes' => 24, 'periodStartType' => 1],
+            ['periodType' => 'Y', 'periodPoint' => '0315', 'periodTimes' => 5, 'periodStartType' => 2],
+        ]);
+
+        // Recreate gateway to load new periods
+        $this->gateway = new NewebPayDCAGateway([
+            'gateway' => 'NewebPay',
+            'gateway_id' => 'newebpay_dca',
+            'title' => '藍新定期定額',
+        ]);
+
+        // Mock is_checkout() to return true using filter
+        add_filter('woocommerce_is_checkout', '__return_true');
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Remove filter
+        remove_filter('woocommerce_is_checkout', '__return_true');
+
+        // Verify the select field exists
+        $this->assertStringContainsString('omnipay_period', $output);
+
+        // Verify period options are rendered
+        $this->assertStringContainsString('M_1_12_2', $output);
+        $this->assertStringContainsString('W_2_24_1', $output);
+        $this->assertStringContainsString('Y_0315_5_2', $output);
+    }
+
+    public function test_payment_fields_displays_warning_message()
+    {
+        // Mock is_checkout() to return true using filter
+        add_filter('woocommerce_is_checkout', '__return_true');
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Remove filter
+        remove_filter('woocommerce_is_checkout', '__return_true');
+
+        // Verify warning message contains provider name
+        $this->assertStringContainsString('NewebPay', $output);
+        $this->assertStringContainsString('recurring credit card payment', $output);
+    }
+
+    public function test_payment_fields_includes_period_select_field()
+    {
+        // Mock is_checkout() to return true using filter
+        add_filter('woocommerce_is_checkout', '__return_true');
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        // Remove filter
+        remove_filter('woocommerce_is_checkout', '__return_true');
+
+        // Verify the period select field and info div are present
+        $this->assertStringContainsString('id="omnipay_period"', $output);
+        $this->assertStringContainsString('name="omnipay_period"', $output);
+        $this->assertStringContainsString('id="omnipay_period_info"', $output);
+    }
 }
