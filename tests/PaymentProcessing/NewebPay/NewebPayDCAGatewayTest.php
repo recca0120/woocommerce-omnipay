@@ -386,4 +386,60 @@ class NewebPayDCAGatewayTest extends TestCase
             'D: interval 999' => ['D', '999'],
         ];
     }
+
+    public function test_generate_periods_html_passes_periods_to_template()
+    {
+        // Set up test periods with specific values
+        update_option('woocommerce_omnipay_newebpay_dca_periods', [
+            ['periodType' => 'M', 'periodPoint' => '15', 'periodTimes' => 24, 'periodStartType' => 2],
+            ['periodType' => 'W', 'periodPoint' => '5', 'periodTimes' => 48, 'periodStartType' => 1],
+        ]);
+
+        // Create new gateway instance to load periods
+        $gateway = new NewebPayDCAGateway([
+            'gateway' => 'NewebPay',
+            'gateway_id' => 'newebpay_dca',
+        ]);
+
+        $html = $gateway->generate_periods_html('periods', []);
+
+        // Verify the periods data appears in the rendered HTML
+        $this->assertStringContainsString('value="M"', $html); // periodType from first period
+        $this->assertStringContainsString('value="15"', $html); // periodPoint from first period
+        $this->assertStringContainsString('value="24"', $html); // periodTimes from first period
+        $this->assertStringContainsString('value="2"', $html); // periodStartType from first period
+        $this->assertStringContainsString('value="W"', $html); // periodType from second period
+        $this->assertStringContainsString('value="5"', $html); // periodPoint from second period
+        $this->assertStringContainsString('value="48"', $html); // periodTimes from second period
+        $this->assertStringContainsString('value="1"', $html); // periodStartType from second period
+    }
+
+    public function test_generate_periods_html_passes_field_configs_to_template()
+    {
+        $html = $this->gateway->generate_periods_html('periods', []);
+
+        // Verify fieldConfigs are used to generate input fields
+        // NewebPay has: periodType, periodPoint, periodTimes, periodStartType
+        $this->assertStringContainsString('name="periodType', $html);
+        $this->assertStringContainsString('name="periodPoint', $html);
+        $this->assertStringContainsString('name="periodTimes', $html);
+        $this->assertStringContainsString('name="periodStartType', $html);
+
+        // Verify field attributes from fieldConfigs are applied
+        $this->assertStringContainsString('maxlength="1"', $html); // periodType maxlength
+        $this->assertStringContainsString('min="2"', $html); // periodTimes min
+        $this->assertStringContainsString('max="99"', $html); // periodTimes max
+        $this->assertStringContainsString('required', $html); // required attributes
+    }
+
+    public function test_generate_periods_html_passes_default_period_to_template()
+    {
+        $html = $this->gateway->generate_periods_html('periods', []);
+
+        // Verify defaultPeriod is rendered in template (for the add-row template)
+        // NewebPay default: periodType='M', periodPoint='01', periodTimes=2, periodStartType='2'
+        $this->assertStringContainsString('value="M"', $html); // default periodType
+        $this->assertStringContainsString('value="01"', $html); // default periodPoint
+        $this->assertStringContainsString('value="2"', $html); // default periodTimes and periodStartType
+    }
 }

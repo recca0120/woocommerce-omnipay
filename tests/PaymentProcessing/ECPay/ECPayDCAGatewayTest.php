@@ -289,4 +289,58 @@ class ECPayDCAGatewayTest extends TestCase
             'D: max execTimes' => ['D', 30, 999],
         ];
     }
+
+    public function test_generate_periods_html_passes_periods_to_template()
+    {
+        // Set up test periods with specific values
+        update_option('woocommerce_omnipay_ecpay_dca_periods', [
+            ['periodType' => 'M', 'frequency' => 6, 'execTimes' => 24],
+            ['periodType' => 'Y', 'frequency' => 1, 'execTimes' => 5],
+        ]);
+
+        // Create new gateway instance to load periods
+        $gateway = new ECPayDCAGateway([
+            'gateway' => 'ECPay',
+            'gateway_id' => 'ecpay_dca',
+        ]);
+
+        $html = $gateway->generate_periods_html('periods', []);
+
+        // Verify the periods data appears in the rendered HTML
+        // Template should render existing periods as table rows with input fields
+        $this->assertStringContainsString('value="M"', $html); // periodType from first period
+        $this->assertStringContainsString('value="6"', $html); // frequency from first period
+        $this->assertStringContainsString('value="24"', $html); // execTimes from first period
+        $this->assertStringContainsString('value="Y"', $html); // periodType from second period
+        $this->assertStringContainsString('value="5"', $html); // execTimes from second period
+    }
+
+    public function test_generate_periods_html_passes_field_configs_to_template()
+    {
+        $html = $this->gateway->generate_periods_html('periods', []);
+
+        // Verify fieldConfigs are used to generate input fields
+        // ECPay has: periodType, frequency, execTimes
+        $this->assertStringContainsString('name="periodType', $html);
+        $this->assertStringContainsString('name="frequency', $html);
+        $this->assertStringContainsString('name="execTimes', $html);
+
+        // Verify field attributes from fieldConfigs are applied
+        $this->assertStringContainsString('maxlength="1"', $html); // periodType maxlength
+        $this->assertStringContainsString('min="1"', $html); // frequency/execTimes min
+        $this->assertStringContainsString('max="365"', $html); // frequency max for D type
+        $this->assertStringContainsString('max="999"', $html); // execTimes max for D type
+    }
+
+    public function test_generate_periods_html_passes_default_period_to_template()
+    {
+        $html = $this->gateway->generate_periods_html('periods', []);
+
+        // Verify defaultPeriod is rendered in template (for the add-row template)
+        // ECPay default: periodType='M', frequency=1, execTimes=12
+        // These default values should appear in the template row script
+        $this->assertStringContainsString('value="M"', $html); // default periodType
+        $this->assertStringContainsString('value="1"', $html); // default frequency
+        $this->assertStringContainsString('value="12"', $html); // default execTimes
+    }
 }
