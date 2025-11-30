@@ -20,55 +20,19 @@ class ECPayTWQRGateway extends ECPayGateway
     protected $paymentType = 'TWQR';
 
     /**
-     * Constructor
-     *
-     * @param  array  $config  Gateway 配置
-     */
-    public function __construct(array $config)
-    {
-        $config['gateway_id'] = $config['gateway_id'] ?? 'ecpay_twqr';
-        $config['title'] = $config['title'] ?? __('ECPay Taiwan Pay', 'woocommerce-omnipay');
-        $config['description'] = $config['description'] ?? __('Pay with Taiwan Pay (TWQR)', 'woocommerce-omnipay');
-
-        parent::__construct($config);
-    }
-
-    /**
      * 初始化表單欄位
      */
     public function init_form_fields()
     {
         parent::init_form_fields();
-
-        // 添加最小金額設定
-        $this->form_fields['min_amount'] = [
-            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method', 'woocommerce-omnipay'),
-            'default' => 0,
-            'desc_tip' => true,
-            'custom_attributes' => [
-                'min' => 0,
-                'step' => 1,
-            ],
-        ];
-
-        // 添加最大金額設定
-        $this->form_fields['max_amount'] = [
-            'title' => __('Maximum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Maximum order amount for this payment method', 'woocommerce-omnipay'),
-            'default' => 0,
-            'desc_tip' => true,
-            'custom_attributes' => [
-                'min' => 0,
-                'step' => 1,
-            ],
-        ];
+        $this->initMinAmountField();
+        $this->initMaxAmountField();
     }
 
     /**
      * 檢查付款方式是否可用
+     *
+     * @return bool
      */
     public function is_available()
     {
@@ -76,22 +40,7 @@ class ECPayTWQRGateway extends ECPayGateway
             return false;
         }
 
-        if (WC()->cart) {
-            $total = $this->get_order_total();
-            $minAmount = (int) $this->get_option('min_amount', 0);
-            $maxAmount = (int) $this->get_option('max_amount', 0);
-
-            if ($total > 0) {
-                if ($minAmount > 0 && $total < $minAmount) {
-                    return false;
-                }
-                if ($maxAmount > 0 && $total > $maxAmount) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return $this->validateMinAmount() && $this->validateMaxAmount();
     }
 
     /**

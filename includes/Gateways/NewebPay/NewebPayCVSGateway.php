@@ -20,43 +20,13 @@ class NewebPayCVSGateway extends NewebPayGateway
     protected $paymentType = 'CVS';
 
     /**
-     * Constructor
-     *
-     * @param  array  $config  Gateway 配置
-     */
-    public function __construct(array $config)
-    {
-        $config['gateway_id'] = $config['gateway_id'] ?? 'newebpay_cvs';
-        $config['title'] = $config['title'] ?? '藍新超商代碼';
-        $config['description'] = $config['description'] ?? '使用超商代碼付款';
-
-        parent::__construct($config);
-    }
-
-    /**
      * 初始化表單欄位
      */
     public function init_form_fields()
     {
         parent::init_form_fields();
-
-        $this->form_fields['min_amount'] = [
-            'title' => __('Minimum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Minimum order amount required for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
-
-        $this->form_fields['max_amount'] = [
-            'title' => __('Maximum Amount', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'description' => __('Maximum order amount for this payment method (0 = no limit)', 'woocommerce-omnipay'),
-            'default' => '0',
-            'desc_tip' => true,
-            'custom_attributes' => ['min' => '0'],
-        ];
+        $this->initMinAmountField();
+        $this->initMaxAmountField();
     }
 
     /**
@@ -70,19 +40,7 @@ class NewebPayCVSGateway extends NewebPayGateway
             return false;
         }
 
-        $total = $this->get_order_total();
-        $minAmount = (int) $this->get_option('min_amount', 0);
-        $maxAmount = (int) $this->get_option('max_amount', 0);
-
-        if ($minAmount > 0 && $total < $minAmount) {
-            return false;
-        }
-
-        if ($maxAmount > 0 && $total > $maxAmount) {
-            return false;
-        }
-
-        return true;
+        return $this->validateMinAmount() && $this->validateMaxAmount();
     }
 
     /**

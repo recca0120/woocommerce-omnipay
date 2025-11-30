@@ -20,20 +20,6 @@ class ECPayATMGateway extends ECPayGateway
     protected $paymentType = 'ATM';
 
     /**
-     * Constructor
-     *
-     * @param  array  $config  Gateway 配置
-     */
-    public function __construct(array $config)
-    {
-        $config['gateway_id'] = $config['gateway_id'] ?? 'ecpay_atm';
-        $config['title'] = $config['title'] ?? '綠界 ATM';
-        $config['description'] = $config['description'] ?? '使用 ATM 虛擬帳號付款';
-
-        parent::__construct($config);
-    }
-
-    /**
      * 初始化表單欄位
      */
     public function init_form_fields()

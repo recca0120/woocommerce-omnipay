@@ -2,6 +2,7 @@
 
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
+use WooCommerceOmnipay\Constants;
 use WooCommerceOmnipay\Gateways\ECPayGateway;
 use WooCommerceOmnipay\Traits\HasAmountLimits;
 
@@ -18,20 +19,6 @@ class ECPayBNPLGateway extends ECPayGateway
      * @var string
      */
     protected $paymentType = 'BNPL';
-
-    /**
-     * Constructor
-     *
-     * @param  array  $config  Gateway 配置
-     */
-    public function __construct(array $config)
-    {
-        $config['gateway_id'] = $config['gateway_id'] ?? 'ecpay_bnpl';
-        $config['title'] = $config['title'] ?? __('ECPay BNPL', 'woocommerce-omnipay');
-        $config['description'] = $config['description'] ?? __('Pay with BNPL (Buy Now Pay Later)', 'woocommerce-omnipay');
-
-        parent::__construct($config);
-    }
 
     /**
      * 初始化表單欄位
@@ -57,12 +44,15 @@ class ECPayBNPLGateway extends ECPayGateway
         $this->form_fields['max_amount'] = [
             'title' => __('Maximum Amount', 'woocommerce-omnipay'),
             'type' => 'number',
-            'description' => __('Maximum order amount for this payment method (max: 300000)', 'woocommerce-omnipay'),
-            'default' => 300000,
+            'description' => sprintf(
+                __('Maximum order amount for this payment method (max: %d)', 'woocommerce-omnipay'),
+                Constants::BNPL_MAX_AMOUNT
+            ),
+            'default' => Constants::BNPL_MAX_AMOUNT,
             'desc_tip' => true,
             'custom_attributes' => [
                 'min' => 0,
-                'max' => 300000,
+                'max' => Constants::BNPL_MAX_AMOUNT,
                 'step' => 1,
             ],
         ];

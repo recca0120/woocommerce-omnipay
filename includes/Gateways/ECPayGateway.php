@@ -71,7 +71,7 @@ class ECPayGateway extends OmnipayGateway
 
         // 模擬付款處理
         if ($this->isSimulatedPayment($data)) {
-            $this->orders->addNote($order, __('ECPay 模擬付款 (SimulatePaid=1)', 'woocommerce-omnipay'));
+            $this->orders->addNote($order, __('ECPay simulated payment (SimulatePaid=1)', 'woocommerce-omnipay'));
             $this->sendNotificationResponse($notification);
 
             return;

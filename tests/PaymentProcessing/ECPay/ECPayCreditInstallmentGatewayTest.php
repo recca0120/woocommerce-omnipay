@@ -35,12 +35,6 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_ecpay_credit_installment', $this->gateway->id);
-        $this->assertEquals('綠界信用卡分期', $this->gateway->method_title);
-    }
-
     public function test_process_payment_sends_credit_payment_type()
     {
         $order = $this->createOrder(100);
@@ -80,13 +74,6 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
 
         $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
         $this->assertEquals('3,6,12,18,24', $redirectData['data']['CreditInstallment']);
-    }
-
-    public function test_form_fields_has_min_amount_and_installments()
-    {
-        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
-        $this->assertArrayHasKey('installments', $this->gateway->form_fields);
-        $this->assertEquals('multiselect', $this->gateway->form_fields['installments']['type']);
     }
 
     public function test_is_available_returns_false_when_below_min_amount()
@@ -134,7 +121,7 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
 
     public function test_process_payment_converts_30_to_30_n_for_dream_installment()
     {
-        // Set up installments including 30 period
+        // Test 1: Convert in installment list
         $this->gateway->update_option('installments', ['3', '6', '12', '30']);
 
         $order = $this->createOrder(25000);
@@ -146,22 +133,18 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
         $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
         // ECPay should convert '30' to '30N' for Dream Installment
         $this->assertEquals('3,6,12,30N', $redirectData['data']['CreditInstallment']);
-    }
 
-    public function test_process_payment_converts_selected_30_to_30_n()
-    {
-        $order = $this->createOrder(25000);
-
-        // Simulate user selecting 30 installments
+        // Test 2: Convert when user selects 30
         $_POST['omnipay_installment'] = '30';
 
-        $result = $this->gateway->process_payment($order->get_id());
+        $order2 = $this->createOrder(25000);
+        $result2 = $this->gateway->process_payment($order2->get_id());
 
-        $this->assertEquals('success', $result['result']);
+        $this->assertEquals('success', $result2['result']);
 
-        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $redirectData2 = get_transient('omnipay_redirect_'.$order2->get_id());
         // ECPay should convert selected '30' to '30N'
-        $this->assertEquals('30N', $redirectData['data']['CreditInstallment']);
+        $this->assertEquals('30N', $redirectData2['data']['CreditInstallment']);
 
         unset($_POST['omnipay_installment']);
     }

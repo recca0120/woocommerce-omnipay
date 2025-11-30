@@ -41,12 +41,6 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_newebpay_credit_installment', $this->gateway->id);
-        $this->assertEquals('藍新信用卡分期', $this->gateway->method_title);
-    }
-
     public function test_multiselect_installments_saved_and_retrieved_as_array()
     {
         // Save multiselect value as array

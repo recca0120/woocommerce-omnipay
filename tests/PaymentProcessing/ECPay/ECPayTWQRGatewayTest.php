@@ -32,12 +32,6 @@ class ECPayTWQRGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_ecpay_twqr', $this->gateway->id);
-        $this->assertEquals('綠界台灣 Pay', $this->gateway->method_title);
-    }
-
     public function test_process_payment_sends_twqr_payment_type()
     {
         $order = $this->createOrder(500);
@@ -48,5 +42,39 @@ class ECPayTWQRGatewayTest extends TestCase
 
         $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
         $this->assertEquals('TWQR', $redirectData['data']['ChoosePayment']);
+    }
+
+    public function test_is_available_returns_false_when_below_min_amount()
+    {
+        $this->gateway->update_option('min_amount', '100');
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(50)->get_id());
+
+        $this->assertFalse($this->gateway->is_available());
+    }
+
+    public function test_is_available_returns_false_when_above_max_amount()
+    {
+        $this->gateway->update_option('max_amount', '10000');
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(15000)->get_id());
+
+        $this->assertFalse($this->gateway->is_available());
+    }
+
+    public function test_is_available_returns_true_when_within_amount_limits()
+    {
+        $this->gateway->update_option('min_amount', '100');
+        $this->gateway->update_option('max_amount', '10000');
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(500)->get_id());
+
+        $this->assertTrue($this->gateway->is_available());
     }
 }

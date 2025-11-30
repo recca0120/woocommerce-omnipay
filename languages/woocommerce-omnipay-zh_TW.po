@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce Omnipay\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-29 00:00+0000\n"
-"PO-Revision-Date: 2025-01-29 00:00+0000\n"
+"POT-Creation-Date: 2025-01-30 00:00+0000\n"
+"PO-Revision-Date: 2025-01-30 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
 "Language: zh_TW\n"
@@ -76,6 +76,30 @@ msgstr "綠界超商條碼"
 msgid "Pay with barcode at convenience store"
 msgstr "使用超商條碼付款"
 
+msgid "ECPay BNPL"
+msgstr "綠界無卡分期"
+
+msgid "Pay with BNPL (Buy Now Pay Later)"
+msgstr "使用無卡分期付款"
+
+msgid "ECPay Apple Pay"
+msgstr "綠界 Apple Pay"
+
+msgid "Pay with Apple Pay"
+msgstr "使用 Apple Pay 付款"
+
+msgid "ECPay Taiwan Pay"
+msgstr "綠界台灣 Pay"
+
+msgid "Pay with Taiwan Pay (TWQR)"
+msgstr "使用台灣 Pay 付款"
+
+msgid "ECPay WeChat Pay"
+msgstr "綠界微信支付"
+
+msgid "Pay with WeChat Pay"
+msgstr "使用微信支付"
+
 msgid "NewebPay"
 msgstr "藍新金流"
 
@@ -118,6 +142,25 @@ msgstr "乙禾 ATM"
 msgid "YiPay CVS"
 msgstr "乙禾超商代碼"
 
+# Gateway Common Fields
+msgid "Enable/Disable"
+msgstr "啟用/停用"
+
+msgid "Enable %s"
+msgstr "啟用 %s"
+
+msgid "Title"
+msgstr "標題"
+
+msgid "Payment method title that users will see during checkout."
+msgstr "用戶在結帳時會看到的付款方式標題。"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Payment method description that users will see during checkout."
+msgstr "用戶在結帳時會看到的付款方式描述。"
+
 # Settings Page
 msgid "General Settings"
 msgstr "通用設定"
@@ -152,6 +195,18 @@ msgstr "%s 共用設定"
 msgid "Configure %s shared parameters. These settings apply to all %s payment methods."
 msgstr "設定 %s 的共用參數，這些設定會套用到所有 %s 付款方式。"
 
+msgid "Minimum Amount"
+msgstr "最小金額"
+
+msgid "Minimum order amount required for this payment method"
+msgstr "此付款方式所需的最小訂單金額"
+
+msgid "Maximum Amount"
+msgstr "最大金額"
+
+msgid "Maximum order amount for this payment method (max: %d)"
+msgstr "此付款方式的最大訂單金額（最大：%d）"
+
 # Template Strings
 msgid "Payment Information"
 msgstr "付款資訊"
@@ -159,17 +214,29 @@ msgstr "付款資訊"
 msgid "Remittance Confirmation"
 msgstr "匯款確認"
 
-msgid "Last 5 digits of remittance account submitted:"
-msgstr "已填寫匯款帳號後5碼："
+msgid "Last %d digits of remittance account submitted:"
+msgstr "已填寫匯款帳號後%d碼："
 
-msgid "Please enter the last 5 digits of your remittance account after payment to help us confirm the transaction."
-msgstr "請於匯款後填寫您的匯款帳號後5碼，以便我們確認款項。"
+msgid "Please enter the last %d digits of your remittance account after payment to help us confirm the transaction."
+msgstr "請於匯款後填寫您的匯款帳號後%d碼，以便我們確認款項。"
 
-msgid "Last 5 Digits of Remittance Account"
-msgstr "匯款帳號後5碼"
+msgid "Last %d Digits of Remittance Account"
+msgstr "匯款帳號後%d碼"
 
 msgid "Submit"
 msgstr "確認送出"
+
+msgid "Security verification failed"
+msgstr "安全驗證失敗"
+
+msgid "Order verification failed"
+msgstr "訂單驗證失敗"
+
+msgid "Please enter %d digits"
+msgstr "請輸入%d位數字"
+
+msgid "Successfully submitted"
+msgstr "已成功送出"
 
 # Installment Payment
 msgid "Installment Period"
@@ -181,19 +248,30 @@ msgstr "請選擇分期期數"
 msgid "%s Installments"
 msgstr "%s 期"
 
-# DCA Payment
+msgctxt "Checkout info"
+msgid "Number of periods"
+msgstr "分期期數"
+
+# DCA (Recurring Payment)
 msgid "Payment Plan"
 msgstr "付款方案"
 
 msgid "Select payment plan"
 msgstr "請選擇付款方案"
 
-msgid "Every %s %s, %s times total"
-msgstr "每 %s %s，共 %s 次"
+msgid "You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products."
+msgstr "你將使用<strong>%s定期定額信用卡付款</strong>，請留意你所購買的商品為<strong>非單次扣款</strong>商品。"
 
-msgid "Every %s, %s times total"
-msgstr "每 %s，共 %s 次"
+msgid "charge every %s year(s)"
+msgstr "每 %s 年扣款"
 
+msgid "charge every %s month(s)"
+msgstr "每 %s 個月扣款"
+
+msgid "charge every %s day(s)"
+msgstr "每 %s 天扣款"
+
+# Period units (lowercase for display)
 msgid "year"
 msgstr "年"
 
@@ -206,27 +284,67 @@ msgstr "週"
 msgid "day"
 msgstr "天"
 
-# DCA Settings
-msgid "There are two section fields for DCA settings: WooCommerce Blocks and Woocommerce Shortcode. Please fill out the section that matches your current page configuration. If you are uncertain about which page configuration you are using, input the identical setting in both sections."
-msgstr "定期定額設定分為兩個區塊：WooCommerce Blocks 和 WooCommerce Shortcode。請填寫符合您目前頁面配置的區塊。如果您不確定使用哪種頁面配置，請在兩個區塊中輸入相同的設定。"
+# NewebPay DCA Display Formats
+msgid "Monday"
+msgstr "週一"
 
-msgid "DCA (Support WooCommerce Blocks)"
-msgstr "定期定額（支援 WooCommerce Blocks）"
+msgid "Tuesday"
+msgstr "週二"
 
-msgid "The following settings support the WooCommerce Blocks checkout page and do not support the use of the traditional shortcode-based checkout. Please configure carefully"
-msgstr "以下設定支援 WooCommerce Blocks 結帳頁面，不支援使用傳統的 shortcode 結帳。請謹慎設定"
+msgid "Wednesday"
+msgstr "週三"
 
-msgid "DCA (Support WooCommerce Shortcode)"
-msgstr "定期定額（支援 WooCommerce Shortcode）"
+msgid "Thursday"
+msgstr "週四"
 
-msgid "The following settings support the traditional shortcode-based checkout page and do not support the use of the WooCommerce Blocks checkout. Please configure carefully"
-msgstr "以下設定支援傳統的 shortcode 結帳頁面，不支援使用 WooCommerce Blocks 結帳。請謹慎設定"
+msgid "Friday"
+msgstr "週五"
+
+msgid "Saturday"
+msgstr "週六"
+
+msgid "Sunday"
+msgstr "週日"
+
+msgid "%d/%d"
+msgstr "%d/%d"
+
+msgid "%d"
+msgstr "%d"
+
+msgid "every %d days"
+msgstr "每 %d 天"
+
+msgid "charge on %s every year"
+msgstr "每年 %s 扣款"
+
+msgid "charge on day %s every month"
+msgstr "每月 %s 日扣款"
+
+msgid "charge every %s"
+msgstr "每週 %s 扣款"
+
+msgid "%s / %s, %s times total"
+msgstr "%s / %s，共 %s 次"
+
+# DCA Admin Settings
+msgid "Configure settings for both WooCommerce Blocks and Shortcode checkout. Fill in the section matching your checkout page type."
+msgstr "請為 WooCommerce Blocks 和 Shortcode 結帳頁面設定。填寫與您的結帳頁面類型相符的區塊。"
+
+msgid "WooCommerce Blocks Checkout"
+msgstr "WooCommerce Blocks 結帳"
+
+msgid "These settings apply when using WooCommerce Blocks checkout page."
+msgstr "使用 WooCommerce Blocks 結帳頁面時套用這些設定。"
+
+msgid "Shortcode Checkout"
+msgstr "Shortcode 結帳"
+
+msgid "These settings apply when using traditional shortcode-based checkout page."
+msgstr "使用傳統 shortcode 結帳頁面時套用這些設定。"
 
 msgid "Period Type"
 msgstr "週期類型"
-
-msgid "Support WooCommerce checkout blocks"
-msgstr "支援 WooCommerce 結帳區塊"
 
 msgid "Year"
 msgstr "年"
@@ -267,69 +385,58 @@ msgstr "3 - 委託商家處理"
 msgid "DCA Periods"
 msgstr "定期定額方案"
 
-msgid "DCA Period Settings"
-msgstr "定期定額設定"
-
-msgid "Period Type (Y/M/D)"
-msgstr "週期類型（Y/M/D）"
-
-msgid "Period Type (Y/M/W/D)"
-msgstr "週期類型（Y/M/W/D）"
-
-msgid "Start Type (1/2/3)"
-msgstr "啟動方式（1/2/3）"
-
 msgid "Add Period"
 msgstr "新增方案"
 
 msgid "Remove Selected"
 msgstr "移除所選項目"
 
-msgid "NT$ %d / %s %s, up to a maximum of %s"
-msgstr "NT$ %d / %s %s，最多 %s 次"
+# Error Messages
+msgid "Order not found."
+msgstr "找不到訂單資料。"
 
-msgid "NT$ %d / %s, up to a maximum of %s"
-msgstr "NT$ %d / %s，最多 %s 次"
+msgid "Payment processing error. Please try again later."
+msgstr "付款處理發生錯誤，請稍後再試。"
 
-msgid "You will use <strong>ECPay recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products."
-msgstr "你將使用<strong>綠界科技定期定額信用卡付款</strong>，請留意你所購買的商品為<strong>非單次扣款</strong>商品。"
+msgid "Payment failed. Please try again or choose another payment method."
+msgstr "付款失敗，請重新嘗試或選擇其他付款方式。"
 
-msgctxt "Checkout info"
-msgid "Number of periods"
-msgstr "分期期數"
+msgid "Error processing payment information."
+msgstr "處理付款資訊時發生錯誤。"
 
-msgid "ECPay BNPL"
-msgstr "綠界無卡分期"
+msgid "Error completing payment."
+msgstr "完成付款時發生錯誤。"
 
-msgid "Pay with BNPL (Buy Now Pay Later)"
-msgstr "使用無卡分期付款"
+# Admin Settings
+msgid "Allow users to resubmit payment"
+msgstr "允許用戶重新提交付款"
 
-msgid "Minimum Amount"
-msgstr "最小金額"
+msgid "When enabled, use random transaction IDs to allow payment retry. Orders remain in Pending status. When disabled, use order IDs as transaction IDs and orders change to On-hold status."
+msgstr "啟用時使用隨機交易編號，訂單維持 Pending 狀態，允許重新付款。停用時使用訂單編號作為交易編號，訂單改為 On-hold 狀態。"
 
-msgid "Minimum order amount required for this payment method"
-msgstr "此付款方式所需的最小訂單金額"
+# Order Notes
+msgid "ECPay simulated payment (SimulatePaid=1)"
+msgstr "ECPay 模擬付款 (SimulatePaid=1)"
 
-msgid "Maximum Amount"
-msgstr "最大金額"
+msgid "Customer submitted last %d digits of remittance account: %s"
+msgstr "客戶已填寫匯款帳號後%d碼：%s"
 
-msgid "Maximum order amount for this payment method (max: 300000)"
-msgstr "此付款方式的最大訂單金額（最大：300000）"
+# NewebPay PeriodPoint Validation
+msgid "Y: MMDD (e.g., 0315), M: 01-31, W: 1-7, D: 2-999"
+msgstr "Y: MMDD (例如 0315), M: 01-31, W: 1-7, D: 2-999"
 
-msgid "ECPay Apple Pay"
-msgstr "綠界 Apple Pay"
+msgid "For yearly periods, PeriodPoint must be in MMDD format (e.g., 0315 for March 15th)."
+msgstr "年週期的 PeriodPoint 必須是 MMDD 格式（例如 0315 代表 3月15日）。"
 
-msgid "Pay with Apple Pay"
-msgstr "使用 Apple Pay 付款"
+msgid "Invalid date in PeriodPoint. Month must be 01-12, day must be 01-31."
+msgstr "PeriodPoint 日期無效。月份必須是 01-12，日期必須是 01-31。"
 
-msgid "ECPay Taiwan Pay"
-msgstr "綠界台灣 Pay"
+msgid "For monthly periods, PeriodPoint must be 1-31 (day of month)."
+msgstr "月週期的 PeriodPoint 必須是 1-31（每月第幾天）。"
 
-msgid "Pay with Taiwan Pay (TWQR)"
-msgstr "使用台灣 Pay 付款"
+msgid "For weekly periods, PeriodPoint must be 1-7 (1=Monday, 7=Sunday)."
+msgstr "週週期的 PeriodPoint 必須是 1-7（1=週一，7=週日）。"
 
-msgid "ECPay WeChat Pay"
-msgstr "綠界微信支付"
+msgid "For daily periods, PeriodPoint must be 2-999 (day interval)."
+msgstr "日週期的 PeriodPoint 必須是 2-999（天數間隔）。"
 
-msgid "Pay with WeChat Pay"
-msgstr "使用微信支付"

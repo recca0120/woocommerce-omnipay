@@ -7,16 +7,21 @@
     'use strict';
 
     /**
-     * 根據週期類型更新欄位限制
-     * Year (Y): frequency=1, execTimes=1-9
-     * Month (M): frequency=1-12, execTimes=1-99
-     * Day (D): frequency=1-365, execTimes=1-999
+     * 更新 ECPay DCA 欄位限制
+     * - Year (Y): frequency=1, execTimes=1-9
+     * - Month (M): frequency=1-12, execTimes=1-99
+     * - Day (D): frequency=1-365, execTimes=1-999
      */
-    function updatePeriodConstraints(periodTypeInput) {
+    function updateECPayConstraints(periodTypeInput) {
         const row = periodTypeInput.closest('tr');
-        const frequencyInput = row.querySelector('input[name^="dca_frequency"]');
-        const execTimesInput = row.querySelector('input[name^="dca_execTimes"]');
         const periodType = periodTypeInput.value.toUpperCase();
+
+        const frequencyInput = row.querySelector('input[name^="frequency"]');
+        const execTimesInput = row.querySelector('input[name^="execTimes"]');
+
+        if (!frequencyInput || !execTimesInput) {
+            return;
+        }
 
         let freqMax = 365;
         let execMax = 999;
@@ -32,13 +37,55 @@
         frequencyInput.setAttribute('max', freqMax);
         execTimesInput.setAttribute('max', execMax);
 
-        // 調整超出範圍的值
         if (parseInt(frequencyInput.value) > freqMax) {
             frequencyInput.value = freqMax;
         }
         if (parseInt(execTimesInput.value) > execMax) {
             execTimesInput.value = execMax;
         }
+    }
+
+    /**
+     * 更新 NewebPay DCA 欄位限制
+     * - Year (Y): periodTimes=2-99
+     * - Month (M): periodTimes=2-99
+     * - Week (W): periodTimes=2-99
+     * - Day (D): periodTimes=2-999
+     */
+    function updateNewebPayConstraints(periodTypeInput) {
+        const row = periodTypeInput.closest('tr');
+        const periodType = periodTypeInput.value.toUpperCase();
+
+        const periodTimesInput = row.querySelector('input[name^="periodTimes"]');
+
+        if (!periodTimesInput) {
+            return;
+        }
+
+        let timesMax = 99;
+        const timesMin = 2;
+
+        if (periodType === 'D') {
+            timesMax = 999;
+        }
+
+        periodTimesInput.setAttribute('min', timesMin);
+        periodTimesInput.setAttribute('max', timesMax);
+
+        const currentValue = parseInt(periodTimesInput.value);
+        if (currentValue > timesMax) {
+            periodTimesInput.value = timesMax;
+        } else if (currentValue < timesMin) {
+            periodTimesInput.value = timesMin;
+        }
+    }
+
+    /**
+     * 根據週期類型更新欄位限制（統一入口）
+     */
+    function updatePeriodConstraints(periodTypeInput) {
+        updateECPayConstraints(periodTypeInput);
+        updateNewebPayConstraints(periodTypeInput);
     }
 
     /**
@@ -73,13 +120,13 @@
 
         // 監聽 periodType 變更，動態更新限制
         container.addEventListener('input', function(e) {
-            if (e.target.name && e.target.name.startsWith('dca_periodType')) {
+            if (e.target.name && e.target.name.startsWith('periodType')) {
                 updatePeriodConstraints(e.target);
             }
         });
 
         // 初始化現有 rows 的限制
-        const periodTypeInputs = tbody.querySelectorAll('input[name^="dca_periodType"]');
+        const periodTypeInputs = tbody.querySelectorAll('input[name^="periodType"]');
         periodTypeInputs.forEach(function(input) {
             updatePeriodConstraints(input);
         });
@@ -90,7 +137,7 @@
      */
     function initAllDcaTables() {
         // 自動偵測所有 DCA periods table
-        const tables = document.querySelectorAll('[id$="_dca_periods"]');
+        const tables = document.querySelectorAll('[id$="_periods"]');
         tables.forEach(function(table) {
             initDcaPeriodsTable(table.id);
         });

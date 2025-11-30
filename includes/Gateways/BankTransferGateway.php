@@ -2,6 +2,7 @@
 
 namespace WooCommerceOmnipay\Gateways;
 
+use WooCommerceOmnipay\Constants;
 use WooCommerceOmnipay\Helper;
 use WooCommerceOmnipay\Repositories\OrderRepository;
 
@@ -102,6 +103,7 @@ class BankTransferGateway extends OmnipayGateway
             'order' => $order,
             'submitted_last5' => $order->get_meta(OrderRepository::META_REMITTANCE_LAST5),
             'submit_url' => WC()->api_request_url($this->id.'_remittance'),
+            'last_digits' => Constants::REMITTANCE_LAST_DIGITS,
         ]);
     }
 
@@ -117,7 +119,7 @@ class BankTransferGateway extends OmnipayGateway
 
         // 驗證 nonce
         if (! wp_verify_nonce($nonce, 'omnipay_remittance_nonce')) {
-            $this->sendJsonResponse(false, __('安全驗證失敗', 'woocommerce-omnipay'));
+            $this->sendJsonResponse(false, __('Security verification failed', 'woocommerce-omnipay'));
 
             return;
         }
@@ -125,14 +127,18 @@ class BankTransferGateway extends OmnipayGateway
         // 驗證訂單
         $order = $this->orders->findById($order_id);
         if (! $order || $order->get_order_key() !== $order_key) {
-            $this->sendJsonResponse(false, __('訂單驗證失敗', 'woocommerce-omnipay'));
+            $this->sendJsonResponse(false, __('Order verification failed', 'woocommerce-omnipay'));
 
             return;
         }
 
-        // 驗證格式（必須是5位數字）
-        if (! preg_match('/^\d{5}$/', $last5)) {
-            $this->sendJsonResponse(false, __('請輸入5位數字', 'woocommerce-omnipay'));
+        // 驗證格式（必須是指定位數的數字）
+        $pattern = sprintf('/^\d{%d}$/', Constants::REMITTANCE_LAST_DIGITS);
+        if (! preg_match($pattern, $last5)) {
+            $this->sendJsonResponse(
+                false,
+                sprintf(__('Please enter %d digits', 'woocommerce-omnipay'), Constants::REMITTANCE_LAST_DIGITS)
+            );
 
             return;
         }
@@ -140,7 +146,7 @@ class BankTransferGateway extends OmnipayGateway
         // 儲存
         $this->orders->saveRemittanceLast5($order, $last5);
 
-        $this->sendJsonResponse(true, __('已成功送出', 'woocommerce-omnipay'));
+        $this->sendJsonResponse(true, __('Successfully submitted', 'woocommerce-omnipay'));
     }
 
     /**

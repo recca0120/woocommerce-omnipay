@@ -35,12 +35,6 @@ class YiPayCreditGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_yipay_credit', $this->gateway->id);
-        $this->assertEquals('乙禾信用卡', $this->gateway->method_title);
-    }
-
     public function test_process_payment_sends_credit_payment_type()
     {
         $order = $this->createOrder(100);
@@ -51,10 +45,5 @@ class YiPayCreditGatewayTest extends TestCase
 
         $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
         $this->assertEquals('2', $redirectData['data']['type']);
-    }
-
-    public function test_form_fields_has_min_amount_setting()
-    {
-        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
     }
 }

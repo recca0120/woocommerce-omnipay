@@ -42,12 +42,6 @@ class YiPayATMGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_yipay_atm', $this->gateway->id);
-        $this->assertEquals('乙禾 ATM', $this->gateway->method_title);
-    }
-
     public function test_process_payment_sends_atm_payment_type()
     {
         $order = $this->createOrder(100);

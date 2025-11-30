@@ -1,6 +1,8 @@
 <?php
 /**
- * DCA Periods Table Template (Admin) - Unified for all gateways
+ * ECPay DCA Periods Table Template (Admin)
+ *
+ * Fields: periodType, frequency, execTimes
  *
  * @var string $fieldKey Field key for the setting
  * @var array $data Field data
@@ -22,9 +24,6 @@ $fieldLabels = [
     'periodType' => __('Period Type', 'woocommerce-omnipay'),
     'frequency' => __('Frequency', 'woocommerce-omnipay'),
     'execTimes' => __('Execute Times', 'woocommerce-omnipay'),
-    'periodPoint' => __('Period Point', 'woocommerce-omnipay'),
-    'periodTimes' => __('Period Times', 'woocommerce-omnipay'),
-    'periodStartType' => __('Start Type', 'woocommerce-omnipay'),
 ];
 
 $headers = [];
@@ -33,7 +32,7 @@ foreach ($fieldConfigs as $config) {
 }
 
 // Calculate table width based on number of fields
-$tableWidth = count($fieldConfigs) > 3 ? 700 : 600;
+$tableWidth = 600;
 
 /**
  * Render a single row

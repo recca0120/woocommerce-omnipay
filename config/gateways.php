@@ -33,21 +33,21 @@ return [
         'gateway' => 'BankTransfer',
         'gateway_id' => 'banktransfer',
         'title' => __('Bank Transfer', 'woocommerce-omnipay'),
-        'description' => __('Pay via bank transfer', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via bank transfer', 'woocommerce-omnipay'),
     ],
     // Dummy (for testing)
     [
         'gateway' => 'Dummy',
         'gateway_id' => 'dummy',
         'title' => __('Dummy Gateway', 'woocommerce-omnipay'),
-        'description' => __('Dummy payment gateway for testing', 'woocommerce-omnipay'),
+        // 'description' => __('Dummy payment gateway for testing', 'woocommerce-omnipay'),
     ],
     // ECPay (All-in-one)
     [
         'gateway' => 'ECPay',
         'gateway_id' => 'ecpay',
         'title' => __('ECPay', 'woocommerce-omnipay'),
-        'description' => __('Pay via ECPay payment gateway', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via ECPay payment gateway', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     // ECPay Sub-Gateways
@@ -56,7 +56,7 @@ return [
         'gateway_id' => 'ecpay_credit',
         'class' => ECPayCreditGateway::class,
         'title' => __('ECPay Credit Card', 'woocommerce-omnipay'),
-        'description' => __('Pay with credit card', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with credit card', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -64,7 +64,7 @@ return [
         'gateway_id' => 'ecpay_credit_installment',
         'class' => ECPayCreditInstallmentGateway::class,
         'title' => __('ECPay Credit Card Installment', 'woocommerce-omnipay'),
-        'description' => __('Pay with credit card installment', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with credit card installment', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -72,7 +72,7 @@ return [
         'gateway_id' => 'ecpay_dca',
         'class' => ECPayDCAGateway::class,
         'title' => __('ECPay Recurring Payment', 'woocommerce-omnipay'),
-        'description' => __('Pay with credit card recurring payment', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with credit card recurring payment', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -80,7 +80,7 @@ return [
         'gateway_id' => 'ecpay_bnpl',
         'class' => ECPayBNPLGateway::class,
         'title' => __('ECPay BNPL', 'woocommerce-omnipay'),
-        'description' => __('Pay with BNPL (Buy Now Pay Later)', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with BNPL (Buy Now Pay Later)', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -88,7 +88,7 @@ return [
         'gateway_id' => 'ecpay_webatm',
         'class' => ECPayWebATMGateway::class,
         'title' => __('ECPay WebATM', 'woocommerce-omnipay'),
-        'description' => __('Pay via WebATM', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via WebATM', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -96,7 +96,7 @@ return [
         'gateway_id' => 'ecpay_atm',
         'class' => ECPayATMGateway::class,
         'title' => __('ECPay ATM', 'woocommerce-omnipay'),
-        'description' => __('Pay via ATM virtual account', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via ATM virtual account', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -104,7 +104,7 @@ return [
         'gateway_id' => 'ecpay_cvs',
         'class' => ECPayCVSGateway::class,
         'title' => __('ECPay CVS', 'woocommerce-omnipay'),
-        'description' => __('Pay at convenience store', 'woocommerce-omnipay'),
+        // 'description' => __('Pay at convenience store', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -112,7 +112,7 @@ return [
         'gateway_id' => 'ecpay_barcode',
         'class' => ECPayBarcodeGateway::class,
         'title' => __('ECPay Barcode', 'woocommerce-omnipay'),
-        'description' => __('Pay with barcode at convenience store', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with barcode at convenience store', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -120,7 +120,7 @@ return [
         'gateway_id' => 'ecpay_applepay',
         'class' => ECPayApplePayGateway::class,
         'title' => __('ECPay Apple Pay', 'woocommerce-omnipay'),
-        'description' => __('Pay with Apple Pay', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with Apple Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -128,7 +128,7 @@ return [
         'gateway_id' => 'ecpay_twqr',
         'class' => ECPayTWQRGateway::class,
         'title' => __('ECPay Taiwan Pay', 'woocommerce-omnipay'),
-        'description' => __('Pay with Taiwan Pay (TWQR)', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with Taiwan Pay (TWQR)', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     [
@@ -136,7 +136,7 @@ return [
         'gateway_id' => 'ecpay_weixin',
         'class' => ECPayWeiXinGateway::class,
         'title' => __('ECPay WeChat Pay', 'woocommerce-omnipay'),
-        'description' => __('Pay with WeChat Pay', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with WeChat Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
     ],
     // NewebPay (All-in-one)
@@ -144,7 +144,7 @@ return [
         'gateway' => 'NewebPay',
         'gateway_id' => 'newebpay',
         'title' => __('NewebPay', 'woocommerce-omnipay'),
-        'description' => __('Pay via NewebPay payment gateway', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via NewebPay payment gateway', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     // NewebPay Sub-Gateways
@@ -153,7 +153,7 @@ return [
         'gateway_id' => 'newebpay_credit',
         'class' => NewebPayCreditGateway::class,
         'title' => __('NewebPay Credit Card', 'woocommerce-omnipay'),
-        'description' => __('Pay with credit card', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with credit card', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     [
@@ -161,7 +161,7 @@ return [
         'gateway_id' => 'newebpay_credit_installment',
         'class' => NewebPayCreditInstallmentGateway::class,
         'title' => __('NewebPay Credit Card Installment', 'woocommerce-omnipay'),
-        'description' => __('Pay with credit card installment', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with credit card installment', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     [
@@ -169,7 +169,7 @@ return [
         'gateway_id' => 'newebpay_dca',
         'class' => NewebPayDCAGateway::class,
         'title' => __('NewebPay Recurring Payment', 'woocommerce-omnipay'),
-        'description' => __('Pay with credit card recurring payment', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with credit card recurring payment', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     [
@@ -177,7 +177,7 @@ return [
         'gateway_id' => 'newebpay_webatm',
         'class' => NewebPayWebATMGateway::class,
         'title' => __('NewebPay WebATM', 'woocommerce-omnipay'),
-        'description' => __('Pay via WebATM', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via WebATM', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     [
@@ -185,7 +185,7 @@ return [
         'gateway_id' => 'newebpay_atm',
         'class' => NewebPayATMGateway::class,
         'title' => __('NewebPay ATM', 'woocommerce-omnipay'),
-        'description' => __('Pay via ATM virtual account', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via ATM virtual account', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     [
@@ -193,7 +193,7 @@ return [
         'gateway_id' => 'newebpay_cvs',
         'class' => NewebPayCVSGateway::class,
         'title' => __('NewebPay CVS', 'woocommerce-omnipay'),
-        'description' => __('Pay at convenience store', 'woocommerce-omnipay'),
+        // 'description' => __('Pay at convenience store', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     [
@@ -201,7 +201,7 @@ return [
         'gateway_id' => 'newebpay_barcode',
         'class' => NewebPayBarcodeGateway::class,
         'title' => __('NewebPay Barcode', 'woocommerce-omnipay'),
-        'description' => __('Pay with barcode at convenience store', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with barcode at convenience store', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
     ],
     // YiPay (All-in-one)
@@ -209,7 +209,7 @@ return [
         'gateway' => 'YiPay',
         'gateway_id' => 'yipay',
         'title' => __('YiPay', 'woocommerce-omnipay'),
-        'description' => __('Pay via YiPay payment gateway', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via YiPay payment gateway', 'woocommerce-omnipay'),
         'icon' => $yipayIcon,
     ],
     // YiPay Sub-Gateways
@@ -218,7 +218,7 @@ return [
         'gateway_id' => 'yipay_credit',
         'class' => YiPayCreditGateway::class,
         'title' => __('YiPay Credit Card', 'woocommerce-omnipay'),
-        'description' => __('Pay with credit card', 'woocommerce-omnipay'),
+        // 'description' => __('Pay with credit card', 'woocommerce-omnipay'),
         'icon' => $yipayIcon,
     ],
     [
@@ -226,7 +226,7 @@ return [
         'gateway_id' => 'yipay_atm',
         'class' => YiPayATMGateway::class,
         'title' => __('YiPay ATM', 'woocommerce-omnipay'),
-        'description' => __('Pay via ATM virtual account', 'woocommerce-omnipay'),
+        // 'description' => __('Pay via ATM virtual account', 'woocommerce-omnipay'),
         'icon' => $yipayIcon,
     ],
     [
@@ -234,7 +234,7 @@ return [
         'gateway_id' => 'yipay_cvs',
         'class' => YiPayCVSGateway::class,
         'title' => __('YiPay CVS', 'woocommerce-omnipay'),
-        'description' => __('Pay at convenience store', 'woocommerce-omnipay'),
+        // 'description' => __('Pay at convenience store', 'woocommerce-omnipay'),
         'icon' => $yipayIcon,
     ],
 ];

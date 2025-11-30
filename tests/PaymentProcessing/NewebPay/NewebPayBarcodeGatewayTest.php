@@ -41,12 +41,6 @@ class NewebPayBarcodeGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_newebpay_barcode', $this->gateway->id);
-        $this->assertEquals('藍新超商條碼', $this->gateway->method_title);
-    }
-
     public function test_process_payment_sends_barcode_payment_type()
     {
         $order = $this->createOrder(100);
@@ -66,9 +60,25 @@ class NewebPayBarcodeGatewayTest extends TestCase
         $this->assertEquals('1', $tradeInfo['BARCODE']);
     }
 
-    public function test_form_fields_has_amount_settings()
+    public function test_is_available_returns_false_when_below_min_amount()
     {
-        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
-        $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
+        $this->gateway->update_option('min_amount', '100');
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(50)->get_id());
+
+        $this->assertFalse($this->gateway->is_available());
+    }
+
+    public function test_is_available_returns_false_when_above_max_amount()
+    {
+        $this->gateway->update_option('max_amount', '10000');
+        $this->gateway->init_settings();
+
+        WC()->cart->empty_cart();
+        WC()->cart->add_to_cart($this->createProduct(15000)->get_id());
+
+        $this->assertFalse($this->gateway->is_available());
     }
 }

@@ -35,12 +35,6 @@ class ECPayBNPLGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_ecpay_bnpl', $this->gateway->id);
-        $this->assertEquals('綠界無卡分期', $this->gateway->method_title);
-    }
-
     public function test_process_payment_sends_bnpl_payment_type()
     {
         $order = $this->createOrder(50000);

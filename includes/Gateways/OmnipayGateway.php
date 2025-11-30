@@ -129,23 +129,23 @@ class OmnipayGateway extends WC_Payment_Gateway
         // 基本欄位
         $this->form_fields = [
             'enabled' => [
-                'title' => 'Enable/Disable',
+                'title' => __('Enable/Disable', 'woocommerce-omnipay'),
                 'type' => 'checkbox',
-                'label' => sprintf('Enable %s', $this->method_title),
+                'label' => sprintf(__('Enable %s', 'woocommerce-omnipay'), $this->method_title),
                 'default' => 'no',
             ],
             'title' => [
-                'title' => 'Title',
+                'title' => __('Title', 'woocommerce-omnipay'),
                 'type' => 'text',
-                'description' => 'Payment method title that users will see during checkout.',
+                'description' => __('Payment method title that users will see during checkout.', 'woocommerce-omnipay'),
                 'default' => $this->method_title,
                 'desc_tip' => true,
             ],
             'description' => [
-                'title' => 'Description',
+                'title' => __('Description', 'woocommerce-omnipay'),
                 'type' => 'textarea',
-                'description' => 'Payment method description that users will see during checkout.',
-                'default' => sprintf('Pay with %s', $this->method_title),
+                'description' => __('Payment method description that users will see during checkout.', 'woocommerce-omnipay'),
+                'default' => '',
                 'desc_tip' => true,
             ],
         ];
@@ -158,18 +158,18 @@ class OmnipayGateway extends WC_Payment_Gateway
 
         // 通用設定欄位
         $this->form_fields['allow_resubmit'] = [
-            'title' => __('允許重新提交', 'woocommerce-omnipay'),
+            'title' => __('Allow Resubmit', 'woocommerce-omnipay'),
             'type' => 'checkbox',
-            'label' => __('允許用戶重新提交付款', 'woocommerce-omnipay'),
-            'description' => __('啟用時使用隨機交易編號，訂單維持 Pending 狀態，允許重新付款。停用時使用訂單編號作為交易編號，訂單改為 On-hold 狀態。', 'woocommerce-omnipay'),
+            'label' => __('Allow users to resubmit payment', 'woocommerce-omnipay'),
+            'description' => __('When enabled, use random transaction IDs to allow payment retry. Orders remain in Pending status. When disabled, use order IDs as transaction IDs and orders change to On-hold status.', 'woocommerce-omnipay'),
             'default' => 'no',
             'desc_tip' => true,
         ];
 
         $this->form_fields['transaction_id_prefix'] = [
-            'title' => __('交易編號前綴', 'woocommerce-omnipay'),
+            'title' => __('Transaction ID Prefix', 'woocommerce-omnipay'),
             'type' => 'text',
-            'description' => __('加在交易編號前面的前綴，用於區分不同網站或環境。', 'woocommerce-omnipay'),
+            'description' => __('Prefix added to transaction IDs to distinguish different sites or environments.', 'woocommerce-omnipay'),
             'default' => '',
             'desc_tip' => true,
         ];
@@ -235,7 +235,7 @@ class OmnipayGateway extends WC_Payment_Gateway
             }
         } catch (OrderNotFoundException $e) {
             $this->logger->error('process_payment: '.$e->getMessage(), ['order_id' => $orderId]);
-            wc_add_notice(__('找不到訂單資料。', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
 
             return ['result' => 'failure'];
         } catch (\Exception $e) {
@@ -243,7 +243,7 @@ class OmnipayGateway extends WC_Payment_Gateway
             if (isset($order) && $order) {
                 $this->orders->addNote($order, sprintf('Payment error: %s', $e->getMessage()));
             }
-            wc_add_notice(__('付款處理發生錯誤，請稍後再試。', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('Payment processing error. Please try again later.', 'woocommerce-omnipay'), 'error');
 
             return ['result' => 'failure'];
         }
@@ -380,7 +380,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->orders->addNote($order, sprintf('Payment failed via %s: %s', $source, $errorMessage));
 
         if ($addNotice) {
-            wc_add_notice(__('付款失敗，請重新嘗試或選擇其他付款方式。', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('Payment failed. Please try again or choose another payment method.', 'woocommerce-omnipay'), 'error');
         }
 
         return [
@@ -515,12 +515,12 @@ class OmnipayGateway extends WC_Payment_Gateway
             return $this->redirect($redirectUrl);
         } catch (OrderNotFoundException $e) {
             $this->logger->warning('getPaymentInfo: '.$e->getMessage());
-            wc_add_notice(__('找不到訂單資料。', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         } catch (\Exception $e) {
             $this->logger->error('getPaymentInfo: '.$e->getMessage());
-            wc_add_notice(__('處理付款資訊時發生錯誤。', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('Error processing payment information.', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         }
@@ -592,12 +592,12 @@ class OmnipayGateway extends WC_Payment_Gateway
             return $this->redirect($this->get_return_url($order));
         } catch (OrderNotFoundException $e) {
             $this->logger->warning('completePurchase: '.$e->getMessage());
-            wc_add_notice(__('找不到訂單資料。', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         } catch (\Exception $e) {
             $this->logger->error('completePurchase: '.$e->getMessage());
-            wc_add_notice(__('完成付款時發生錯誤。', 'woocommerce-omnipay'), 'error');
+            wc_add_notice(__('Error completing payment.', 'woocommerce-omnipay'), 'error');
 
             return $this->redirect(wc_get_checkout_url());
         }

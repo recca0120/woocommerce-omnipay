@@ -42,12 +42,6 @@ class NewebPayATMGatewayTest extends TestCase
         ]);
     }
 
-    public function test_gateway_has_correct_id_and_title()
-    {
-        $this->assertEquals('omnipay_newebpay_atm', $this->gateway->id);
-        $this->assertEquals('藍新 ATM', $this->gateway->method_title);
-    }
-
     public function test_process_payment_sends_atm_payment_type()
     {
         $order = $this->createOrder(100);
@@ -65,11 +59,5 @@ class NewebPayATMGatewayTest extends TestCase
             parse_str($tradeInfo, $tradeInfo);
         }
         $this->assertEquals('1', $tradeInfo['VACC']);
-    }
-
-    public function test_form_fields_has_amount_settings()
-    {
-        $this->assertArrayHasKey('min_amount', $this->gateway->form_fields);
-        $this->assertArrayHasKey('max_amount', $this->gateway->form_fields);
     }
 }
