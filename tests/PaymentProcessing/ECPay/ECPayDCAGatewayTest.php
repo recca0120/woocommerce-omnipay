@@ -304,10 +304,10 @@ class ECPayDCAGatewayTest extends TestCase
             'gateway_id' => 'ecpay_dca',
         ]);
 
+        // Test via public WooCommerce API method
         $html = $gateway->generate_periods_html('periods', []);
 
         // Verify the periods data appears in the rendered HTML
-        // Template should render existing periods as table rows with input fields
         $this->assertStringContainsString('value="M"', $html); // periodType from first period
         $this->assertStringContainsString('value="6"', $html); // frequency from first period
         $this->assertStringContainsString('value="24"', $html); // execTimes from first period
@@ -338,7 +338,6 @@ class ECPayDCAGatewayTest extends TestCase
 
         // Verify defaultPeriod is rendered in template (for the add-row template)
         // ECPay default: periodType='M', frequency=1, execTimes=12
-        // These default values should appear in the template row script
         $this->assertStringContainsString('value="M"', $html); // default periodType
         $this->assertStringContainsString('value="1"', $html); // default frequency
         $this->assertStringContainsString('value="12"', $html); // default execTimes

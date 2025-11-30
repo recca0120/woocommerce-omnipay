@@ -401,6 +401,7 @@ class NewebPayDCAGatewayTest extends TestCase
             'gateway_id' => 'newebpay_dca',
         ]);
 
+        // Test via public WooCommerce API method
         $html = $gateway->generate_periods_html('periods', []);
 
         // Verify the periods data appears in the rendered HTML

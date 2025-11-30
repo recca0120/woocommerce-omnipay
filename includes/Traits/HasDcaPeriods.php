@@ -143,6 +143,8 @@ trait HasDcaPeriods
 
     /**
      * 生成 DCA 設定表格 HTML
+     *
+     * WooCommerce Settings API callback for custom field type 'periods'
      */
     public function generate_periods_html($key, $data)
     {
