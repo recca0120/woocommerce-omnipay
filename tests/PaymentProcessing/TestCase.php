@@ -26,6 +26,7 @@ abstract class TestCase extends WP_UnitTestCase
         add_filter('woocommerce_omnipay_should_exit', '__return_false');
 
         wp_cache_delete('woocommerce_omnipay_'.$this->gatewayId.'_settings', 'options');
+        wp_cache_delete('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', 'options');
         wp_cache_delete('alloptions', 'options');
 
         $gatewayId = $this->gatewayId;
@@ -41,10 +42,13 @@ abstract class TestCase extends WP_UnitTestCase
         };
         add_filter('woocommerce_omnipay_gateway_config', $this->configCallback);
 
-        update_option('woocommerce_omnipay_'.$this->gatewayId.'_settings', array_merge(
-            ['enabled' => 'yes'],
-            $this->settings
-        ));
+        // 設定 Gateway settings（只有 enabled）
+        update_option('woocommerce_omnipay_'.$this->gatewayId.'_settings', [
+            'enabled' => 'yes',
+        ]);
+
+        // 設定 Shared settings（Omnipay 參數，供 overrideSettings=false 的 gateway 使用）
+        update_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', $this->settings);
 
         WC()->payment_gateways()->payment_gateways = [];
         WC()->payment_gateways()->init();
@@ -59,7 +63,9 @@ abstract class TestCase extends WP_UnitTestCase
         $_REQUEST = [];
 
         delete_option('woocommerce_omnipay_'.$this->gatewayId.'_settings');
+        delete_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings');
         wp_cache_delete('woocommerce_omnipay_'.$this->gatewayId.'_settings', 'options');
+        wp_cache_delete('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', 'options');
         wp_cache_delete('alloptions', 'options');
 
         if ($this->configCallback) {

@@ -233,9 +233,11 @@ class AdminSettingsTest extends WP_UnitTestCase
             'MerchantID' => 'gateway_merchant',
         ]);
 
+        // 使用 overrideSettings = true 的 gateway 才能覆蓋 shared settings
         $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'ecpay',
             'gateway' => 'ECPay',
+            'override_settings' => true,  // 啟用設定覆蓋
         ]);
         $omnipayGateway = $gateway->get_gateway();
 
