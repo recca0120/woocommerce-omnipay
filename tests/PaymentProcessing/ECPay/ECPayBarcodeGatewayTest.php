@@ -105,8 +105,11 @@ class ECPayBarcodeGatewayTest extends TestCase
 
     private function makeCallbackData($order, array $overrides = [])
     {
+        // 從 shared settings 讀取 Omnipay 參數
+        $sharedSettings = get_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', []);
+
         $data = array_merge([
-            'MerchantID' => $this->settings['MerchantID'],
+            'MerchantID' => $sharedSettings['MerchantID'] ?? $this->settings['MerchantID'],
             'MerchantTradeNo' => (string) $order->get_id(),
             'StoreID' => '',
             'RtnCode' => '1',
@@ -121,8 +124,8 @@ class ECPayBarcodeGatewayTest extends TestCase
         ], $overrides);
 
         $service = new CheckMacValueService(
-            $this->settings['HashKey'],
-            $this->settings['HashIV'],
+            $sharedSettings['HashKey'] ?? $this->settings['HashKey'],
+            $sharedSettings['HashIV'] ?? $this->settings['HashIV'],
             CheckMacValueService::METHOD_SHA256
         );
         $data['CheckMacValue'] = $service->generate($data);

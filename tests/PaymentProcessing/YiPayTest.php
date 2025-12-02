@@ -13,23 +13,13 @@ class YiPayTest extends TestCase
 
     protected $gatewayName = 'YiPay';
 
-    private $merchantId = '1234567890';
-
-    private $key = 'dGVzdGtleXRlc3QxMjM0NQ==';
-
-    private $iv = 'dGVzdGl2dGVzdDEyMzQ1Ng==';
-
-    protected function setUp(): void
-    {
-        $this->settings = [
-            'merchantId' => $this->merchantId,
-            'key' => $this->key,
-            'iv' => $this->iv,
-            'testMode' => 'yes',
-            'allow_resubmit' => 'no',
-        ];
-        parent::setUp();
-    }
+    protected $settings = [
+        'merchantId' => '1234567890',
+        'key' => 'dGVzdGtleXRlc3QxMjM0NQ==',
+        'iv' => 'dGVzdGl2dGVzdDEyMzQ1Ng==',
+        'testMode' => 'yes',
+        'allow_resubmit' => 'no',
+    ];
 
     // ==================== process_payment ====================
 
@@ -196,6 +186,10 @@ class YiPayTest extends TestCase
 
     private function makeCallbackData($order, array $overrides = [])
     {
+        // 從 shared settings 讀取 Omnipay 參數
+        $sharedSettings = get_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', []);
+        $merchantId = $sharedSettings['merchantId'] ?? $this->settings['merchantId'];
+
         $type = (int) ($overrides['type'] ?? '2');
 
         $returnUrl = WC()->api_request_url('omnipay_yipay_complete');
@@ -204,7 +198,7 @@ class YiPayTest extends TestCase
 
         $isOffline = in_array($type, [3, 4], true);
         $data = [
-            'merchantId' => $this->merchantId,
+            'merchantId' => $merchantId,
             'orderNo' => (string) $order->get_id(),
             'amount' => (string) ((int) $order->get_total()),
             'statusCode' => '00',
@@ -232,6 +226,10 @@ class YiPayTest extends TestCase
 
     private function makePaymentInfoData($order, array $overrides = [])
     {
+        // 從 shared settings 讀取 Omnipay 參數
+        $sharedSettings = get_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', []);
+        $merchantId = $sharedSettings['merchantId'] ?? $this->settings['merchantId'];
+
         $type = (int) ($overrides['type'] ?? '4');
 
         $returnUrl = WC()->api_request_url('omnipay_yipay_complete');
@@ -239,7 +237,7 @@ class YiPayTest extends TestCase
         $paymentInfoUrl = WC()->api_request_url('omnipay_yipay_payment_info');
 
         $data = [
-            'merchantId' => $this->merchantId,
+            'merchantId' => $merchantId,
             'orderNo' => (string) $order->get_id(),
             'amount' => (string) ((int) $order->get_total()),
             'statusCode' => '00',
@@ -265,15 +263,20 @@ class YiPayTest extends TestCase
 
     private function sign(int $type, array $data)
     {
+        // 從 shared settings 讀取 Omnipay 參數
+        $sharedSettings = get_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', []);
+        $key = $sharedSettings['key'] ?? $this->settings['key'];
+        $iv = $sharedSettings['iv'] ?? $this->settings['iv'];
+
         $keys = ['merchantId', 'amount', 'orderNo', 'returnURL', 'cancelURL', 'backgroundURL', 'transactionNo', 'statusCode'];
         $typeKeys = [3 => 'pinCode', 4 => 'account'];
         $keys[] = $typeKeys[$type] ?? 'approvalCode';
 
         $signed = [];
-        foreach ($keys as $key) {
-            $signed[$key] = $data[$key] ?? '';
+        foreach ($keys as $key_name) {
+            $signed[$key_name] = $data[$key_name] ?? '';
         }
 
-        return (new Hasher($this->key, $this->iv))->make($signed);
+        return (new Hasher($key, $iv))->make($signed);
     }
 }

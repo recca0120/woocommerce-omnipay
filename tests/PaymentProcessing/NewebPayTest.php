@@ -13,23 +13,13 @@ class NewebPayTest extends TestCase
 
     protected $gatewayName = 'NewebPay';
 
-    private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
-
-    private $hashIV = 'VVcW9t4feCshKOTi';
-
-    private $merchantId = 'MS350098593';
-
-    protected function setUp(): void
-    {
-        $this->settings = [
-            'HashKey' => $this->hashKey,
-            'HashIV' => $this->hashIV,
-            'MerchantID' => $this->merchantId,
-            'testMode' => 'yes',
-            'allow_resubmit' => 'no',
-        ];
-        parent::setUp();
-    }
+    protected $settings = [
+        'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
+        'HashIV' => 'VVcW9t4feCshKOTi',
+        'MerchantID' => 'MS350098593',
+        'testMode' => 'yes',
+        'allow_resubmit' => 'no',
+    ];
 
     // ==================== process_payment ====================
 
@@ -166,10 +156,14 @@ class NewebPayTest extends TestCase
 
     private function makeCallbackData($order, array $overrides = [])
     {
+        // 從 shared settings 讀取 Omnipay 參數
+        $sharedSettings = get_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', []);
+        $merchantId = $sharedSettings['MerchantID'] ?? $this->settings['MerchantID'];
+
         $result = array_merge([
             'Status' => 'SUCCESS',
             'Message' => '授權成功',
-            'MerchantID' => $this->merchantId,
+            'MerchantID' => $merchantId,
             'Amt' => (int) $order->get_total(),
             'TradeNo' => '24112500001234',
             'MerchantOrderNo' => (string) $order->get_id(),
@@ -185,10 +179,14 @@ class NewebPayTest extends TestCase
 
     private function makePaymentInfoData($order, array $overrides = [])
     {
+        // 從 shared settings 讀取 Omnipay 參數
+        $sharedSettings = get_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', []);
+        $merchantId = $sharedSettings['MerchantID'] ?? $this->settings['MerchantID'];
+
         $result = array_merge([
             'Status' => 'SUCCESS',
             'Message' => '取號成功',
-            'MerchantID' => $this->merchantId,
+            'MerchantID' => $merchantId,
             'Amt' => (int) $order->get_total(),
             'TradeNo' => '24112500001234',
             'MerchantOrderNo' => (string) $order->get_id(),
@@ -200,12 +198,18 @@ class NewebPayTest extends TestCase
 
     private function encrypt(array $result)
     {
-        $encryptor = new Encryptor($this->hashKey, $this->hashIV);
+        // 從 shared settings 讀取 Omnipay 參數
+        $sharedSettings = get_option('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', []);
+        $hashKey = $sharedSettings['HashKey'] ?? $this->settings['HashKey'];
+        $hashIV = $sharedSettings['HashIV'] ?? $this->settings['HashIV'];
+        $merchantId = $sharedSettings['MerchantID'] ?? $this->settings['MerchantID'];
+
+        $encryptor = new Encryptor($hashKey, $hashIV);
         $tradeInfo = $encryptor->encrypt($result);
 
         return [
             'Status' => $result['Status'],
-            'MerchantID' => $this->merchantId,
+            'MerchantID' => $merchantId,
             'TradeInfo' => $tradeInfo,
             'TradeSha' => $encryptor->tradeSha($tradeInfo),
             'Version' => '2.0',

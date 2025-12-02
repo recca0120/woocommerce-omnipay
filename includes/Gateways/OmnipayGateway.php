@@ -182,7 +182,11 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     public function get_gateway()
     {
-        return $this->bridge->createGateway($this->settings);
+        // 只有在 overrideSettings = true 時才傳遞 Gateway 自己的設定
+        // 否則使用空陣列，讓 Bridge 從共用設定中讀取
+        $settings = $this->overrideSettings ? $this->settings : [];
+
+        return $this->bridge->createGateway($settings);
     }
 
     /**
