@@ -6,7 +6,7 @@ A flexible WooCommerce payment gateway plugin that integrates multiple Taiwan-ba
 
 ![Tests](https://github.com/recca0120/woocommerce-omnipay/actions/workflows/tests.yml/badge.svg)
 [![codecov](https://codecov.io/gh/recca0120/woocommerce-omnipay/branch/main/graph/badge.svg)](https://codecov.io/gh/recca0120/woocommerce-omnipay)
-![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue)
+![PHP Version](https://img.shields.io/badge/PHP-7.2%2B-blue)
 ![WooCommerce](https://img.shields.io/badge/WooCommerce-8.0%2B-purple)
 ![WordPress](https://img.shields.io/badge/WordPress-6.4%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -35,7 +35,7 @@ A flexible WooCommerce payment gateway plugin that integrates multiple Taiwan-ba
 
 ## Requirements
 
-- PHP 7.4 or higher
+- PHP 7.2 or higher
 - WordPress 6.4 or higher
 - WooCommerce 8.0 or higher
 
@@ -141,16 +141,29 @@ composer test
 ```
 woocommerce-omnipay/
 ├── includes/
+│   ├── Adapters/                   # Gateway Adapter layer
+│   │   ├── Contracts/
+│   │   │   └── GatewayAdapter.php  # Adapter interface
+│   │   ├── Concerns/               # Adapter Traits
+│   │   ├── ECPayAdapter.php        # ECPay Adapter
+│   │   ├── NewebPayAdapter.php     # NewebPay Adapter
+│   │   ├── YiPayAdapter.php        # YiPay Adapter
+│   │   └── DefaultGatewayAdapter.php
 │   ├── Gateways/
+│   │   ├── Concerns/               # Gateway Traits
+│   │   ├── ECPay/                  # ECPay payment methods
+│   │   ├── NewebPay/               # NewebPay payment methods
+│   │   ├── YiPay/                  # YiPay payment methods
 │   │   ├── OmnipayGateway.php      # Base gateway class
 │   │   ├── ECPayGateway.php        # ECPay implementation
 │   │   ├── NewebPayGateway.php     # NewebPay implementation
-│   │   ├── YiPayGateway.php        # YiPay implementation
-│   │   ├── BankTransferGateway.php # Bank transfer implementation
-│   │   └── DummyGateway.php        # Testing gateway
-│   ├── Services/
-│   │   ├── OmnipayBridge.php       # Omnipay adapter
-│   │   └── WooCommerceLogger.php   # PSR-3 logger
+│   │   └── YiPayGateway.php        # YiPay implementation
+│   ├── Http/
+│   │   ├── WordPressHttpClient.php # WordPress HTTP Client
+│   │   └── NetworkException.php    # Network exception
+│   ├── WordPress/
+│   │   ├── Logger.php              # PSR-3 logger
+│   │   └── SettingsManager.php     # Settings manager
 │   ├── Repositories/
 │   │   └── OrderRepository.php     # Order data persistence
 │   └── GatewayRegistry.php         # Gateway registration
@@ -170,14 +183,36 @@ woocommerce-omnipay/
 
 ### Adding a New Gateway
 
-1. Create a new gateway class extending `OmnipayGateway`:
+1. Create an Adapter (encapsulates gateway logic):
+
+```php
+namespace WooCommerceOmnipay\Adapters;
+
+class MyGatewayAdapter extends DefaultGatewayAdapter
+{
+    public function getGatewayName(): string
+    {
+        return 'MyGateway';
+    }
+
+    public function normalizePaymentInfo(array $data): array
+    {
+        return [
+            'vAccount' => $data['account'] ?? '',
+            'ExpireDate' => $data['expire'] ?? '',
+        ];
+    }
+}
+```
+
+2. Create a Gateway (if special handling needed):
 
 ```php
 namespace WooCommerceOmnipay\Gateways;
 
 class MyGateway extends OmnipayGateway
 {
-    protected function get_callback_parameters()
+    protected function getCallbackParameters()
     {
         return [
             'returnUrl' => WC()->api_request_url($this->id . '_complete'),
@@ -187,12 +222,13 @@ class MyGateway extends OmnipayGateway
 }
 ```
 
-2. Register the gateway in the config:
+3. Register the gateway in the config:
 
 ```php
 add_filter('woocommerce_omnipay_gateway_config', function($config) {
-    $config['gateways']['MyGateway'] = [
-        'enabled' => true,
+    $config['gateways'][] = [
+        'gateway' => 'MyGateway',
+        'gateway_id' => 'mygateway',
         'title' => 'My Gateway',
         'description' => 'Pay with My Gateway',
     ];
@@ -200,7 +236,7 @@ add_filter('woocommerce_omnipay_gateway_config', function($config) {
 });
 ```
 
-3. Install the corresponding Omnipay driver:
+4. Install the corresponding Omnipay driver:
 
 ```bash
 composer require omnipay/my-gateway

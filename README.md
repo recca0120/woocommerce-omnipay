@@ -6,7 +6,7 @@
 
 ![Tests](https://github.com/recca0120/woocommerce-omnipay/actions/workflows/tests.yml/badge.svg)
 [![codecov](https://codecov.io/gh/recca0120/woocommerce-omnipay/branch/main/graph/badge.svg)](https://codecov.io/gh/recca0120/woocommerce-omnipay)
-![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue)
+![PHP Version](https://img.shields.io/badge/PHP-7.2%2B-blue)
 ![WooCommerce](https://img.shields.io/badge/WooCommerce-8.0%2B-purple)
 ![WordPress](https://img.shields.io/badge/WordPress-6.4%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -35,7 +35,7 @@
 
 ## 系統需求
 
-- PHP 7.4 或更高版本
+- PHP 7.2 或更高版本
 - WordPress 6.4 或更高版本
 - WooCommerce 8.0 或更高版本
 
@@ -163,16 +163,29 @@ composer test
 ```
 woocommerce-omnipay/
 ├── includes/
+│   ├── Adapters/                   # Gateway Adapter 層
+│   │   ├── Contracts/
+│   │   │   └── GatewayAdapter.php  # Adapter 介面
+│   │   ├── Concerns/               # Adapter Traits
+│   │   ├── ECPayAdapter.php        # 綠界 Adapter
+│   │   ├── NewebPayAdapter.php     # 藍新 Adapter
+│   │   ├── YiPayAdapter.php        # 乙禾 Adapter
+│   │   └── DefaultGatewayAdapter.php
 │   ├── Gateways/
+│   │   ├── Concerns/               # Gateway Traits
+│   │   ├── ECPay/                  # 綠界各付款方式
+│   │   ├── NewebPay/               # 藍新各付款方式
+│   │   ├── YiPay/                  # 乙禾各付款方式
 │   │   ├── OmnipayGateway.php      # 基礎金流類別
 │   │   ├── ECPayGateway.php        # 綠界實作
 │   │   ├── NewebPayGateway.php     # 藍新實作
-│   │   ├── YiPayGateway.php        # 乙禾實作
-│   │   ├── BankTransferGateway.php # 銀行轉帳實作
-│   │   └── DummyGateway.php        # 測試用金流
-│   ├── Services/
-│   │   ├── OmnipayBridge.php       # Omnipay 轉接器
-│   │   └── WooCommerceLogger.php   # PSR-3 日誌
+│   │   └── YiPayGateway.php        # 乙禾實作
+│   ├── Http/
+│   │   ├── WordPressHttpClient.php # WordPress HTTP Client
+│   │   └── NetworkException.php    # 網路例外
+│   ├── WordPress/
+│   │   ├── Logger.php              # PSR-3 日誌
+│   │   └── SettingsManager.php     # 設定管理
 │   ├── Repositories/
 │   │   └── OrderRepository.php     # 訂單資料持久化
 │   └── GatewayRegistry.php         # 金流註冊
@@ -192,14 +205,36 @@ woocommerce-omnipay/
 
 ### 新增金流
 
-1. 建立繼承 `OmnipayGateway` 的新金流類別：
+1. 建立 Adapter（封裝金流邏輯）：
+
+```php
+namespace WooCommerceOmnipay\Adapters;
+
+class MyGatewayAdapter extends DefaultGatewayAdapter
+{
+    public function getGatewayName(): string
+    {
+        return 'MyGateway';
+    }
+
+    public function normalizePaymentInfo(array $data): array
+    {
+        return [
+            'vAccount' => $data['account'] ?? '',
+            'ExpireDate' => $data['expire'] ?? '',
+        ];
+    }
+}
+```
+
+2. 建立 Gateway（如需特殊處理）：
 
 ```php
 namespace WooCommerceOmnipay\Gateways;
 
 class MyGateway extends OmnipayGateway
 {
-    protected function get_callback_parameters()
+    protected function getCallbackParameters()
     {
         return [
             'returnUrl' => WC()->api_request_url($this->id . '_complete'),
@@ -209,7 +244,7 @@ class MyGateway extends OmnipayGateway
 }
 ```
 
-2. 在設定中註冊金流：
+3. 在設定中註冊金流：
 
 ```php
 add_filter('woocommerce_omnipay_gateway_config', function($config) {
@@ -223,7 +258,7 @@ add_filter('woocommerce_omnipay_gateway_config', function($config) {
 });
 ```
 
-3. 安裝對應的 Omnipay 驅動：
+4. 安裝對應的 Omnipay 驅動：
 
 ```bash
 composer require omnipay/my-gateway
