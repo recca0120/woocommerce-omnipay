@@ -143,6 +143,19 @@ class OmnipayBridge
     }
 
     /**
+     * 取得合併後的設定
+     *
+     * 用於提供給 Adapter 初始化
+     *
+     * @param  array  $gatewaySettings  Gateway 自身的設定
+     * @return array
+     */
+    public function getMergedSettings(array $gatewaySettings = [])
+    {
+        return $this->mergeParameters($this->getDefaultParameters(), $gatewaySettings);
+    }
+
+    /**
      * 取得設定的 option key
      *
      * @param  string  $name  Gateway 名稱

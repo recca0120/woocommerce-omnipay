@@ -2,9 +2,6 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
-use Omnipay\Common\GatewayInterface;
-use Omnipay\Omnipay;
-
 /**
  * ECPay Adapter
  *
@@ -12,6 +9,8 @@ use Omnipay\Omnipay;
  */
 class ECPayAdapter implements GatewayAdapterInterface
 {
+    use GatewayOperationsTrait;
+
     /**
      * ECPay 取號成功的 RtnCode
      */
@@ -22,14 +21,6 @@ class ECPayAdapter implements GatewayAdapterInterface
     public function getGatewayName(): string
     {
         return 'ECPay';
-    }
-
-    public function createGateway(array $settings): GatewayInterface
-    {
-        $gateway = Omnipay::create($this->getGatewayName());
-        $gateway->initialize($settings);
-
-        return $gateway;
     }
 
     public function validateAmount(array $data, int $orderTotal): bool
@@ -51,11 +42,6 @@ class ECPayAdapter implements GatewayAdapterInterface
             'Barcode2' => $data['Barcode2'] ?? null,
             'Barcode3' => $data['Barcode3'] ?? null,
         ], fn ($value) => $value !== null);
-    }
-
-    public function getCallbackParameters(string $gatewayId): array
-    {
-        return [];
     }
 
     public function getPaymentInfoEndpoint(): string

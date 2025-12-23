@@ -3,12 +3,15 @@
 namespace WooCommerceOmnipay\Adapters;
 
 use Omnipay\Common\GatewayInterface;
+use Omnipay\Common\Message\NotificationInterface;
+use Omnipay\Common\Message\ResponseInterface;
 
 /**
  * Gateway Adapter Interface
  *
  * 封裝特定金流的邏輯，包含：
  * - Gateway 建立與配置
+ * - 付款操作（purchase, completePurchase, acceptNotification, getPaymentInfo）
  * - 金額驗證
  * - 付款資訊欄位正規化
  * - Callback URL 處理
@@ -24,6 +27,36 @@ interface GatewayAdapterInterface
      * 建立 Omnipay Gateway
      */
     public function createGateway(array $settings): GatewayInterface;
+
+    /**
+     * 執行付款
+     */
+    public function purchase(array $data): ResponseInterface;
+
+    /**
+     * 完成付款（處理用戶返回）
+     */
+    public function completePurchase(array $parameters = []): ResponseInterface;
+
+    /**
+     * 是否支援接收通知
+     */
+    public function supportsAcceptNotification(): bool;
+
+    /**
+     * 接收金流通知
+     */
+    public function acceptNotification(array $parameters = []): NotificationInterface;
+
+    /**
+     * 是否支援取得付款資訊
+     */
+    public function supportsGetPaymentInfo(): bool;
+
+    /**
+     * 取得付款資訊
+     */
+    public function getPaymentInfo(array $parameters = []): ResponseInterface;
 
     /**
      * 驗證金額

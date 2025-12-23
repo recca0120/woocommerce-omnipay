@@ -2,9 +2,6 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
-use Omnipay\Common\GatewayInterface;
-use Omnipay\Omnipay;
-
 /**
  * NewebPay Adapter
  *
@@ -12,6 +9,8 @@ use Omnipay\Omnipay;
  */
 class NewebPayAdapter implements GatewayAdapterInterface
 {
+    use GatewayOperationsTrait;
+
     /**
      * NewebPay 付款類型
      */
@@ -24,14 +23,6 @@ class NewebPayAdapter implements GatewayAdapterInterface
     public function getGatewayName(): string
     {
         return 'NewebPay';
-    }
-
-    public function createGateway(array $settings): GatewayInterface
-    {
-        $gateway = Omnipay::create($this->getGatewayName());
-        $gateway->initialize($settings);
-
-        return $gateway;
     }
 
     public function validateAmount(array $data, int $orderTotal): bool
@@ -72,15 +63,5 @@ class NewebPayAdapter implements GatewayAdapterInterface
         }
 
         return $normalized;
-    }
-
-    public function getCallbackParameters(string $gatewayId): array
-    {
-        return [];
-    }
-
-    public function getPaymentInfoEndpoint(): string
-    {
-        return '_payment_info';
     }
 }

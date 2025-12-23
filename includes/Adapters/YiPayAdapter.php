@@ -2,9 +2,6 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
-use Omnipay\Common\GatewayInterface;
-use Omnipay\Omnipay;
-
 /**
  * YiPay Adapter
  *
@@ -12,6 +9,8 @@ use Omnipay\Omnipay;
  */
 class YiPayAdapter implements GatewayAdapterInterface
 {
+    use GatewayOperationsTrait;
+
     /**
      * YiPay 付款類型
      */
@@ -22,14 +21,6 @@ class YiPayAdapter implements GatewayAdapterInterface
     public function getGatewayName(): string
     {
         return 'YiPay';
-    }
-
-    public function createGateway(array $settings): GatewayInterface
-    {
-        $gateway = Omnipay::create($this->getGatewayName());
-        $gateway->initialize($settings);
-
-        return $gateway;
     }
 
     public function validateAmount(array $data, int $orderTotal): bool
@@ -77,11 +68,6 @@ class YiPayAdapter implements GatewayAdapterInterface
             'notifyUrl' => WC()->api_request_url($gatewayId.'_notify'),
             'paymentInfoUrl' => WC()->api_request_url($gatewayId.'_payment_info'),
         ];
-    }
-
-    public function getPaymentInfoEndpoint(): string
-    {
-        return '_payment_info';
     }
 
     /**
