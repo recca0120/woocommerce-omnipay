@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\WordPress;
+namespace WooCommerceOmnipay\Http;
 
 use Omnipay\Common\Http\Exception\NetworkException as OmnipayNetworkException;
 

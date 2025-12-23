@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\WordPress;
+namespace WooCommerceOmnipay\Http;
 
 use Nyholm\Psr7\Response;
 use Omnipay\Common\Http\ClientInterface;
@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * 使用 WordPress 的 wp_remote_request() 實作 Omnipay HTTP Client
  */
-class HttpClient implements ClientInterface
+class WordPressHttpClient implements ClientInterface
 {
     /**
      * @var array
