@@ -5,6 +5,7 @@ namespace WooCommerceOmnipay\Gateways;
 use Omnipay\Common\Message\NotificationInterface;
 use Psr\Log\LoggerInterface;
 use WC_Payment_Gateway;
+use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
 use WooCommerceOmnipay\Adapters\GatewayAdapterInterface;
 use WooCommerceOmnipay\Exceptions\OrderNotFoundException;
 use WooCommerceOmnipay\Helper;
@@ -53,7 +54,7 @@ class OmnipayGateway extends WC_Payment_Gateway
     protected $logger;
 
     /**
-     * @var GatewayAdapterInterface|null
+     * @var GatewayAdapterInterface
      */
     protected $adapter;
 
@@ -71,7 +72,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->method_description = $config['description'] ?? '';
         $this->name = $config['gateway'] ?? '';
         $this->overrideSettings = $config['override_settings'] ?? false;
-        $this->adapter = $adapter;
+        $this->adapter = $adapter ?? new DefaultGatewayAdapter($this->name);
 
         // 設定 icon
         if (! empty($config['icon'])) {
@@ -200,14 +201,10 @@ class OmnipayGateway extends WC_Payment_Gateway
     /**
      * 取得已初始化的 Adapter
      *
-     * @return GatewayAdapterInterface|null
+     * @return GatewayAdapterInterface
      */
     protected function getAdapter()
     {
-        if ($this->adapter === null) {
-            return null;
-        }
-
         // 從 Bridge 取得合併後的設定
         $settings = $this->overrideSettings ? $this->settings : [];
         $mergedSettings = $this->bridge->getMergedSettings($settings);
@@ -236,11 +233,8 @@ class OmnipayGateway extends WC_Payment_Gateway
                 'transaction_id' => $paymentData['transactionId'],
             ]);
 
-            // 執行付款（優先使用 adapter）
-            $adapter = $this->getAdapter();
-            $response = $adapter !== null
-                ? $adapter->purchase($paymentData)
-                : $this->get_gateway()->purchase($paymentData)->send();
+            // 執行付款
+            $response = $this->getAdapter()->purchase($paymentData);
 
             $this->logger->info('process_payment: Gateway response', [
                 'order_id' => $orderId,
@@ -325,11 +319,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function getPaymentInfoUrl($order)
     {
-        $endpoint = $this->adapter !== null
-            ? $this->adapter->getPaymentInfoEndpoint()
-            : '_payment_info';
-
-        return WC()->api_request_url($this->id.$endpoint);
+        return WC()->api_request_url($this->id.$this->adapter->getPaymentInfoEndpoint());
     }
 
     /**
@@ -341,11 +331,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function getCallbackParameters()
     {
-        if ($this->adapter !== null) {
-            return $this->adapter->getCallbackParameters($this->id);
-        }
-
-        return [];
+        return $this->adapter->getCallbackParameters($this->id);
     }
 
     /**
@@ -495,14 +481,9 @@ class OmnipayGateway extends WC_Payment_Gateway
 
         try {
             $adapter = $this->getAdapter();
-            $supportsAcceptNotification = $adapter !== null
-                ? $adapter->supportsAcceptNotification()
-                : $this->get_gateway()->supportsAcceptNotification();
 
-            if ($supportsAcceptNotification) {
-                $notification = $adapter !== null
-                    ? $adapter->acceptNotification($this->getCallbackParameters())
-                    : $this->get_gateway()->acceptNotification($this->getCallbackParameters());
+            if ($adapter->supportsAcceptNotification()) {
+                $notification = $adapter->acceptNotification($this->getCallbackParameters());
 
                 $this->logger->info('acceptNotification: Parsed notification', [
                     'transaction_id' => $notification->getTransactionId(),
@@ -516,9 +497,7 @@ class OmnipayGateway extends WC_Payment_Gateway
                 return;
             }
 
-            $response = $adapter !== null
-                ? $adapter->completePurchase($this->getCallbackParameters())
-                : $this->get_gateway()->completePurchase($this->getCallbackParameters())->send();
+            $response = $adapter->completePurchase($this->getCallbackParameters());
 
             $this->logger->info('acceptNotification: Fallback response', [
                 'transaction_id' => $response->getTransactionId(),
@@ -582,10 +561,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function handlePaymentInfo()
     {
-        $adapter = $this->getAdapter();
-        $response = $adapter !== null
-            ? $adapter->getPaymentInfo()
-            : $this->get_gateway()->getPaymentInfo()->send();
+        $response = $this->getAdapter()->getPaymentInfo();
 
         $this->logger->info('getPaymentInfo: Gateway response', [
             'transaction_id' => $response->getTransactionId(),
@@ -613,10 +589,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->logger->info('completePurchase: User returned', $this->getRequestData());
 
         try {
-            $adapter = $this->getAdapter();
-            $response = $adapter !== null
-                ? $adapter->completePurchase($this->getCallbackParameters())
-                : $this->get_gateway()->completePurchase($this->getCallbackParameters())->send();
+            $response = $this->getAdapter()->completePurchase($this->getCallbackParameters());
 
             $this->logger->info('completePurchase: Gateway response', [
                 'transaction_id' => $response->getTransactionId(),
@@ -699,12 +672,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function validateAmount($order, array $data)
     {
-        if ($this->adapter !== null) {
-            return $this->adapter->validateAmount($data, (int) $order->get_total());
-        }
-
-        // 沒有 adapter 時不驗證
-        return true;
+        return $this->adapter->validateAmount($data, (int) $order->get_total());
     }
 
     /**
@@ -738,12 +706,7 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function savePaymentInfo($order, array $data)
     {
-        // 使用 adapter 正規化欄位名稱
-        $normalizedData = $this->adapter !== null
-            ? $this->adapter->normalizePaymentInfo($data)
-            : $data;
-
-        $this->orders->savePaymentInfo($order, $normalizedData);
+        $this->orders->savePaymentInfo($order, $this->adapter->normalizePaymentInfo($data));
     }
 
     /**
