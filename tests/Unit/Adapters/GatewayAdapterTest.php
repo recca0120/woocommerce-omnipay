@@ -16,7 +16,10 @@ use WooCommerceOmnipay\Tests\Unit\TestHttpClient;
  */
 class GatewayAdapterTest extends TestCase
 {
-    private TestHttpClient $httpClient;
+    /**
+     * @var TestHttpClient
+     */
+    private $httpClient;
 
     protected function setUp(): void
     {
