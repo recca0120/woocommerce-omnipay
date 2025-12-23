@@ -2,6 +2,8 @@
 
 namespace WooCommerceOmnipay\Gateways;
 
+use WooCommerceOmnipay\Helper;
+
 /**
  * YiPay Gateway
  *
@@ -59,6 +61,37 @@ class YiPayGateway extends OmnipayGateway
             'notifyUrl' => WC()->api_request_url($this->id.'_notify'),
             'paymentInfoUrl' => WC()->api_request_url($this->id.'_payment_info'),
         ];
+    }
+
+    /**
+     * 處理付款資訊的核心邏輯
+     *
+     * YiPay 的 backgroundURL 使用背景 POST 通知（不同於使用者端導向）
+     * 使用 acceptNotification() 解析回應，儲存付款資訊，回應金流
+     *
+     * @return null 背景通知不需 redirect
+     */
+    protected function handlePaymentInfo()
+    {
+        $gateway = $this->get_gateway();
+        $notification = $gateway->acceptNotification($this->getCallbackParameters());
+
+        $this->logger->info('getPaymentInfo: Parsed notification', [
+            'transaction_id' => $notification->getTransactionId(),
+            'data' => Helper::maskSensitiveData($notification->getData() ?? []),
+        ]);
+
+        $order = $this->orders->findByTransactionIdOrFail($notification->getTransactionId());
+
+        $this->savePaymentInfo($order, $notification->getData());
+
+        $this->logger->info('getPaymentInfo: Payment info saved', [
+            'order_id' => $order->get_id(),
+        ]);
+
+        $this->sendNotificationResponse($notification);
+
+        return null;
     }
 
     /**

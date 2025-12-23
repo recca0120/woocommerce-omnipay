@@ -2,8 +2,6 @@
 
 namespace WooCommerceOmnipay\Gateways;
 
-use WooCommerceOmnipay\Helper;
-
 /**
  * NewebPay Gateway
  *
@@ -37,37 +35,6 @@ class NewebPayGateway extends OmnipayGateway
         $amt = isset($data['Amt']) ? (int) $data['Amt'] : 0;
 
         return $amt === (int) $order->get_total();
-    }
-
-    /**
-     * 處理付款資訊的核心邏輯
-     *
-     * NewebPay 的 CustomerURL 是使用者端導向（不同於背景 POST），需要：
-     * 1. 使用 getPaymentInfo() 解析回應（不是 acceptNotification）
-     * 2. 儲存付款資訊
-     * 3. 回傳感謝頁 URL 讓使用者重導向
-     *
-     * @return string redirect URL
-     */
-    protected function handlePaymentInfo()
-    {
-        $gateway = $this->get_gateway();
-        $response = $gateway->getPaymentInfo()->send();
-
-        $this->logger->info('getPaymentInfo: Gateway response', [
-            'transaction_id' => $response->getTransactionId(),
-            'data' => Helper::maskSensitiveData($response->getData() ?? []),
-        ]);
-
-        $order = $this->orders->findByTransactionIdOrFail($response->getTransactionId());
-
-        $this->savePaymentInfo($order, $response->getData());
-
-        $this->logger->info('getPaymentInfo: Payment info saved', [
-            'order_id' => $order->get_id(),
-        ]);
-
-        return $this->get_return_url($order);
     }
 
     /**

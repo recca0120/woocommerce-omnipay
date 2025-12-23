@@ -533,32 +533,31 @@ class OmnipayGateway extends WC_Payment_Gateway
     /**
      * 處理付款資訊的核心邏輯
      *
-     * 預設行為：接收背景 POST 通知，儲存付款資訊，回應金流
-     * 子類可覆寫此方法改變處理邏輯（例如：NewebPay 是使用者導向的 CustomerURL）
+     * 預設行為：處理使用者端導向的付款資訊回傳（如 NewebPay 的 CustomerURL）
+     * 使用 getPaymentInfo() 解析回應，儲存付款資訊，並導向感謝頁
+     * 子類可覆寫此方法改變處理邏輯（例如：ECPay 使用背景 POST 通知）
      *
-     * @return string|null redirect URL 或 null（背景通知不需 redirect）
+     * @return string redirect URL
      */
     protected function handlePaymentInfo()
     {
         $gateway = $this->get_gateway();
-        $notification = $gateway->acceptNotification($this->getCallbackParameters());
+        $response = $gateway->getPaymentInfo()->send();
 
-        $this->logger->info('getPaymentInfo: Parsed notification', [
-            'transaction_id' => $notification->getTransactionId(),
-            'data' => Helper::maskSensitiveData($notification->getData() ?? []),
+        $this->logger->info('getPaymentInfo: Gateway response', [
+            'transaction_id' => $response->getTransactionId(),
+            'data' => Helper::maskSensitiveData($response->getData() ?? []),
         ]);
 
-        $order = $this->orders->findByTransactionIdOrFail($notification->getTransactionId());
+        $order = $this->orders->findByTransactionIdOrFail($response->getTransactionId());
 
-        $this->savePaymentInfo($order, $notification->getData());
+        $this->savePaymentInfo($order, $response->getData());
 
         $this->logger->info('getPaymentInfo: Payment info saved', [
             'order_id' => $order->get_id(),
         ]);
 
-        $this->sendNotificationResponse($notification);
-
-        return null;
+        return $this->get_return_url($order);
     }
 
     /**
