@@ -79,13 +79,6 @@ interface GatewayAdapterInterface
     public function normalizePaymentInfo(array $data): array;
 
     /**
-     * 取得 callback 參數
-     *
-     * 某些金流（如 YiPay）需要額外參數來驗證簽章
-     */
-    public function getCallbackParameters(string $gatewayId): array;
-
-    /**
      * 取得付款資訊 URL endpoint
      *
      * 預設為 _payment_info，ECPay 為 _notify
@@ -119,22 +112,4 @@ interface GatewayAdapterInterface
      * 初始化設定
      */
     public function initialize(array $settings);
-
-    /**
-     * 處理 notify callback
-     *
-     * 統一處理 acceptNotification 或 completePurchase fallback
-     *
-     * @param  array  $parameters  callback 參數
-     * @return array{
-     *     transactionId: string,
-     *     transactionReference: ?string,
-     *     isSuccessful: bool,
-     *     message: ?string,
-     *     data: ?array,
-     *     reply: ?string,
-     *     isPaymentInfo: bool
-     * }
-     */
-    public function processNotifyCallback(array $parameters): array;
 }

@@ -85,11 +85,6 @@ trait GatewayOperationsTrait
         return $this->getGateway()->getPaymentInfo($parameters)->send();
     }
 
-    public function getCallbackParameters(string $gatewayId): array
-    {
-        return [];
-    }
-
     public function getPaymentInfoEndpoint(): string
     {
         return '_payment_info';
@@ -108,56 +103,5 @@ trait GatewayOperationsTrait
     public function isPaymentInfoNotification(array $data): bool
     {
         return false;
-    }
-
-    /**
-     * 處理 notify callback
-     *
-     * 統一處理 acceptNotification 或 completePurchase fallback
-     */
-    public function processNotifyCallback(array $parameters): array
-    {
-        if ($this->supportsAcceptNotification()) {
-            return $this->processNotification($parameters);
-        }
-
-        return $this->processCompletePurchaseCallback($parameters);
-    }
-
-    /**
-     * 處理 acceptNotification 回應
-     */
-    protected function processNotification(array $parameters): array
-    {
-        $notification = $this->acceptNotification($parameters);
-        $data = $notification->getData() ?? [];
-
-        return [
-            'transactionId' => $notification->getTransactionId(),
-            'transactionReference' => $notification->getTransactionReference(),
-            'isSuccessful' => $notification->getTransactionStatus() === NotificationInterface::STATUS_COMPLETED,
-            'message' => $notification->getMessage(),
-            'data' => $data,
-            'reply' => method_exists($notification, 'getReply') ? $notification->getReply() : null,
-            'isPaymentInfo' => $this->isPaymentInfoNotification($data),
-        ];
-    }
-
-    /**
-     * 處理 completePurchase callback 回應
-     */
-    protected function processCompletePurchaseCallback(array $parameters): array
-    {
-        $response = $this->completePurchase($parameters);
-
-        return [
-            'transactionId' => $response->getTransactionId(),
-            'transactionReference' => $response->getTransactionReference(),
-            'isSuccessful' => $response->isSuccessful(),
-            'message' => $response->getMessage(),
-            'data' => $response->getData() ?? [],
-            'reply' => null,
-            'isPaymentInfo' => false,
-        ];
     }
 }

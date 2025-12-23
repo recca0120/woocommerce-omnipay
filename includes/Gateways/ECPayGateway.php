@@ -2,6 +2,7 @@
 
 namespace WooCommerceOmnipay\Gateways;
 
+use Omnipay\Common\Message\NotificationInterface;
 use WooCommerceOmnipay\Adapters\ECPayAdapter;
 
 /**
@@ -12,41 +13,51 @@ use WooCommerceOmnipay\Adapters\ECPayAdapter;
 class ECPayGateway extends OmnipayGateway
 {
     /**
-     * 處理統一的 callback 結果
+     * @var ECPayAdapter
+     */
+    protected $adapter;
+
+    public function __construct(array $config, ?ECPayAdapter $adapter = null)
+    {
+        parent::__construct($config, $adapter ?? new ECPayAdapter);
+    }
+
+    /**
+     * 處理 AcceptNotification 回應
      *
      * ECPay 有額外的信用卡資訊儲存與模擬付款處理
      */
-    protected function handleCallbackResult(array $result)
+    protected function handleNotification($notification, array $data)
     {
         // 處理付款資訊通知
-        if ($result['isPaymentInfo']) {
-            $order = $this->orders->findByTransactionId($result['transactionId']);
+        if ($this->adapter->isPaymentInfoNotification($data)) {
+            $order = $this->orders->findByTransactionId($notification->getTransactionId());
 
             if ($order) {
-                $this->savePaymentInfo($order, $result['data']);
+                $this->savePaymentInfo($order, $data);
             }
 
-            $this->sendCallbackResultResponse($result, true);
+            $this->sendNotificationResponse($notification);
 
             return;
         }
 
-        $order = $this->orders->findByTransactionIdOrFail($result['transactionId']);
+        $order = $this->orders->findByTransactionIdOrFail($notification->getTransactionId());
 
         // 金額驗證
-        if (! $this->adapter->validateAmount($result['data'], (int) $order->get_total())) {
+        if (! $this->adapter->validateAmount($data, (int) $order->get_total())) {
             $this->sendCallbackResponse(false, 'Amount mismatch');
 
             return;
         }
 
         // 儲存信用卡資訊
-        $this->saveCreditCardInfo($order, $result['data']);
+        $this->saveCreditCardInfo($order, $data);
 
         // 模擬付款處理：不改變訂單狀態
-        if ($this->isSimulatedPayment($result['data'])) {
+        if ($this->adapter->isSimulatedPayment($data)) {
             $this->orders->addNote($order, __('ECPay simulated payment (SimulatePaid=1)', 'woocommerce-omnipay'));
-            $this->sendCallbackResultResponse($result, true);
+            $this->sendNotificationResponse($notification);
 
             return;
         }
@@ -57,25 +68,16 @@ class ECPayGateway extends OmnipayGateway
             return;
         }
 
-        if (! $result['isSuccessful']) {
-            $errorMessage = $result['message'] ?: 'Payment failed';
+        if ($notification->getTransactionStatus() !== NotificationInterface::STATUS_COMPLETED) {
+            $errorMessage = $notification->getMessage() ?: 'Payment failed';
             $this->onPaymentFailed($order, $errorMessage, 'callback', false);
             $this->sendCallbackResponse(false, $errorMessage);
 
             return;
         }
 
-        $this->completeOrderPayment($order, $result['transactionReference'], 'callback');
-        $this->sendCallbackResultResponse($result, true);
-    }
-
-    /**
-     * 檢查是否為模擬付款
-     */
-    protected function isSimulatedPayment(array $data): bool
-    {
-        return $this->adapter instanceof ECPayAdapter
-            && $this->adapter->isSimulatedPayment($data);
+        $this->completeOrderPayment($order, $notification->getTransactionReference(), 'callback');
+        $this->sendNotificationResponse($notification);
     }
 
     /**
@@ -83,10 +85,6 @@ class ECPayGateway extends OmnipayGateway
      */
     protected function saveCreditCardInfo($order, array $data): void
     {
-        if (! $this->adapter instanceof ECPayAdapter) {
-            return;
-        }
-
         $cardInfo = $this->adapter->getCreditCardInfo($data);
 
         if (empty($cardInfo)) {

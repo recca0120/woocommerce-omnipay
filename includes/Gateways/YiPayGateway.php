@@ -21,6 +21,31 @@ use WooCommerceOmnipay\Helper;
 class YiPayGateway extends OmnipayGateway
 {
     /**
+     * @var YiPayAdapter
+     */
+    protected $adapter;
+
+    public function __construct(array $config, ?YiPayAdapter $adapter = null)
+    {
+        parent::__construct($config, $adapter ?? new YiPayAdapter);
+    }
+
+    /**
+     * 取得 callback 參數
+     *
+     * YiPay 需要這些 URL 來驗證 checkCode 簽章
+     */
+    protected function getCallbackParameters()
+    {
+        return [
+            'returnUrl' => WC()->api_request_url($this->id.'_complete'),
+            'cancelUrl' => WC()->api_request_url($this->id.'_complete'),
+            'notifyUrl' => WC()->api_request_url($this->id.'_notify'),
+            'paymentInfoUrl' => WC()->api_request_url($this->id.'_payment_info'),
+        ];
+    }
+
+    /**
      * 處理付款資訊的核心邏輯
      *
      * YiPay 的 backgroundURL 使用背景 POST 通知（不同於使用者端導向）
@@ -31,7 +56,7 @@ class YiPayGateway extends OmnipayGateway
     protected function handlePaymentInfo()
     {
         $adapter = $this->getAdapter();
-        $notification = $adapter->acceptNotification($this->adapter->getCallbackParameters($this->id));
+        $notification = $adapter->acceptNotification($this->getCallbackParameters());
 
         $this->logger->info('getPaymentInfo: Parsed notification', [
             'transaction_id' => $notification->getTransactionId(),
@@ -58,10 +83,7 @@ class YiPayGateway extends OmnipayGateway
     {
         parent::savePaymentInfo($order, $data);
 
-        $typeName = $this->adapter instanceof YiPayAdapter
-            ? $this->adapter->getPaymentTypeName($data)
-            : 'Unknown';
-
+        $typeName = $this->adapter->getPaymentTypeName($data);
         $this->orders->addNote($order, sprintf('YiPay 取號成功 (%s)，等待付款', $typeName));
     }
 }

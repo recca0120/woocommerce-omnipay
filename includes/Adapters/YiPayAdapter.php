@@ -59,17 +59,6 @@ class YiPayAdapter implements GatewayAdapterInterface
         return $normalized;
     }
 
-    public function getCallbackParameters(string $gatewayId): array
-    {
-        // YiPay 需要這些 URL 來驗證 checkCode 簽章
-        return [
-            'returnUrl' => WC()->api_request_url($gatewayId.'_complete'),
-            'cancelUrl' => WC()->api_request_url($gatewayId.'_complete'),
-            'notifyUrl' => WC()->api_request_url($gatewayId.'_notify'),
-            'paymentInfoUrl' => WC()->api_request_url($gatewayId.'_payment_info'),
-        ];
-    }
-
     /**
      * 取得付款類型名稱
      */

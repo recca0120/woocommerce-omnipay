@@ -90,17 +90,6 @@ class GatewayAdapterTest extends TestCase
         $this->assertFalse($adapter->isPaymentInfoNotification(['RtnCode' => '1']));
     }
 
-    public function test_yipay_adapter_returns_callback_parameters(): void
-    {
-        $adapter = new YiPayAdapter;
-        $params = $adapter->getCallbackParameters('omnipay_yipay_credit');
-
-        $this->assertArrayHasKey('returnUrl', $params);
-        $this->assertArrayHasKey('cancelUrl', $params);
-        $this->assertArrayHasKey('notifyUrl', $params);
-        $this->assertArrayHasKey('paymentInfoUrl', $params);
-    }
-
     public static function adapterProvider(): array
     {
         return [
