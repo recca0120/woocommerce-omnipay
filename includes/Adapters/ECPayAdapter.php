@@ -2,14 +2,25 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
+use WooCommerceOmnipay\Adapters\Concerns\CreatesGateway;
+use WooCommerceOmnipay\Adapters\Concerns\FormatsCallbackResponse;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesNotifications;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesPurchases;
+use WooCommerceOmnipay\Adapters\Concerns\HasPaymentInfo;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
+
 /**
  * ECPay Adapter
  *
  * 封裝 ECPay 特有的邏輯
  */
-class ECPayAdapter implements GatewayAdapterInterface
+class ECPayAdapter implements GatewayAdapter
 {
-    use GatewayOperationsTrait;
+    use CreatesGateway;
+    use FormatsCallbackResponse;
+    use HandlesNotifications;
+    use HandlesPurchases;
+    use HasPaymentInfo;
 
     /**
      * ECPay 取號成功的 RtnCode

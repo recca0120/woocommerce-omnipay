@@ -2,8 +2,8 @@
 
 namespace WooCommerceOmnipay\Gateways\NewebPay;
 
+use WooCommerceOmnipay\Gateways\Concerns\HasAmountLimits;
 use WooCommerceOmnipay\Gateways\NewebPayGateway;
-use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * NewebPay 超商條碼 Gateway

@@ -2,14 +2,25 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
+use WooCommerceOmnipay\Adapters\Concerns\CreatesGateway;
+use WooCommerceOmnipay\Adapters\Concerns\FormatsCallbackResponse;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesNotifications;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesPurchases;
+use WooCommerceOmnipay\Adapters\Concerns\HasPaymentInfo;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
+
 /**
  * Default Gateway Adapter
  *
  * 通用的 Gateway Adapter，用於沒有特定實作的 Gateway
  */
-class DefaultGatewayAdapter implements GatewayAdapterInterface
+class DefaultGatewayAdapter implements GatewayAdapter
 {
-    use GatewayOperationsTrait;
+    use CreatesGateway;
+    use FormatsCallbackResponse;
+    use HandlesNotifications;
+    use HandlesPurchases;
+    use HasPaymentInfo;
 
     /**
      * @var string

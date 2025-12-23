@@ -2,8 +2,8 @@
 
 namespace WooCommerceOmnipay\Gateways\YiPay;
 
+use WooCommerceOmnipay\Gateways\Concerns\HasAmountLimits;
 use WooCommerceOmnipay\Gateways\YiPayGateway;
-use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * YiPay ATM Gateway

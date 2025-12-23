@@ -2,14 +2,25 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
+use WooCommerceOmnipay\Adapters\Concerns\CreatesGateway;
+use WooCommerceOmnipay\Adapters\Concerns\FormatsCallbackResponse;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesNotifications;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesPurchases;
+use WooCommerceOmnipay\Adapters\Concerns\HasPaymentInfo;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
+
 /**
  * NewebPay Adapter
  *
  * 封裝 NewebPay 特有的邏輯
  */
-class NewebPayAdapter implements GatewayAdapterInterface
+class NewebPayAdapter implements GatewayAdapter
 {
-    use GatewayOperationsTrait;
+    use CreatesGateway;
+    use FormatsCallbackResponse;
+    use HandlesNotifications;
+    use HandlesPurchases;
+    use HasPaymentInfo;
 
     /**
      * NewebPay 付款類型

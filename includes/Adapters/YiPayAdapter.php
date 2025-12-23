@@ -2,14 +2,25 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
+use WooCommerceOmnipay\Adapters\Concerns\CreatesGateway;
+use WooCommerceOmnipay\Adapters\Concerns\FormatsCallbackResponse;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesNotifications;
+use WooCommerceOmnipay\Adapters\Concerns\HandlesPurchases;
+use WooCommerceOmnipay\Adapters\Concerns\HasPaymentInfo;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
+
 /**
  * YiPay Adapter
  *
  * 封裝 YiPay 特有的邏輯
  */
-class YiPayAdapter implements GatewayAdapterInterface
+class YiPayAdapter implements GatewayAdapter
 {
-    use GatewayOperationsTrait;
+    use CreatesGateway;
+    use FormatsCallbackResponse;
+    use HandlesNotifications;
+    use HandlesPurchases;
+    use HasPaymentInfo;
 
     /**
      * YiPay 付款類型

@@ -3,8 +3,8 @@
 namespace WooCommerceOmnipay\Tests\Unit\Adapters;
 
 use PHPUnit\Framework\TestCase;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Adapters\ECPayAdapter;
-use WooCommerceOmnipay\Adapters\GatewayAdapterInterface;
 use WooCommerceOmnipay\Adapters\NewebPayAdapter;
 use WooCommerceOmnipay\Adapters\YiPayAdapter;
 
@@ -22,7 +22,7 @@ class GatewayAdapterTest extends TestCase
     {
         $adapter = new $adapterClass;
 
-        $this->assertInstanceOf(GatewayAdapterInterface::class, $adapter);
+        $this->assertInstanceOf(GatewayAdapter::class, $adapter);
     }
 
     /**

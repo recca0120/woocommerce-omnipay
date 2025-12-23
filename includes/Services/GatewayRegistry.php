@@ -2,8 +2,8 @@
 
 namespace WooCommerceOmnipay\Services;
 
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
-use WooCommerceOmnipay\Adapters\GatewayAdapterInterface;
 
 /**
  * Gateway Registry
@@ -163,7 +163,7 @@ class GatewayRegistry
      *
      * @param  array  $gatewayInfo  Gateway 配置資訊
      */
-    public function resolveAdapter(array $gatewayInfo): GatewayAdapterInterface
+    public function resolveAdapter(array $gatewayInfo): GatewayAdapter
     {
         // 1. 優先使用配置中指定的 adapter
         if (! empty($gatewayInfo['adapter']) && class_exists($gatewayInfo['adapter'])) {

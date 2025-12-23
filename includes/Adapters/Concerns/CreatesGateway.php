@@ -1,19 +1,17 @@
 <?php
 
-namespace WooCommerceOmnipay\Adapters;
+namespace WooCommerceOmnipay\Adapters\Concerns;
 
 use Omnipay\Common\GatewayInterface;
-use Omnipay\Common\Message\NotificationInterface;
-use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\Omnipay;
 use WooCommerceOmnipay\Helper;
 
 /**
- * Gateway Operations Trait
+ * Creates Gateway
  *
- * 提供 Omnipay Gateway 的共同操作實作
+ * 提供 Omnipay Gateway 的建立與初始化
  */
-trait GatewayOperationsTrait
+trait CreatesGateway
 {
     /**
      * @var GatewayInterface|null
@@ -31,7 +29,7 @@ trait GatewayOperationsTrait
     public function initialize(array $settings): self
     {
         $this->settings = $settings;
-        $this->gateway = null; // 重設 gateway，下次使用時重新建立
+        $this->gateway = null;
 
         return $this;
     }
@@ -77,55 +75,5 @@ trait GatewayOperationsTrait
         $gateway->initialize($settings);
 
         return $gateway;
-    }
-
-    public function purchase(array $data): ResponseInterface
-    {
-        return $this->getGateway()->purchase($data)->send();
-    }
-
-    public function completePurchase(array $parameters = []): ResponseInterface
-    {
-        return $this->getGateway()->completePurchase($parameters)->send();
-    }
-
-    public function supportsAcceptNotification(): bool
-    {
-        return $this->getGateway()->supportsAcceptNotification();
-    }
-
-    public function acceptNotification(array $parameters = []): NotificationInterface
-    {
-        return $this->getGateway()->acceptNotification($parameters);
-    }
-
-    public function supportsGetPaymentInfo(): bool
-    {
-        return method_exists($this->getGateway(), 'getPaymentInfo');
-    }
-
-    public function getPaymentInfo(array $parameters = []): ResponseInterface
-    {
-        return $this->getGateway()->getPaymentInfo($parameters)->send();
-    }
-
-    public function getPaymentInfoEndpoint(): string
-    {
-        return '_payment_info';
-    }
-
-    public function getCallbackSuccessResponse(): string
-    {
-        return '1|OK';
-    }
-
-    public function getCallbackFailureResponse(string $message): string
-    {
-        return '0|'.$message;
-    }
-
-    public function getPaymentInfoNote(array $data): ?string
-    {
-        return null;
     }
 }

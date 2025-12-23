@@ -1,13 +1,13 @@
 <?php
 
-namespace WooCommerceOmnipay\Adapters;
+namespace WooCommerceOmnipay\Adapters\Contracts;
 
 use Omnipay\Common\GatewayInterface;
 use Omnipay\Common\Message\NotificationInterface;
 use Omnipay\Common\Message\ResponseInterface;
 
 /**
- * Gateway Adapter Interface
+ * Gateway Adapter Contract
  *
  * 封裝特定金流的邏輯，包含：
  * - Gateway 建立與配置
@@ -16,7 +16,7 @@ use Omnipay\Common\Message\ResponseInterface;
  * - 付款資訊欄位正規化
  * - Callback URL 處理
  */
-interface GatewayAdapterInterface
+interface GatewayAdapter
 {
     /**
      * 取得 Omnipay Gateway 名稱

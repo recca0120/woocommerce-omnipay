@@ -5,14 +5,14 @@ namespace WooCommerceOmnipay\Gateways;
 use Omnipay\Common\Message\NotificationInterface;
 use Psr\Log\LoggerInterface;
 use WC_Payment_Gateway;
-use WooCommerceOmnipay\Adapters\GatewayAdapterInterface;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Exceptions\OrderNotFoundException;
+use WooCommerceOmnipay\Gateways\Concerns\DisplaysPaymentInfo;
 use WooCommerceOmnipay\Helper;
 use WooCommerceOmnipay\Repositories\OrderRepository;
 use WooCommerceOmnipay\Services\GatewayRegistry;
 use WooCommerceOmnipay\Services\SettingsManager;
 use WooCommerceOmnipay\Services\WooCommerceLogger;
-use WooCommerceOmnipay\Traits\DisplaysPaymentInfo;
 
 /**
  * Omnipay Gateway
@@ -47,7 +47,7 @@ class OmnipayGateway extends WC_Payment_Gateway
     protected $logger;
 
     /**
-     * @var GatewayAdapterInterface
+     * @var GatewayAdapter
      */
     protected $adapter;
 
@@ -55,9 +55,9 @@ class OmnipayGateway extends WC_Payment_Gateway
      * Constructor
      *
      * @param  array  $config  gateway 配置
-     * @param  GatewayAdapterInterface|null  $adapter  金流適配器
+     * @param  GatewayAdapter|null  $adapter  金流適配器
      */
-    public function __construct(array $config, ?GatewayAdapterInterface $adapter = null)
+    public function __construct(array $config, ?GatewayAdapter $adapter = null)
     {
         // gateway_id 自動加上 omnipay_ 前綴
         $this->id = 'omnipay_'.($config['gateway_id'] ?? '');
@@ -179,7 +179,7 @@ class OmnipayGateway extends WC_Payment_Gateway
     /**
      * 取得已初始化的 Adapter
      *
-     * @return GatewayAdapterInterface
+     * @return GatewayAdapter
      */
     protected function getAdapter()
     {
