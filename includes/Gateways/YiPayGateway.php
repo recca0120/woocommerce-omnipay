@@ -75,15 +75,4 @@ class YiPayGateway extends OmnipayGateway
 
         return null;
     }
-
-    /**
-     * 處理付款資訊通知
-     */
-    protected function savePaymentInfo($order, array $data)
-    {
-        parent::savePaymentInfo($order, $data);
-
-        $typeName = $this->adapter->getPaymentTypeName($data);
-        $this->orders->addNote($order, sprintf('YiPay 取號成功 (%s)，等待付款', $typeName));
-    }
 }

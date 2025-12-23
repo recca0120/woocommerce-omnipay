@@ -25,15 +25,4 @@ class NewebPayGateway extends OmnipayGateway
     {
         parent::__construct($config, $adapter ?? new NewebPayAdapter);
     }
-
-    /**
-     * 處理付款資訊通知
-     */
-    protected function savePaymentInfo($order, array $data)
-    {
-        parent::savePaymentInfo($order, $data);
-
-        $paymentType = $data['PaymentType'] ?? '';
-        $this->orders->addNote($order, sprintf('藍新金流取號成功 (%s)，等待付款', $paymentType));
-    }
 }

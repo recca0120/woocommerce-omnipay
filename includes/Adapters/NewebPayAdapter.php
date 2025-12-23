@@ -64,4 +64,11 @@ class NewebPayAdapter implements GatewayAdapterInterface
 
         return $normalized;
     }
+
+    public function getPaymentInfoNote(array $data): ?string
+    {
+        $paymentType = $data['PaymentType'] ?? '';
+
+        return sprintf('藍新金流取號成功 (%s)，等待付款', $paymentType);
+    }
 }

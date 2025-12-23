@@ -109,6 +109,14 @@ interface GatewayAdapterInterface
     public function isPaymentInfoNotification(array $data): bool;
 
     /**
+     * 取得付款資訊通知的訂單備註
+     *
+     * @param  array  $data  通知資料
+     * @return string|null 備註訊息，null 表示不加備註
+     */
+    public function getPaymentInfoNote(array $data): ?string;
+
+    /**
      * 初始化設定
      */
     public function initialize(array $settings);

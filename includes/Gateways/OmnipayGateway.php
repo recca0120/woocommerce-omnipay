@@ -690,6 +690,11 @@ class OmnipayGateway extends WC_Payment_Gateway
     protected function savePaymentInfo($order, array $data)
     {
         $this->orders->savePaymentInfo($order, $this->adapter->normalizePaymentInfo($data));
+
+        $note = $this->adapter->getPaymentInfoNote($data);
+        if ($note) {
+            $this->orders->addNote($order, $note);
+        }
     }
 
     /**

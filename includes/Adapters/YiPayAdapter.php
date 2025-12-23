@@ -68,4 +68,9 @@ class YiPayAdapter implements GatewayAdapterInterface
 
         return $type === self::TYPE_ATM ? 'ATM' : 'CVS';
     }
+
+    public function getPaymentInfoNote(array $data): ?string
+    {
+        return sprintf('YiPay 取號成功 (%s)，等待付款', $this->getPaymentTypeName($data));
+    }
 }

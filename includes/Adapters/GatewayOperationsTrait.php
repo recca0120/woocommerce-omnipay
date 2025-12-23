@@ -104,4 +104,9 @@ trait GatewayOperationsTrait
     {
         return false;
     }
+
+    public function getPaymentInfoNote(array $data): ?string
+    {
+        return null;
+    }
 }

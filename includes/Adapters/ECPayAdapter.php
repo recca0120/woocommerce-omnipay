@@ -80,4 +80,11 @@ class ECPayAdapter implements GatewayAdapterInterface
             'card4no' => $data['card4no'] ?? null,
         ], fn ($value) => $value !== null);
     }
+
+    public function getPaymentInfoNote(array $data): ?string
+    {
+        $paymentType = $data['PaymentType'] ?? '';
+
+        return sprintf('ECPay 取號成功 (%s)，等待付款', $paymentType);
+    }
 }
