@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Gateways;
 
-use WooCommerceOmnipay\Adapters\NewebPayAdapter;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 
 /**
  * NewebPay Gateway
@@ -16,8 +16,8 @@ use WooCommerceOmnipay\Adapters\NewebPayAdapter;
  */
 class NewebPayGateway extends OmnipayGateway
 {
-    public function __construct(array $config, ?NewebPayAdapter $adapter = null)
+    public function __construct(array $config, ?GatewayAdapter $adapter = null)
     {
-        parent::__construct($config, $adapter ?? new NewebPayAdapter);
+        parent::__construct($config, $adapter);
     }
 }

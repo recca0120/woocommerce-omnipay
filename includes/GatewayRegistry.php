@@ -2,6 +2,7 @@
 
 namespace WooCommerceOmnipay;
 
+use Omnipay\Common\Http\ClientInterface;
 use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
 use WooCommerceOmnipay\WordPress\HttpClient;
@@ -36,15 +37,32 @@ class GatewayRegistry
     protected $availabilityCache = [];
 
     /**
+     * HTTP Client
+     *
+     * @var ClientInterface|null
+     */
+    protected $httpClient;
+
+    /**
      * Constructor
      *
      * @param  array  $config  配置選項
+     * @param  ClientInterface|null  $httpClient  HTTP Client
      */
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], ?ClientInterface $httpClient = null)
     {
         $this->config = array_merge([
             'gateways' => [],
         ], $config);
+        $this->httpClient = $httpClient ?? new HttpClient;
+    }
+
+    /**
+     * 取得 HTTP Client
+     */
+    public function getHttpClient(): ClientInterface
+    {
+        return $this->httpClient;
     }
 
     /**
@@ -60,7 +78,7 @@ class GatewayRegistry
         }
 
         try {
-            \Omnipay\Omnipay::create($name, new HttpClient);
+            \Omnipay\Omnipay::create($name, $this->getHttpClient());
             $this->availabilityCache[$name] = true;
         } catch (\Exception $e) {
             $this->availabilityCache[$name] = false;
@@ -165,6 +183,17 @@ class GatewayRegistry
      * @param  array  $gatewayInfo  Gateway 配置資訊
      */
     public function resolveAdapter(array $gatewayInfo): GatewayAdapter
+    {
+        $adapter = $this->createAdapter($gatewayInfo);
+        $adapter->setHttpClient($this->getHttpClient());
+
+        return $adapter;
+    }
+
+    /**
+     * 建立 Adapter 實例
+     */
+    protected function createAdapter(array $gatewayInfo): GatewayAdapter
     {
         // 1. 優先使用配置中指定的 adapter
         if (! empty($gatewayInfo['adapter']) && class_exists($gatewayInfo['adapter'])) {

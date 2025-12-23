@@ -3,6 +3,7 @@
 namespace WooCommerceOmnipay\Adapters\Contracts;
 
 use Omnipay\Common\GatewayInterface;
+use Omnipay\Common\Http\ClientInterface;
 use Omnipay\Common\Message\NotificationInterface;
 use Omnipay\Common\Message\ResponseInterface;
 
@@ -18,6 +19,13 @@ use Omnipay\Common\Message\ResponseInterface;
  */
 interface GatewayAdapter
 {
+    /**
+     * 設定 HTTP Client
+     *
+     * @return $this
+     */
+    public function setHttpClient(ClientInterface $httpClient);
+
     /**
      * 取得 Omnipay Gateway 名稱
      */
@@ -120,8 +128,8 @@ interface GatewayAdapter
     /**
      * 從所有設定中初始化（自動過濾並轉換型別）
      *
-     * @param  array  $allSettings  所有設定（已合併優先順序）
+     * @param  array  $settings  所有設定（已合併優先順序）
      * @return self
      */
-    public function initializeFromSettings(array $allSettings);
+    public function initializeFromSettings(array $settings);
 }

@@ -3,9 +3,9 @@
 namespace WooCommerceOmnipay\Adapters\Concerns;
 
 use Omnipay\Common\GatewayInterface;
+use Omnipay\Common\Http\ClientInterface;
 use Omnipay\Omnipay;
 use WooCommerceOmnipay\Helper;
-use WooCommerceOmnipay\WordPress\HttpClient;
 
 /**
  * Creates Gateway
@@ -25,6 +25,23 @@ trait CreatesGateway
     protected $settings = [];
 
     /**
+     * @var ClientInterface|null
+     */
+    protected $httpClient;
+
+    /**
+     * 設定 HTTP Client
+     *
+     * @return $this
+     */
+    public function setHttpClient(ClientInterface $httpClient)
+    {
+        $this->httpClient = $httpClient;
+
+        return $this;
+    }
+
+    /**
      * 設定 Gateway 參數
      */
     public function initialize(array $settings): self
@@ -38,15 +55,15 @@ trait CreatesGateway
     /**
      * 從所有設定中初始化（自動過濾並轉換型別）
      *
-     * @param  array  $allSettings  所有設定（已合併優先順序）
+     * @param  array  $settings  所有設定（已合併優先順序）
      */
-    public function initializeFromSettings(array $allSettings): self
+    public function initializeFromSettings(array $settings): self
     {
         $parameters = [];
 
         foreach ($this->getDefaultParameters() as $key => $defaultValue) {
-            if (isset($allSettings[$key]) && $allSettings[$key] !== '') {
-                $parameters[$key] = Helper::convertOptionValue($allSettings[$key], $defaultValue);
+            if (isset($settings[$key]) && $settings[$key] !== '') {
+                $parameters[$key] = Helper::convertOptionValue($settings[$key], $defaultValue);
             }
         }
 
@@ -67,22 +84,22 @@ trait CreatesGateway
 
     public function getDefaultParameters(): array
     {
-        return Omnipay::create($this->getGatewayName(), $this->createHttpClient())->getDefaultParameters();
+        return Omnipay::create($this->getGatewayName(), $this->getHttpClient())->getDefaultParameters();
     }
 
     public function createGateway(array $settings): GatewayInterface
     {
-        $gateway = Omnipay::create($this->getGatewayName(), $this->createHttpClient());
+        $gateway = Omnipay::create($this->getGatewayName(), $this->getHttpClient());
         $gateway->initialize($settings);
 
         return $gateway;
     }
 
     /**
-     * 建立 HTTP Client
+     * 取得 HTTP Client
      */
-    protected function createHttpClient(): HttpClient
+    protected function getHttpClient(): ?ClientInterface
     {
-        return new HttpClient;
+        return $this->httpClient;
     }
 }

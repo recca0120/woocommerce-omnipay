@@ -2,7 +2,6 @@
 
 namespace WooCommerceOmnipay;
 
-use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
 use WooCommerceOmnipay\WordPress\SettingsManager;
 
 /**
@@ -23,9 +22,15 @@ class SharedSettingsPage
     private $adapters = [];
 
     /**
-     * @param  array  $gateways  Gateway 配置列表
+     * @var GatewayRegistry
      */
-    public function __construct(array $gateways)
+    private $registry;
+
+    /**
+     * @param  array  $gateways  Gateway 配置列表
+     * @param  GatewayRegistry|null  $registry  Gateway Registry
+     */
+    public function __construct(array $gateways, ?GatewayRegistry $registry = null)
     {
         // 取得不重複的 gateway 列表
         $seen = [];
@@ -38,6 +43,8 @@ class SharedSettingsPage
                 $seen[$name] = true;
             }
         }
+
+        $this->registry = $registry ?? new GatewayRegistry;
     }
 
     /**
@@ -296,12 +303,12 @@ class SharedSettingsPage
      * 取得 Adapter 實例
      *
      * @param  string  $name
-     * @return DefaultGatewayAdapter
+     * @return \WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter
      */
     private function get_adapter($name)
     {
         if (! isset($this->adapters[$name])) {
-            $this->adapters[$name] = new DefaultGatewayAdapter($name);
+            $this->adapters[$name] = $this->registry->resolveAdapter(['gateway' => $name]);
         }
 
         return $this->adapters[$name];

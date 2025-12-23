@@ -7,6 +7,7 @@ use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Adapters\ECPayAdapter;
 use WooCommerceOmnipay\Adapters\NewebPayAdapter;
 use WooCommerceOmnipay\Adapters\YiPayAdapter;
+use WooCommerceOmnipay\Tests\Unit\TestHttpClient;
 
 /**
  * GatewayAdapter Test
@@ -15,6 +16,25 @@ use WooCommerceOmnipay\Adapters\YiPayAdapter;
  */
 class GatewayAdapterTest extends TestCase
 {
+    private TestHttpClient $httpClient;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->httpClient = new TestHttpClient;
+    }
+
+    /**
+     * 建立 Adapter 並注入 HttpClient
+     */
+    private function createAdapter(string $adapterClass): GatewayAdapter
+    {
+        $adapter = new $adapterClass;
+        $adapter->setHttpClient($this->httpClient);
+
+        return $adapter;
+    }
+
     /**
      * @dataProvider adapterProvider
      */
@@ -40,7 +60,7 @@ class GatewayAdapterTest extends TestCase
      */
     public function test_adapter_can_create_gateway(string $adapterClass): void
     {
-        $adapter = new $adapterClass;
+        $adapter = $this->createAdapter($adapterClass);
         $gateway = $adapter->createGateway([]);
 
         $this->assertNotNull($gateway);

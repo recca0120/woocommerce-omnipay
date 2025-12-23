@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Gateways;
 
-use WooCommerceOmnipay\Adapters\YiPayAdapter;
+use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 
 /**
  * YiPay Gateway
@@ -19,9 +19,9 @@ use WooCommerceOmnipay\Adapters\YiPayAdapter;
  */
 class YiPayGateway extends OmnipayGateway
 {
-    public function __construct(array $config, ?YiPayAdapter $adapter = null)
+    public function __construct(array $config, ?GatewayAdapter $adapter = null)
     {
-        parent::__construct($config, $adapter ?? new YiPayAdapter);
+        parent::__construct($config, $adapter);
     }
 
     /**
