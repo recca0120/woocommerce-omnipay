@@ -2,7 +2,6 @@
 
 namespace WooCommerceOmnipay\Gateways;
 
-use Omnipay\Common\Message\NotificationInterface;
 use WooCommerceOmnipay\Adapters\ECPayAdapter;
 
 /**
@@ -25,11 +24,11 @@ class ECPayGateway extends OmnipayGateway
     /**
      * 處理 AcceptNotification 回應
      *
-     * ECPay 有額外的信用卡資訊儲存與模擬付款處理
+     * ECPay 的付款資訊通知與付款完成通知共用同一個 endpoint
      */
     protected function handleNotification($notification, array $data)
     {
-        // 處理付款資訊通知
+        // ECPay 專用：檢查付款資訊通知
         if ($this->adapter->isPaymentInfoNotification($data)) {
             $order = $this->orders->findByTransactionId($notification->getTransactionId());
 
@@ -42,16 +41,16 @@ class ECPayGateway extends OmnipayGateway
             return;
         }
 
-        $order = $this->orders->findByTransactionIdOrFail($notification->getTransactionId());
+        parent::handleNotification($notification, $data);
+    }
 
-        // 金額驗證
-        if (! $this->adapter->validateAmount($data, (int) $order->get_total())) {
-            $this->sendCallbackResponse(false, 'Amount mismatch');
-
-            return;
-        }
-
-        // 儲存信用卡資訊
+    /**
+     * 通知接收後的 hook
+     *
+     * 處理 ECPay 的信用卡資訊儲存與模擬付款
+     */
+    protected function onNotificationReceived($order, $notification, array $data): bool
+    {
         $this->saveCreditCardInfo($order, $data);
 
         // 模擬付款處理：不改變訂單狀態
@@ -59,25 +58,10 @@ class ECPayGateway extends OmnipayGateway
             $this->orders->addNote($order, __('ECPay simulated payment (SimulatePaid=1)', 'woocommerce-omnipay'));
             $this->sendNotificationResponse($notification);
 
-            return;
+            return false;
         }
 
-        if (! $this->shouldProcessOrder($order)) {
-            $this->sendCallbackResponse(true);
-
-            return;
-        }
-
-        if ($notification->getTransactionStatus() !== NotificationInterface::STATUS_COMPLETED) {
-            $errorMessage = $notification->getMessage() ?: 'Payment failed';
-            $this->onPaymentFailed($order, $errorMessage, 'callback', false);
-            $this->sendCallbackResponse(false, $errorMessage);
-
-            return;
-        }
-
-        $this->completeOrderPayment($order, $notification->getTransactionReference(), 'callback');
-        $this->sendNotificationResponse($notification);
+        return true;
     }
 
     /**

@@ -619,25 +619,17 @@ class OmnipayGateway extends WC_Payment_Gateway
      */
     protected function handleNotification($notification, array $data)
     {
-        // 處理付款資訊通知
-        if ($this->adapter->isPaymentInfoNotification($data)) {
-            $order = $this->orders->findByTransactionId($notification->getTransactionId());
-
-            if ($order) {
-                $this->savePaymentInfo($order, $data);
-            }
-
-            $this->sendNotificationResponse($notification);
-
-            return;
-        }
-
         $order = $this->orders->findByTransactionIdOrFail($notification->getTransactionId());
 
         // 金額驗證
         if (! $this->adapter->validateAmount($data, (int) $order->get_total())) {
             $this->sendCallbackResponse(false, 'Amount mismatch');
 
+            return;
+        }
+
+        // Hook: 讓子類處理額外邏輯（如 ECPay 的信用卡資訊、模擬付款）
+        if (! $this->onNotificationReceived($order, $notification, $data)) {
             return;
         }
 
@@ -657,6 +649,18 @@ class OmnipayGateway extends WC_Payment_Gateway
 
         $this->completeOrderPayment($order, $notification->getTransactionReference(), 'callback');
         $this->sendNotificationResponse($notification);
+    }
+
+    /**
+     * 通知接收後的 hook
+     *
+     * 子類可覆寫此方法處理額外邏輯
+     *
+     * @return bool true 繼續處理，false 已處理完畢
+     */
+    protected function onNotificationReceived($order, $notification, array $data): bool
+    {
+        return true;
     }
 
     /**
