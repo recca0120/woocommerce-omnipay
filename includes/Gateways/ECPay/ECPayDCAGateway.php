@@ -2,8 +2,8 @@
 
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
+use WooCommerceOmnipay\Gateways\Concerns\HasDcaPeriods;
 use WooCommerceOmnipay\Gateways\ECPayGateway;
-use WooCommerceOmnipay\Traits\HasDcaPeriods;
 
 /**
  * ECPay 定期定額 Gateway

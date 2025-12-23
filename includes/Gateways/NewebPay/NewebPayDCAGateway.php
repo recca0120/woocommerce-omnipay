@@ -2,8 +2,8 @@
 
 namespace WooCommerceOmnipay\Gateways\NewebPay;
 
+use WooCommerceOmnipay\Gateways\Concerns\HasDcaPeriods;
 use WooCommerceOmnipay\Gateways\NewebPayGateway;
-use WooCommerceOmnipay\Traits\HasDcaPeriods;
 
 /**
  * NewebPay 定期定額 Gateway

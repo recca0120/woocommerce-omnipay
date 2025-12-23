@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Services;
+namespace WooCommerceOmnipay\WordPress;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -10,7 +10,7 @@ use Psr\Log\LogLevel;
  *
  * 將 WC_Logger 包裝成 PSR-3 LoggerInterface
  */
-class WooCommerceLogger implements LoggerInterface
+class Logger implements LoggerInterface
 {
     /**
      * @var \WC_Logger

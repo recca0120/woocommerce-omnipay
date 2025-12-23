@@ -81,4 +81,55 @@ class NewebPayBarcodeGatewayTest extends TestCase
 
         $this->assertFalse($this->gateway->is_available());
     }
+
+    public function test_get_payment_info_stores_barcode_info()
+    {
+        $order = $this->createOrder(100);
+        $this->gateway->process_payment($order->get_id());
+
+        $this->simulateCallback($this->makePaymentInfoData($order, [
+            'PaymentType' => 'BARCODE',
+            'Barcode_1' => 'TEST1',
+            'Barcode_2' => 'TEST2',
+            'Barcode_3' => 'TEST3',
+        ]));
+
+        $url = $this->gateway->getPaymentInfo();
+
+        $this->assertStringContainsString('order-received', $url);
+
+        $order = wc_get_order($order->get_id());
+        $this->assertEquals('TEST1', $order->get_meta('_omnipay_barcode_1'));
+        $this->assertEquals('TEST2', $order->get_meta('_omnipay_barcode_2'));
+        $this->assertEquals('TEST3', $order->get_meta('_omnipay_barcode_3'));
+    }
+
+    private function makePaymentInfoData($order, array $overrides = [])
+    {
+        $result = array_merge([
+            'Status' => 'SUCCESS',
+            'Message' => '取號成功',
+            'MerchantID' => $this->merchantId,
+            'Amt' => (int) $order->get_total(),
+            'TradeNo' => '24112500001234',
+            'MerchantOrderNo' => (string) $order->get_id(),
+            'PaymentType' => 'BARCODE',
+        ], $overrides);
+
+        return $this->encrypt($result);
+    }
+
+    private function encrypt(array $result)
+    {
+        $encryptor = new Encryptor($this->hashKey, $this->hashIV);
+        $tradeInfo = $encryptor->encrypt($result);
+
+        return [
+            'Status' => $result['Status'],
+            'MerchantID' => $this->merchantId,
+            'TradeInfo' => $tradeInfo,
+            'TradeSha' => $encryptor->tradeSha($tradeInfo),
+            'Version' => '2.0',
+        ];
+    }
 }

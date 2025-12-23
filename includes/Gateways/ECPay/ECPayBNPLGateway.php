@@ -3,8 +3,8 @@
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
 use WooCommerceOmnipay\Constants;
+use WooCommerceOmnipay\Gateways\Concerns\HasAmountLimits;
 use WooCommerceOmnipay\Gateways\ECPayGateway;
-use WooCommerceOmnipay\Traits\HasAmountLimits;
 
 /**
  * ECPay BNPL (無卡分期) Gateway

@@ -2,9 +2,9 @@
 
 namespace WooCommerceOmnipay\Gateways\ECPay;
 
+use WooCommerceOmnipay\Gateways\Concerns\HasAmountLimits;
+use WooCommerceOmnipay\Gateways\Concerns\HasInstallments;
 use WooCommerceOmnipay\Gateways\ECPayGateway;
-use WooCommerceOmnipay\Traits\HasAmountLimits;
-use WooCommerceOmnipay\Traits\HasInstallments;
 
 /**
  * ECPay 信用卡分期 Gateway

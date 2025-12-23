@@ -229,23 +229,19 @@ class AdminSettingsTest extends WP_UnitTestCase
         ]);
 
         // Gateway 設定覆蓋 MerchantID
-        update_option('woocommerce_omnipay_ecpay_settings', [
+        $gatewaySettings = [
             'MerchantID' => 'gateway_merchant',
-        ]);
+        ];
 
-        // 使用 overrideSettings = true 的 gateway 才能覆蓋 shared settings
-        $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
-            'gateway_id' => 'ecpay',
-            'gateway' => 'ECPay',
-            'override_settings' => true,  // 啟用設定覆蓋
-        ]);
-        $omnipayGateway = $gateway->get_gateway();
+        // 測試設定合併邏輯
+        $settingsManager = new \WooCommerceOmnipay\WordPress\SettingsManager('ECPay');
+        $allSettings = $settingsManager->getAllSettings($gatewaySettings);
 
         // Gateway 設定優先
-        $this->assertEquals('gateway_merchant', $omnipayGateway->getMerchantID());
+        $this->assertEquals('gateway_merchant', $allSettings['MerchantID']);
         // 未覆蓋的使用共用設定
-        $this->assertEquals('shared_key', $omnipayGateway->getHashKey());
-        $this->assertEquals('shared_iv', $omnipayGateway->getHashIV());
+        $this->assertEquals('shared_key', $allSettings['HashKey']);
+        $this->assertEquals('shared_iv', $allSettings['HashIV']);
     }
 
     /**
@@ -263,15 +259,13 @@ class AdminSettingsTest extends WP_UnitTestCase
         // Gateway 沒有設定
         delete_option('woocommerce_omnipay_ecpay_settings');
 
-        $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
-            'gateway_id' => 'ecpay',
-            'gateway' => 'ECPay',
-        ]);
-        $omnipayGateway = $gateway->get_gateway();
+        // 測試設定合併邏輯
+        $settingsManager = new \WooCommerceOmnipay\WordPress\SettingsManager('ECPay');
+        $allSettings = $settingsManager->getAllSettings([]);
 
-        $this->assertEquals('shared_merchant', $omnipayGateway->getMerchantID());
-        $this->assertEquals('shared_key', $omnipayGateway->getHashKey());
-        $this->assertEquals('shared_iv', $omnipayGateway->getHashIV());
+        $this->assertEquals('shared_merchant', $allSettings['MerchantID']);
+        $this->assertEquals('shared_key', $allSettings['HashKey']);
+        $this->assertEquals('shared_iv', $allSettings['HashIV']);
     }
 
     /**
