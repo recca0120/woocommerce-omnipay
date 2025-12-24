@@ -3,6 +3,8 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -39,7 +41,7 @@ class NewebPayBarcodeGatewayTest extends TestCase
             'gateway_id' => 'newebpay_barcode',
             'title' => '藍新超商條碼',
             'payment_data' => ['BARCODE' => 1],
-            'features' => ['min_amount', 'max_amount'],
+            'features' => [new MinAmountFeature, new MaxAmountFeature],
         ]);
     }
 

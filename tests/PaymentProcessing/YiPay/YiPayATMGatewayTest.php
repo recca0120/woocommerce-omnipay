@@ -3,6 +3,8 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
 
 use Omnipay\YiPay\Hasher;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\YiPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -40,7 +42,7 @@ class YiPayATMGatewayTest extends TestCase
             'gateway_id' => 'yipay_atm',
             'title' => '乙禾 ATM',
             'payment_data' => ['type' => '4'],
-            'features' => ['min_amount', 'max_amount'],
+            'features' => [new MinAmountFeature, new MaxAmountFeature],
         ]);
     }
 

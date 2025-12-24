@@ -3,6 +3,8 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
 use WooCommerceOmnipay\Gateways\Features\ExpireDateFeature;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -35,7 +37,7 @@ class ECPayATMGatewayTest extends TestCase
             'gateway_id' => 'ecpay_atm',
             'title' => '綠界 ATM',
             'payment_data' => ['ChoosePayment' => 'ATM'],
-            'features' => ['min_amount', 'max_amount', new ExpireDateFeature('ExpireDate', 3, 1, 60)],
+            'features' => [new MinAmountFeature, new MaxAmountFeature, new ExpireDateFeature('ExpireDate', 3, 1, 60)],
         ]);
     }
 

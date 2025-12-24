@@ -3,6 +3,7 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
 use WooCommerceOmnipay\Gateways\Features\InstallmentFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -35,7 +36,7 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
             'title' => '綠界信用卡分期',
             'payment_data' => ['ChoosePayment' => 'Credit'],
             'features' => [
-                'min_amount',
+                new MinAmountFeature,
                 new InstallmentFeature('CreditInstallment', [], [], true),
             ],
         ]);

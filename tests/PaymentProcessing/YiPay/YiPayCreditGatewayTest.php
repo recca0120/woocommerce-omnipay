@@ -2,6 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
 
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -33,7 +34,7 @@ class YiPayCreditGatewayTest extends TestCase
             'gateway_id' => 'yipay_credit',
             'title' => '乙禾信用卡',
             'payment_data' => ['type' => '2'],
-            'features' => ['min_amount'],
+            'features' => [new MinAmountFeature],
         ]);
     }
 

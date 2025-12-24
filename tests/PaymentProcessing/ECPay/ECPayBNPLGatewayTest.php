@@ -2,6 +2,8 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -33,7 +35,7 @@ class ECPayBNPLGatewayTest extends TestCase
             'gateway_id' => 'ecpay_bnpl',
             'title' => '綠界無卡分期',
             'payment_data' => ['ChoosePayment' => 'BNPL'],
-            'features' => ['min_amount', 'max_amount'],
+            'features' => [new MinAmountFeature, new MaxAmountFeature],
         ]);
     }
 

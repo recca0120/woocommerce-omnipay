@@ -2,6 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -30,7 +31,7 @@ class ECPayApplePayGatewayTest extends TestCase
             'gateway_id' => 'ecpay_applepay',
             'title' => '綠界 Apple Pay',
             'payment_data' => ['ChoosePayment' => 'ApplePay'],
-            'features' => ['min_amount'],
+            'features' => [new MinAmountFeature],
         ]);
     }
 

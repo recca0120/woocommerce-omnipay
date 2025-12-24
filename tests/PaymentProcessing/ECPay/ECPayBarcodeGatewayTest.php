@@ -5,6 +5,8 @@ namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 use Ecpay\Sdk\Services\CheckMacValueService;
 use WooCommerceOmnipay\Gateways\ECPayGateway;
 use WooCommerceOmnipay\Gateways\Features\ExpireDateFeature;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -36,7 +38,7 @@ class ECPayBarcodeGatewayTest extends TestCase
             'gateway_id' => 'ecpay_barcode',
             'title' => '綠界超商條碼',
             'payment_data' => ['ChoosePayment' => 'BARCODE'],
-            'features' => ['min_amount', 'max_amount', new ExpireDateFeature('StoreExpireDate', 7, 1, 30)],
+            'features' => [new MinAmountFeature, new MaxAmountFeature, new ExpireDateFeature('StoreExpireDate', 7, 1, 30)],
         ]);
     }
 

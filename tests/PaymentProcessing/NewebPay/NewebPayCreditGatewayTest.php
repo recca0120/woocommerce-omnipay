@@ -3,6 +3,7 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
@@ -39,7 +40,7 @@ class NewebPayCreditGatewayTest extends TestCase
             'gateway_id' => 'newebpay_credit',
             'title' => '藍新信用卡',
             'payment_data' => ['CREDIT' => 1],
-            'features' => ['min_amount'],
+            'features' => [new MinAmountFeature],
         ]);
     }
 
