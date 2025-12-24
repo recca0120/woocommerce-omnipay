@@ -3,9 +3,6 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
 
 use Omnipay\YiPay\Hasher;
-use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Gateways\YiPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -26,25 +23,13 @@ class YiPayATMGatewayTest extends TestCase
 
     private $iv = 'dGVzdGl2dGVzdDEyMzQ1Ng==';
 
-    protected function setUp(): void
-    {
-        $this->settings = [
-            'merchantId' => $this->merchantId,
-            'key' => $this->key,
-            'iv' => $this->iv,
-            'testMode' => 'yes',
-            'allow_resubmit' => 'no',
-        ];
-        parent::setUp();
-
-        $this->gateway = new YiPayGateway([
-            'gateway' => 'YiPay',
-            'gateway_id' => 'yipay_atm',
-            'title' => '乙禾 ATM',
-            'payment_data' => ['type' => '4'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
-        ]);
-    }
+    protected $settings = [
+        'merchantId' => '1234567890',
+        'key' => 'dGVzdGtleXRlc3QxMjM0NQ==',
+        'iv' => 'dGVzdGl2dGVzdDEyMzQ1Ng==',
+        'testMode' => 'yes',
+        'allow_resubmit' => 'no',
+    ];
 
     public function test_process_payment_sends_atm_payment_type()
     {

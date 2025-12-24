@@ -2,9 +2,6 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -22,19 +19,6 @@ class ECPayTWQRGatewayTest extends TestCase
         'MerchantID' => '2000132',
         'testMode' => 'yes',
     ];
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->gateway = new OmnipayGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_twqr',
-            'title' => '綠界台灣 Pay',
-            'payment_data' => ['ChoosePayment' => 'TWQR'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
-        ]);
-    }
 
     public function test_process_payment_sends_twqr_payment_type()
     {

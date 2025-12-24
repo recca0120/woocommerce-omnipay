@@ -65,7 +65,7 @@ return [
         'title' => __('ECPay BNPL', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'BNPL'],
-        'features' => [new MinAmountFeature],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     [
         'gateway' => 'ECPay',
@@ -113,7 +113,7 @@ return [
         'title' => __('ECPay Taiwan Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'TWQR'],
-        'features' => [new MinAmountFeature],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     [
         'gateway' => 'ECPay',
@@ -121,7 +121,7 @@ return [
         'title' => __('ECPay WeChat Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'WeiXin'],
-        'features' => [new MinAmountFeature],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     // NewebPay (All-in-one)
     [

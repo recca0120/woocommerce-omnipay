@@ -2,8 +2,6 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -21,19 +19,6 @@ class ECPayApplePayGatewayTest extends TestCase
         'MerchantID' => '2000132',
         'testMode' => 'yes',
     ];
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->gateway = new OmnipayGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_applepay',
-            'title' => '綠界 Apple Pay',
-            'payment_data' => ['ChoosePayment' => 'ApplePay'],
-            'features' => [new MinAmountFeature],
-        ]);
-    }
 
     public function test_process_payment_sends_applepay_payment_type()
     {

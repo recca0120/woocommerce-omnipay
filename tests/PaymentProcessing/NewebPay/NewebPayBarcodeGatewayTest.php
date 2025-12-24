@@ -3,9 +3,6 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -26,24 +23,12 @@ class NewebPayBarcodeGatewayTest extends TestCase
 
     private $merchantId = 'MS350098593';
 
-    protected function setUp(): void
-    {
-        $this->settings = [
-            'HashKey' => $this->hashKey,
-            'HashIV' => $this->hashIV,
-            'MerchantID' => $this->merchantId,
-            'testMode' => 'yes',
-        ];
-        parent::setUp();
-
-        $this->gateway = new OmnipayGateway([
-            'gateway' => 'NewebPay',
-            'gateway_id' => 'newebpay_barcode',
-            'title' => '藍新超商條碼',
-            'payment_data' => ['BARCODE' => 1],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
-        ]);
-    }
+    protected $settings = [
+        'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
+        'HashIV' => 'VVcW9t4feCshKOTi',
+        'MerchantID' => 'MS350098593',
+        'testMode' => 'yes',
+    ];
 
     public function test_process_payment_sends_barcode_payment_type()
     {
