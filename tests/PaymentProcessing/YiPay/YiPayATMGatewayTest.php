@@ -3,7 +3,7 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
 
 use Omnipay\YiPay\Hasher;
-use WooCommerceOmnipay\Gateways\YiPay\YiPayATMGateway;
+use WooCommerceOmnipay\Gateways\YiPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -35,10 +35,12 @@ class YiPayATMGatewayTest extends TestCase
         ];
         parent::setUp();
 
-        $this->gateway = new YiPayATMGateway([
+        $this->gateway = new YiPayGateway([
             'gateway' => 'YiPay',
             'gateway_id' => 'yipay_atm',
             'title' => '乙禾 ATM',
+            'payment_data' => ['type' => '4'],
+            'features' => ['min_amount', 'max_amount'],
         ]);
     }
 

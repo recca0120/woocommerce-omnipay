@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayCreditGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -25,10 +25,12 @@ class ECPayCreditGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayCreditGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_credit',
             'title' => '綠界信用卡',
+            'payment_data' => ['ChoosePayment' => 'Credit'],
+            'features' => ['min_amount'],
         ]);
     }
 

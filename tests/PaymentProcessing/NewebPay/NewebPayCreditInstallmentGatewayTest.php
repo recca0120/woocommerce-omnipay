@@ -3,7 +3,8 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\NewebPay\NewebPayCreditInstallmentGateway;
+use WooCommerceOmnipay\Gateways\Features\InstallmentFeature;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -34,10 +35,15 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
         ];
         parent::setUp();
 
-        $this->gateway = new NewebPayCreditInstallmentGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'NewebPay',
             'gateway_id' => 'newebpay_credit_installment',
             'title' => '藍新信用卡分期',
+            'payment_data' => ['CREDIT' => 1],
+            'features' => [
+                'min_amount',
+                new InstallmentFeature('InstFlag'),
+            ],
         ]);
     }
 

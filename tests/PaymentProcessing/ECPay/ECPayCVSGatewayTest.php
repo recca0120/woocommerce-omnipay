@@ -2,7 +2,8 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayCVSGateway;
+use WooCommerceOmnipay\Gateways\Features\ExpireDateFeature;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -29,10 +30,12 @@ class ECPayCVSGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayCVSGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_cvs',
             'title' => '綠界超商代碼',
+            'payment_data' => ['ChoosePayment' => 'CVS'],
+            'features' => ['min_amount', 'max_amount', new ExpireDateFeature('StoreExpireDate', 10080, 1, 43200)],
         ]);
     }
 

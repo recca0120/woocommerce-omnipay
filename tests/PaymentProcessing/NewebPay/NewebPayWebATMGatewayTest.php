@@ -3,7 +3,7 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\NewebPay\NewebPayWebATMGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -34,10 +34,12 @@ class NewebPayWebATMGatewayTest extends TestCase
         ];
         parent::setUp();
 
-        $this->gateway = new NewebPayWebATMGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'NewebPay',
             'gateway_id' => 'newebpay_webatm',
             'title' => '藍新網路 ATM',
+            'payment_data' => ['WEBATM' => 1],
+            'features' => ['min_amount', 'max_amount'],
         ]);
     }
 

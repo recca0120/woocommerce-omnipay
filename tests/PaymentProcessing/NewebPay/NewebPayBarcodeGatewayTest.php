@@ -3,7 +3,7 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\NewebPay\NewebPayBarcodeGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -34,10 +34,12 @@ class NewebPayBarcodeGatewayTest extends TestCase
         ];
         parent::setUp();
 
-        $this->gateway = new NewebPayBarcodeGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'NewebPay',
             'gateway_id' => 'newebpay_barcode',
             'title' => '藍新超商條碼',
+            'payment_data' => ['BARCODE' => 1],
+            'features' => ['min_amount', 'max_amount'],
         ]);
     }
 

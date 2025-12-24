@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
 
-use WooCommerceOmnipay\Gateways\YiPay\YiPayCVSGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -28,10 +28,12 @@ class YiPayCVSGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new YiPayCVSGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'YiPay',
             'gateway_id' => 'yipay_cvs',
             'title' => '乙禾超商代碼',
+            'payment_data' => ['type' => '3'],
+            'features' => ['min_amount', 'max_amount'],
         ]);
     }
 

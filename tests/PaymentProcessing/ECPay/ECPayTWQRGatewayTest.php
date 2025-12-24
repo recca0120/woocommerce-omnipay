@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayTWQRGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -25,10 +25,12 @@ class ECPayTWQRGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayTWQRGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_twqr',
             'title' => '綠界台灣 Pay',
+            'payment_data' => ['ChoosePayment' => 'TWQR'],
+            'features' => ['min_amount', 'max_amount'],
         ]);
     }
 

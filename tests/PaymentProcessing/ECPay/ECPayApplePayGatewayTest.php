@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayApplePayGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -25,10 +25,12 @@ class ECPayApplePayGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayApplePayGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_applepay',
             'title' => '綠界 Apple Pay',
+            'payment_data' => ['ChoosePayment' => 'ApplePay'],
+            'features' => ['min_amount'],
         ]);
     }
 

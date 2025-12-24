@@ -9,6 +9,8 @@ use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Exceptions\OrderNotFoundException;
 use WooCommerceOmnipay\GatewayRegistry;
 use WooCommerceOmnipay\Gateways\Concerns\DisplaysPaymentInfo;
+use WooCommerceOmnipay\Gateways\Features\FeatureFactory;
+use WooCommerceOmnipay\Gateways\Features\GatewayFeature;
 use WooCommerceOmnipay\Helper;
 use WooCommerceOmnipay\Repositories\OrderRepository;
 use WooCommerceOmnipay\WordPress\Logger;
@@ -52,6 +54,11 @@ class OmnipayGateway extends WC_Payment_Gateway
     protected $adapter;
 
     /**
+     * @var GatewayFeature[]
+     */
+    protected $features = [];
+
+    /**
      * Constructor
      *
      * @param  array  $config  gateway 配置
@@ -65,6 +72,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->method_description = $config['description'] ?? '';
         $this->overrideSettings = $config['override_settings'] ?? false;
         $this->adapter = $adapter ?? (new GatewayRegistry)->resolveAdapter($config);
+        $this->features = FeatureFactory::createFromConfig($config);
 
         // 設定 icon
         if (! empty($config['icon'])) {
@@ -75,8 +83,8 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->orders = new OrderRepository;
         $this->logger = new Logger($this->id);
 
-        // 預設不啟用付款欄位（子類可以覆寫）
-        $this->has_fields = false;
+        // 如果有 features 需要顯示付款欄位，則啟用
+        $this->has_fields = $this->hasPaymentFields();
 
         // Load the settings
         $this->init_form_fields();
@@ -174,6 +182,78 @@ class OmnipayGateway extends WC_Payment_Gateway
             'default' => '',
             'desc_tip' => true,
         ];
+
+        // 讓 Features 加入表單欄位
+        foreach ($this->features as $feature) {
+            $feature->initFormFields($this->form_fields);
+        }
+    }
+
+    /**
+     * 檢查付款方式是否可用
+     *
+     * @return bool
+     */
+    public function is_available()
+    {
+        if (! parent::is_available()) {
+            return false;
+        }
+
+        // 檢查所有 Features 的可用性
+        foreach ($this->features as $feature) {
+            if (! $feature->isAvailable($this)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 顯示付款欄位
+     */
+    public function payment_fields()
+    {
+        if ($this->description) {
+            echo '<p>'.wp_kses_post($this->description).'</p>';
+        }
+
+        foreach ($this->features as $feature) {
+            $feature->paymentFields($this);
+        }
+    }
+
+    /**
+     * 驗證付款欄位
+     *
+     * @return bool
+     */
+    public function validate_fields()
+    {
+        foreach ($this->features as $feature) {
+            if (! $feature->validateFields()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 檢查是否有付款欄位需要顯示
+     */
+    protected function hasPaymentFields(): bool
+    {
+        // 使用反射檢查 paymentFields 是否被覆寫
+        foreach ($this->features as $feature) {
+            $reflection = new \ReflectionMethod($feature, 'paymentFields');
+            if ($reflection->getDeclaringClass()->getName() !== 'WooCommerceOmnipay\\Gateways\\Features\\AbstractFeature') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -279,6 +359,11 @@ class OmnipayGateway extends WC_Payment_Gateway
         if (! empty($cardData)) {
             // 建立 Omnipay CreditCard 物件
             $data['card'] = new \Omnipay\Common\CreditCard($cardData);
+        }
+
+        // 讓 Features 處理付款資料
+        foreach ($this->features as $feature) {
+            $data = $feature->preparePaymentData($data, $order, $this);
         }
 
         return $data;

@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayBNPLGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -28,10 +28,12 @@ class ECPayBNPLGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayBNPLGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_bnpl',
             'title' => '綠界無卡分期',
+            'payment_data' => ['ChoosePayment' => 'BNPL'],
+            'features' => ['min_amount', 'max_amount'],
         ]);
     }
 

@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayWeiXinGateway;
+use WooCommerceOmnipay\Gateways\OmnipayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -25,10 +25,12 @@ class ECPayWeiXinGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayWeiXinGateway([
+        $this->gateway = new OmnipayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_weixin',
             'title' => '綠界微信支付',
+            'payment_data' => ['ChoosePayment' => 'WeiXin'],
+            'features' => ['min_amount', 'max_amount'],
         ]);
     }
 
