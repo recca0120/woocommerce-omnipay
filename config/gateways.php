@@ -3,6 +3,8 @@
 use WooCommerceOmnipay\Gateways\ECPay\ECPayDCAGateway;
 use WooCommerceOmnipay\Gateways\Features\ExpireDateFeature;
 use WooCommerceOmnipay\Gateways\Features\InstallmentFeature;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Gateways\NewebPay\NewebPayDCAGateway;
 
 // Icon URLs
@@ -37,7 +39,7 @@ return [
         'title' => __('ECPay Credit Card', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'Credit'],
-        'features' => ['min_amount'],
+        'features' => [new MinAmountFeature],
     ],
     [
         'gateway' => 'ECPay',
@@ -46,7 +48,7 @@ return [
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'Credit'],
         'features' => [
-            'min_amount',
+            new MinAmountFeature,
             new InstallmentFeature('CreditInstallment', [], [], true),
         ],
     ],
@@ -63,7 +65,7 @@ return [
         'title' => __('ECPay BNPL', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'BNPL'],
-        'features' => ['min_amount'],
+        'features' => [new MinAmountFeature],
     ],
     [
         'gateway' => 'ECPay',
@@ -71,7 +73,7 @@ return [
         'title' => __('ECPay WebATM', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'WebATM'],
-        'features' => ['min_amount', 'max_amount'],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     [
         'gateway' => 'ECPay',
@@ -79,7 +81,7 @@ return [
         'title' => __('ECPay ATM', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'ATM'],
-        'features' => ['min_amount', 'max_amount', new ExpireDateFeature('ExpireDate', 3, 1, 60)],
+        'features' => [new MinAmountFeature, new MaxAmountFeature, new ExpireDateFeature('ExpireDate', 3, 1, 60)],
     ],
     [
         'gateway' => 'ECPay',
@@ -87,7 +89,7 @@ return [
         'title' => __('ECPay CVS', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'CVS'],
-        'features' => ['min_amount', 'max_amount', new ExpireDateFeature('StoreExpireDate', 10080, 1, 43200)],
+        'features' => [new MinAmountFeature, new MaxAmountFeature, new ExpireDateFeature('StoreExpireDate', 10080, 1, 43200)],
     ],
     [
         'gateway' => 'ECPay',
@@ -95,7 +97,7 @@ return [
         'title' => __('ECPay Barcode', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'BARCODE'],
-        'features' => ['min_amount', 'max_amount', new ExpireDateFeature('StoreExpireDate', 7, 1, 30)],
+        'features' => [new MinAmountFeature, new MaxAmountFeature, new ExpireDateFeature('StoreExpireDate', 7, 1, 30)],
     ],
     [
         'gateway' => 'ECPay',
@@ -103,7 +105,7 @@ return [
         'title' => __('ECPay Apple Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'ApplePay'],
-        'features' => ['min_amount'],
+        'features' => [new MinAmountFeature],
     ],
     [
         'gateway' => 'ECPay',
@@ -111,7 +113,7 @@ return [
         'title' => __('ECPay Taiwan Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'TWQR'],
-        'features' => ['min_amount'],
+        'features' => [new MinAmountFeature],
     ],
     [
         'gateway' => 'ECPay',
@@ -119,7 +121,7 @@ return [
         'title' => __('ECPay WeChat Pay', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
         'payment_data' => ['ChoosePayment' => 'WeiXin'],
-        'features' => ['min_amount'],
+        'features' => [new MinAmountFeature],
     ],
     // NewebPay (All-in-one)
     [
@@ -135,7 +137,7 @@ return [
         'title' => __('NewebPay Credit Card', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
         'payment_data' => ['CREDIT' => 1],
-        'features' => ['min_amount'],
+        'features' => [new MinAmountFeature],
     ],
     [
         'gateway' => 'NewebPay',
@@ -144,7 +146,7 @@ return [
         'icon' => $newebpayIcon,
         'payment_data' => ['CREDIT' => 1],
         'features' => [
-            'min_amount',
+            new MinAmountFeature,
             new InstallmentFeature('InstFlag'),
         ],
     ],
@@ -161,7 +163,7 @@ return [
         'title' => __('NewebPay WebATM', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
         'payment_data' => ['WEBATM' => 1],
-        'features' => ['min_amount', 'max_amount'],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     [
         'gateway' => 'NewebPay',
@@ -169,7 +171,7 @@ return [
         'title' => __('NewebPay ATM', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
         'payment_data' => ['VACC' => 1],
-        'features' => ['min_amount', 'max_amount'],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     [
         'gateway' => 'NewebPay',
@@ -177,7 +179,7 @@ return [
         'title' => __('NewebPay CVS', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
         'payment_data' => ['CVS' => 1],
-        'features' => ['min_amount', 'max_amount'],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     [
         'gateway' => 'NewebPay',
@@ -185,7 +187,7 @@ return [
         'title' => __('NewebPay Barcode', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
         'payment_data' => ['BARCODE' => 1],
-        'features' => ['min_amount', 'max_amount'],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     // YiPay (All-in-one)
     [
@@ -201,7 +203,7 @@ return [
         'title' => __('YiPay Credit Card', 'woocommerce-omnipay'),
         'icon' => $yipayIcon,
         'payment_data' => ['type' => '2'],
-        'features' => ['min_amount'],
+        'features' => [new MinAmountFeature],
     ],
     [
         'gateway' => 'YiPay',
@@ -209,7 +211,7 @@ return [
         'title' => __('YiPay ATM', 'woocommerce-omnipay'),
         'icon' => $yipayIcon,
         'payment_data' => ['type' => '4'],
-        'features' => ['min_amount', 'max_amount'],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
     [
         'gateway' => 'YiPay',
@@ -217,6 +219,6 @@ return [
         'title' => __('YiPay CVS', 'woocommerce-omnipay'),
         'icon' => $yipayIcon,
         'payment_data' => ['type' => '3'],
-        'features' => ['min_amount', 'max_amount'],
+        'features' => [new MinAmountFeature, new MaxAmountFeature],
     ],
 ];
