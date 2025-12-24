@@ -161,7 +161,7 @@ class YiPayTest extends TestCase
         ]));
 
         ob_start();
-        $this->gateway->getPaymentInfo();
+        $this->gateway->handlePaymentInfoCallback();
         ob_get_clean();
 
         $order = wc_get_order($order->get_id());

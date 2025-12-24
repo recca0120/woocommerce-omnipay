@@ -213,6 +213,14 @@ class FrequencyRecurringFeature extends AbstractFeature implements RecurringFeat
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasPaymentFields(): bool
+    {
+        return true;
+    }
+
+    /**
      * 是否為 Blocks 模式
      */
     private function isBlocksMode(): bool

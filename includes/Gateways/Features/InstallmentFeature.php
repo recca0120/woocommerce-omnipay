@@ -101,6 +101,14 @@ class InstallmentFeature extends AbstractFeature
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasPaymentFields(): bool
+    {
+        return true;
+    }
+
+    /**
      * 取得預設分期選項
      */
     private function getDefaultOptions(): array

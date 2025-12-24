@@ -60,7 +60,7 @@ class NewebPayCVSGatewayTest extends TestCase
             'CodeNo' => 'LLL24112512345',
         ]));
 
-        $url = $this->gateway->getPaymentInfo();
+        $url = $this->gateway->handlePaymentInfoCallback();
 
         $this->assertStringContainsString('order-received', $url);
 

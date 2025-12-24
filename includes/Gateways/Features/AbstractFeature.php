@@ -52,4 +52,12 @@ abstract class AbstractFeature implements GatewayFeature
     {
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasPaymentFields(): bool
+    {
+        return false;
+    }
 }

@@ -17,7 +17,8 @@
         "omnipay-taiwan/omnipay-newebpay": "^1.0",
         "omnipay-taiwan/omnipay-yipay": "^1.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
-        "nyholm/psr7": "^1.8"
+        "nyholm/psr7": "^1.8",
+        "php-http/guzzle7-adapter": "^1.1"
     },
     "require-dev": {
         "omnipay/dummy": "^3.0",

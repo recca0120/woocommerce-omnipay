@@ -21,7 +21,7 @@ trait HasPaymentInfo
         return $this->getGateway()->getPaymentInfo($parameters)->send();
     }
 
-    public function getPaymentInfoEndpoint(): string
+    public function getPaymentInfoUrlSuffix(): string
     {
         return '_payment_info';
     }

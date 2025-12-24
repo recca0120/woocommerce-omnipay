@@ -51,4 +51,11 @@ interface GatewayFeature
      * @return bool 驗證通過返回 true
      */
     public function validateFields(): bool;
+
+    /**
+     * 是否有付款欄位需要顯示
+     *
+     * @return bool 有付款欄位返回 true
+     */
+    public function hasPaymentFields(): bool;
 }

@@ -180,9 +180,6 @@ woocommerce-omnipay/
 │   │   ├── ECPayGateway.php        # 綠界實作
 │   │   ├── NewebPayGateway.php     # 藍新實作
 │   │   └── YiPayGateway.php        # 乙禾實作
-│   ├── Http/
-│   │   ├── WordPressHttpClient.php # WordPress HTTP Client
-│   │   └── NetworkException.php    # 網路例外
 │   ├── WordPress/
 │   │   ├── Logger.php              # PSR-3 日誌
 │   │   └── SettingsManager.php     # 設定管理

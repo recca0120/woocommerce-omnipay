@@ -2,26 +2,13 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
-use WooCommerceOmnipay\Adapters\Concerns\CreatesGateway;
-use WooCommerceOmnipay\Adapters\Concerns\FormatsCallbackResponse;
-use WooCommerceOmnipay\Adapters\Concerns\HandlesNotifications;
-use WooCommerceOmnipay\Adapters\Concerns\HandlesPurchases;
-use WooCommerceOmnipay\Adapters\Concerns\HasPaymentInfo;
-use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
-
 /**
  * ECPay Adapter
  *
  * 封裝 ECPay 特有的邏輯
  */
-class ECPayAdapter implements GatewayAdapter
+class ECPayAdapter extends DefaultGatewayAdapter
 {
-    use CreatesGateway;
-    use FormatsCallbackResponse;
-    use HandlesNotifications;
-    use HandlesPurchases;
-    use HasPaymentInfo;
-
     /**
      * ECPay 取號成功的 RtnCode
      */
@@ -29,16 +16,14 @@ class ECPayAdapter implements GatewayAdapter
 
     private const RTNCODE_CVS_BARCODE_SUCCESS = '10100073';
 
-    public function getGatewayName(): string
+    public function __construct()
     {
-        return 'ECPay';
+        parent::__construct('ECPay');
     }
 
     public function validateAmount(array $data, int $orderTotal): bool
     {
-        $tradeAmt = isset($data['TradeAmt']) ? (int) $data['TradeAmt'] : 0;
-
-        return $tradeAmt === $orderTotal;
+        return $this->validateAmountField($data, 'TradeAmt', $orderTotal);
     }
 
     public function normalizePaymentInfo(array $data): array
@@ -57,7 +42,7 @@ class ECPayAdapter implements GatewayAdapter
         });
     }
 
-    public function getPaymentInfoEndpoint(): string
+    public function getPaymentInfoUrlSuffix(): string
     {
         // ECPay 的 PaymentInfoURL 與 notifyUrl 共用 _notify endpoint
         return '_notify';

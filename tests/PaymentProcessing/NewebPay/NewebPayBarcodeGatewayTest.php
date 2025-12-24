@@ -83,7 +83,7 @@ class NewebPayBarcodeGatewayTest extends TestCase
             'Barcode_3' => 'TEST3',
         ]));
 
-        $url = $this->gateway->getPaymentInfo();
+        $url = $this->gateway->handlePaymentInfoCallback();
 
         $this->assertStringContainsString('order-received', $url);
 

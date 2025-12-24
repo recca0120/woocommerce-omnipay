@@ -2,26 +2,13 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
-use WooCommerceOmnipay\Adapters\Concerns\CreatesGateway;
-use WooCommerceOmnipay\Adapters\Concerns\FormatsCallbackResponse;
-use WooCommerceOmnipay\Adapters\Concerns\HandlesNotifications;
-use WooCommerceOmnipay\Adapters\Concerns\HandlesPurchases;
-use WooCommerceOmnipay\Adapters\Concerns\HasPaymentInfo;
-use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
-
 /**
  * NewebPay Adapter
  *
  * 封裝 NewebPay 特有的邏輯
  */
-class NewebPayAdapter implements GatewayAdapter
+class NewebPayAdapter extends DefaultGatewayAdapter
 {
-    use CreatesGateway;
-    use FormatsCallbackResponse;
-    use HandlesNotifications;
-    use HandlesPurchases;
-    use HasPaymentInfo;
-
     /**
      * NewebPay 付款類型
      */
@@ -31,16 +18,14 @@ class NewebPayAdapter implements GatewayAdapter
 
     private const PAYMENT_TYPE_BARCODE = 'BARCODE';
 
-    public function getGatewayName(): string
+    public function __construct()
     {
-        return 'NewebPay';
+        parent::__construct('NewebPay');
     }
 
     public function validateAmount(array $data, int $orderTotal): bool
     {
-        $amt = isset($data['Amt']) ? (int) $data['Amt'] : 0;
-
-        return $amt === $orderTotal;
+        return $this->validateAmountField($data, 'Amt', $orderTotal);
     }
 
     public function normalizePaymentInfo(array $data): array

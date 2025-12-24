@@ -158,9 +158,6 @@ woocommerce-omnipay/
 │   │   ├── ECPayGateway.php        # ECPay implementation
 │   │   ├── NewebPayGateway.php     # NewebPay implementation
 │   │   └── YiPayGateway.php        # YiPay implementation
-│   ├── Http/
-│   │   ├── WordPressHttpClient.php # WordPress HTTP Client
-│   │   └── NetworkException.php    # Network exception
 │   ├── WordPress/
 │   │   ├── Logger.php              # PSR-3 logger
 │   │   └── SettingsManager.php     # Settings manager
