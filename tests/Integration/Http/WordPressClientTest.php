@@ -78,7 +78,7 @@ class WordPressClientTest extends HttpClientTestCase
     {
         $this->expectException(NetworkException::class);
 
-        $client = new WordPressClient(1);
+        $client = new WordPressClient(['timeout' => 1]);
 
         $client->request('GET', $this->getServerUrl('/delay'));
     }

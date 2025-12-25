@@ -69,7 +69,7 @@ class CurlClientTest extends HttpClientTestCase
     {
         $this->expectException(NetworkException::class);
 
-        $client = new CurlClient(1);
+        $client = new CurlClient(['timeout' => 1]);
 
         $client->request('GET', 'http://localhost:59999/not-exist');
     }
@@ -78,7 +78,7 @@ class CurlClientTest extends HttpClientTestCase
     {
         $this->expectException(NetworkException::class);
 
-        $client = new CurlClient(1);
+        $client = new CurlClient(['timeout' => 1]);
 
         $client->request('GET', $this->getServerUrl('/delay'));
     }

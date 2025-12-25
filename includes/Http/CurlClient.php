@@ -15,13 +15,13 @@ use WooCommerceOmnipay\Exceptions\NetworkException;
 class CurlClient implements ClientInterface
 {
     /**
-     * @var int
+     * @var array
      */
-    private $timeout;
+    private $options;
 
-    public function __construct(int $timeout = 30)
+    public function __construct(array $options = [])
     {
-        $this->timeout = $timeout;
+        $this->options = array_merge(['timeout' => 30], $options);
     }
 
     /**
@@ -40,7 +40,7 @@ class CurlClient implements ClientInterface
             CURLOPT_URL => (string) $uri,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
-            CURLOPT_TIMEOUT => $this->timeout,
+            CURLOPT_TIMEOUT => $this->options['timeout'],
             CURLOPT_CUSTOMREQUEST => strtoupper($method),
             CURLOPT_HTTP_VERSION => $protocolVersion === '1.0' ? CURL_HTTP_VERSION_1_0 : CURL_HTTP_VERSION_1_1,
         ]);

@@ -15,13 +15,13 @@ use WooCommerceOmnipay\Exceptions\NetworkException;
 class StreamClient implements ClientInterface
 {
     /**
-     * @var int
+     * @var array
      */
-    private $timeout;
+    private $options;
 
-    public function __construct(int $timeout = 30)
+    public function __construct(array $options = [])
     {
-        $this->timeout = $timeout;
+        $this->options = array_merge(['timeout' => 30], $options);
     }
 
     /**
@@ -43,7 +43,7 @@ class StreamClient implements ClientInterface
             'http' => [
                 'method' => strtoupper($method),
                 'header' => implode("\r\n", $httpHeaders),
-                'timeout' => $this->timeout,
+                'timeout' => $this->options['timeout'],
                 'protocol_version' => (float) $protocolVersion,
                 'ignore_errors' => true,
             ],

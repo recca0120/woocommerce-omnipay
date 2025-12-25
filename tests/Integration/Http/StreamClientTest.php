@@ -69,7 +69,7 @@ class StreamClientTest extends HttpClientTestCase
     {
         $this->expectException(NetworkException::class);
 
-        $client = new StreamClient(1);
+        $client = new StreamClient(['timeout' => 1]);
 
         $client->request('GET', 'http://localhost:59999/not-exist');
     }
@@ -78,7 +78,7 @@ class StreamClientTest extends HttpClientTestCase
     {
         $this->expectException(NetworkException::class);
 
-        $client = new StreamClient(1);
+        $client = new StreamClient(['timeout' => 1]);
 
         $client->request('GET', $this->getServerUrl('/delay'));
     }
