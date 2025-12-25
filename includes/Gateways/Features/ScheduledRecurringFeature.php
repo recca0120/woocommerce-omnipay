@@ -9,7 +9,7 @@ use WC_Payment_Gateway;
  * Scheduled Recurring Payment Feature
  *
  * 排程式定期付款（指定日期/星期執行）
- * 用於 NewebPay 定期定額
+ * 使用 periodType + periodPoint + periodTimes + periodStartType 參數
  */
 class ScheduledRecurringFeature extends AbstractFeature implements RecurringFeature
 {
@@ -206,13 +206,15 @@ class ScheduledRecurringFeature extends AbstractFeature implements RecurringFeat
 
         $total = WC()->cart ? WC()->cart->total : 0;
 
+        $gatewayName = method_exists($gateway, 'getGatewayName') ? $gateway->getGatewayName() : '';
+
         echo woocommerce_omnipay_get_template('checkout/scheduled-recurring-form.php', [
             'periods' => $this->dcaPeriods,
             'total' => $total,
             'periodFields' => ['periodType', 'periodPoint', 'periodTimes', 'periodStartType'],
             'warningMessage' => sprintf(
                 __('You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
-                __('NewebPay', 'woocommerce-omnipay')
+                $gatewayName
             ),
         ]);
     }
@@ -222,8 +224,6 @@ class ScheduledRecurringFeature extends AbstractFeature implements RecurringFeat
      */
     public function preparePaymentData(array $data, WC_Order $order, WC_Payment_Gateway $gateway): array
     {
-        $data['CREDIT'] = '1';
-
         // 根據模式取得 DCA 設定
         $dcaData = $this->isBlocksMode()
             ? $this->getBlocksModeDcaData($gateway)

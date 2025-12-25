@@ -9,7 +9,7 @@ use WC_Payment_Gateway;
  * Frequency-based Recurring Payment Feature
  *
  * 頻率式定期付款（每隔 N 天/月/年執行一次）
- * 用於 ECPay 定期定額
+ * 使用 periodType + frequency + execTimes 參數
  */
 class FrequencyRecurringFeature extends AbstractFeature implements RecurringFeature
 {
@@ -183,13 +183,15 @@ class FrequencyRecurringFeature extends AbstractFeature implements RecurringFeat
 
         $total = WC()->cart ? WC()->cart->total : 0;
 
+        $gatewayName = method_exists($gateway, 'getGatewayName') ? $gateway->getGatewayName() : '';
+
         echo woocommerce_omnipay_get_template('checkout/frequency-recurring-form.php', [
             'periods' => $this->dcaPeriods,
             'total' => $total,
             'periodFields' => ['periodType', 'frequency', 'execTimes'],
             'warningMessage' => sprintf(
                 __('You will use <strong>%s recurring credit card payment</strong>. Please note that the products you purchased are <strong>non-single payment</strong> products.', 'woocommerce-omnipay'),
-                __('ECPay', 'woocommerce-omnipay')
+                $gatewayName
             ),
         ]);
     }
@@ -199,8 +201,6 @@ class FrequencyRecurringFeature extends AbstractFeature implements RecurringFeat
      */
     public function preparePaymentData(array $data, WC_Order $order, WC_Payment_Gateway $gateway): array
     {
-        $data['ChoosePayment'] = 'Credit';
-
         // 根據模式取得 DCA 設定
         $dcaData = $this->isBlocksMode()
             ? $this->getBlocksModeDcaData($gateway)

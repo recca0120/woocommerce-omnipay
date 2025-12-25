@@ -28,26 +28,26 @@ class InstallmentFeature extends AbstractFeature
     private $defaults;
 
     /**
-     * @var bool 是否需要 ECPay 圓夢分期 (30N) 處理
+     * @var bool 是否驗證 30 期最低金額 (ECPay 圓夢分期需 >= 20000)
      */
-    private $requiresDreamInstallment;
+    private $validate30MinAmount;
 
     /**
      * @param  string  $fieldName  API 欄位名稱 (如 'CreditInstallment' 或 'InstFlag')
      * @param  array  $options  可用的分期選項
      * @param  array  $defaults  預設啟用的分期
-     * @param  bool  $requiresDreamInstallment  是否需要圓夢分期處理
+     * @param  bool  $validate30MinAmount  是否驗證 30 期最低金額
      */
     public function __construct(
         string $fieldName = 'CreditInstallment',
         array $options = [],
         array $defaults = [],
-        bool $requiresDreamInstallment = false
+        bool $validate30MinAmount = false
     ) {
         $this->fieldName = $fieldName;
         $this->options = $options ?: $this->getDefaultOptions();
         $this->defaults = $defaults ?: ['3', '6', '12', '18', '24'];
-        $this->requiresDreamInstallment = $requiresDreamInstallment;
+        $this->validate30MinAmount = $validate30MinAmount;
     }
 
     /**
@@ -80,7 +80,7 @@ class InstallmentFeature extends AbstractFeature
         echo woocommerce_omnipay_get_template('checkout/installment-form.php', [
             'installments' => $installments,
             'total' => WC()->cart->get_total('edit'),
-            'validate_30_min_amount' => $this->requiresDreamInstallment,
+            'validate_30_min_amount' => $this->validate30MinAmount,
         ]);
     }
 
@@ -92,7 +92,7 @@ class InstallmentFeature extends AbstractFeature
         $selectedInstallment = $this->getSelectedInstallment();
 
         if (! empty($selectedInstallment)) {
-            $data[$this->fieldName] = $this->convertInstallmentValue($selectedInstallment);
+            $data[$this->fieldName] = $selectedInstallment;
         } else {
             $data[$this->fieldName] = $this->getInstallmentsString($gateway);
         }
@@ -134,18 +134,6 @@ class InstallmentFeature extends AbstractFeature
     }
 
     /**
-     * 轉換分期值（ECPay 圓夢分期）
-     */
-    private function convertInstallmentValue(string $value): string
-    {
-        if ($this->requiresDreamInstallment && $value === '30') {
-            return '30N';
-        }
-
-        return $value;
-    }
-
-    /**
      * 取得分期字串（逗號分隔）
      */
     private function getInstallmentsString(WC_Payment_Gateway $gateway): string
@@ -153,13 +141,9 @@ class InstallmentFeature extends AbstractFeature
         $installments = $gateway->get_option('installments', $this->defaults);
 
         if (! is_array($installments)) {
-            return $this->convertInstallmentValue($installments);
+            return $installments;
         }
 
-        $converted = array_map(function ($value) {
-            return $this->convertInstallmentValue($value);
-        }, $installments);
-
-        return implode(',', $converted);
+        return implode(',', $installments);
     }
 }

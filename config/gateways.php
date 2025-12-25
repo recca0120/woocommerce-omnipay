@@ -57,6 +57,7 @@ return [
         'gateway_id' => 'ecpay_dca',
         'title' => __('ECPay Recurring Payment', 'woocommerce-omnipay'),
         'icon' => $ecpayIcon,
+        'payment_data' => ['ChoosePayment' => 'Credit'],
         'features' => [new FrequencyRecurringFeature],
     ],
     [
@@ -155,6 +156,7 @@ return [
         'gateway_id' => 'newebpay_dca',
         'title' => __('NewebPay Recurring Payment', 'woocommerce-omnipay'),
         'icon' => $newebpayIcon,
+        'payment_data' => ['CREDIT' => 1],
         'features' => [new ScheduledRecurringFeature],
     ],
     [

@@ -115,6 +115,14 @@ class OmnipayGateway extends WC_Payment_Gateway
     }
 
     /**
+     * 取得 Gateway 名稱 (ECPay, NewebPay, YiPay 等)
+     */
+    public function getGatewayName(): string
+    {
+        return $this->adapter->getGatewayName();
+    }
+
+    /**
      * 取得有效的設定值（Gateway 設定 > 共用設定）
      *
      * 用於 transaction_id_prefix, allow_resubmit 等 Plugin 設定

@@ -33,6 +33,7 @@ class ECPayDCAGatewayTest extends TestCase
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_dca',
             'title' => '綠界定期定額',
+            'payment_data' => ['ChoosePayment' => 'Credit'],
             'features' => [new FrequencyRecurringFeature],
         ]);
 
@@ -57,6 +58,7 @@ class ECPayDCAGatewayTest extends TestCase
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_dca',
             'title' => '綠界定期定額',
+            'payment_data' => ['ChoosePayment' => 'Credit'],
             'features' => [new FrequencyRecurringFeature],
         ]);
     }
