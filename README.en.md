@@ -216,7 +216,7 @@ woocommerce-omnipay/
 │   │   ├── NetworkException.php    # Network exception
 │   │   └── OrderNotFoundException.php
 │   ├── Http/
-│   │   ├── WpClient.php            # WordPress HTTP Client
+│   │   ├── WordPressClient.php     # WordPress HTTP Client
 │   │   ├── CurlClient.php          # cURL HTTP Client
 │   │   └── StreamClient.php        # Stream HTTP Client
 │   ├── WordPress/

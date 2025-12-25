@@ -3,13 +3,13 @@
 namespace WooCommerceOmnipay\Tests\Integration\Http;
 
 use WooCommerceOmnipay\Exceptions\NetworkException;
-use WooCommerceOmnipay\Http\WpClient;
+use WooCommerceOmnipay\Http\WordPressClient;
 
-class WpClientTest extends HttpClientTestCase
+class WordPressClientTest extends HttpClientTestCase
 {
     public function test_it_sends_get_request()
     {
-        $client = new WpClient;
+        $client = new WordPressClient;
 
         $response = $client->request('GET', $this->getServerUrl('/api/test'));
 
@@ -23,7 +23,7 @@ class WpClientTest extends HttpClientTestCase
 
     public function test_it_sends_post_request_with_body()
     {
-        $client = new WpClient;
+        $client = new WordPressClient;
 
         $response = $client->request(
             'POST',
@@ -41,7 +41,7 @@ class WpClientTest extends HttpClientTestCase
 
     public function test_it_sends_request_headers()
     {
-        $client = new WpClient;
+        $client = new WordPressClient;
 
         $response = $client->request('GET', $this->getServerUrl('/'), [
             'Accept' => 'application/json',
@@ -56,7 +56,7 @@ class WpClientTest extends HttpClientTestCase
 
     public function test_it_handles_error_status_codes()
     {
-        $client = new WpClient;
+        $client = new WordPressClient;
 
         $response404 = $client->request('GET', $this->getServerUrl('/status/404'));
         $this->assertEquals(404, $response404->getStatusCode());
@@ -69,7 +69,7 @@ class WpClientTest extends HttpClientTestCase
     {
         $this->expectException(NetworkException::class);
 
-        $client = new WpClient;
+        $client = new WordPressClient;
 
         $client->request('GET', 'http://localhost:59999/not-exist');
     }

@@ -5,7 +5,7 @@ namespace WooCommerceOmnipay;
 use Omnipay\Common\Http\ClientInterface;
 use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
-use WooCommerceOmnipay\Http\WpClient;
+use WooCommerceOmnipay\Http\WordPressClient;
 
 /**
  * Gateway Registry
@@ -54,7 +54,7 @@ class GatewayRegistry
         $this->config = array_merge([
             'gateways' => [],
         ], $config);
-        $this->httpClient = $httpClient ?? new WpClient;
+        $this->httpClient = $httpClient ?? new WordPressClient;
     }
 
     /**

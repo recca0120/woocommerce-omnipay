@@ -12,7 +12,7 @@ use WooCommerceOmnipay\Exceptions\NetworkException;
  *
  * 使用 WordPress 內建的 wp_remote_request() 取代 php-http/curl-client
  */
-class WpClient implements ClientInterface
+class WordPressClient implements ClientInterface
 {
     /**
      * {@inheritdoc}
