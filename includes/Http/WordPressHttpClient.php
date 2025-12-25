@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * 使用 WordPress 內建的 wp_remote_request() 取代 php-http/curl-client
  */
-class HttpClient implements ClientInterface
+class WordPressHttpClient implements ClientInterface
 {
     /**
      * {@inheritdoc}
