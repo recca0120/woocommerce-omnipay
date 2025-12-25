@@ -5,7 +5,7 @@ namespace WooCommerceOmnipay;
 use Omnipay\Common\Http\ClientInterface;
 use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
 use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
-use WooCommerceOmnipay\WordPress\HttpClient;
+use WooCommerceOmnipay\Http\HttpClient;
 
 /**
  * Gateway Registry

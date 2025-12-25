@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\WordPress;
+namespace WooCommerceOmnipay\Http;
 
 use Nyholm\Psr7\Response;
 use Omnipay\Common\Http\ClientInterface;
