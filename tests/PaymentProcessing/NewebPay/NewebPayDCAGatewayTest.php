@@ -3,6 +3,8 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
+use WooCommerceOmnipay\Gateways\Features\ScheduledRecurringFeature;
+use WooCommerceOmnipay\Gateways\NewebPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -33,6 +35,13 @@ class NewebPayDCAGatewayTest extends TestCase
         ];
         parent::setUp();
 
+        $this->gateway = new NewebPayGateway([
+            'gateway' => 'NewebPay',
+            'gateway_id' => 'newebpay_dca',
+            'title' => '藍新定期定額',
+            'features' => [new ScheduledRecurringFeature],
+        ]);
+
         // Set up DCA periods for Shortcode mode
         update_option('woocommerce_omnipay_newebpay_dca_periods', [
             [
@@ -48,6 +57,16 @@ class NewebPayDCAGatewayTest extends TestCase
         $this->gateway->update_option('periodPoint', '1');
         $this->gateway->update_option('periodTimes', 12);
         $this->gateway->update_option('periodStartType', 2);
+    }
+
+    protected function createGateway(): NewebPayGateway
+    {
+        return new NewebPayGateway([
+            'gateway' => 'NewebPay',
+            'gateway_id' => 'newebpay_dca',
+            'title' => '藍新定期定額',
+            'features' => [new ScheduledRecurringFeature],
+        ]);
     }
 
     public function test_process_payment_sends_credit_parameter()

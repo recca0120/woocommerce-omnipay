@@ -2,6 +2,8 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
 
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
+use WooCommerceOmnipay\Gateways\YiPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -22,6 +24,19 @@ class YiPayCreditGatewayTest extends TestCase
         'iv' => 'dGVzdGl2dGVzdDEyMzQ1Ng==',
         'testMode' => 'yes',
     ];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->gateway = new YiPayGateway([
+            'gateway' => 'YiPay',
+            'gateway_id' => 'yipay_credit',
+            'title' => 'YiPay 信用卡',
+            'payment_data' => ['type' => '2'],
+            'features' => [new MinAmountFeature],
+        ]);
+    }
 
     public function test_process_payment_sends_credit_payment_type()
     {

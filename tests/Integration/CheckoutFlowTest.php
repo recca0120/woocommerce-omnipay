@@ -2,6 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\Integration;
 
+use WooCommerceOmnipay\Gateways\ECPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -21,11 +22,27 @@ class CheckoutFlowTest extends TestCase
     ];
 
     /**
+     * 取得 DCA Gateway 配置
+     */
+    protected function getDcaGatewayConfig(): array
+    {
+        $gateways = require WOOCOMMERCE_OMNIPAY_PLUGIN_DIR.'config/gateways.php';
+
+        foreach ($gateways as $config) {
+            if (($config['gateway_id'] ?? '') === 'ecpay_dca') {
+                return $config;
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * 取得 DCA Gateway
      */
-    protected function getDcaGateway()
+    protected function getDcaGateway(): ECPayGateway
     {
-        return WC()->payment_gateways->payment_gateways()['omnipay_ecpay_dca'];
+        return new ECPayGateway($this->getDcaGatewayConfig());
     }
 
     /**
@@ -112,10 +129,6 @@ class CheckoutFlowTest extends TestCase
             ['periodType' => 'M', 'frequency' => 1, 'execTimes' => 24],
             ['periodType' => 'Y', 'frequency' => 1, 'execTimes' => 3],
         ]);
-
-        // Re-init gateways to load periods
-        WC()->payment_gateways()->payment_gateways = [];
-        WC()->payment_gateways()->init();
 
         $dcaGateway = $this->getDcaGateway();
 

@@ -24,7 +24,8 @@
         "omnipay/dummy": "^3.0",
         "phpunit/phpunit": "^8.5 || ^9.5",
         "wp-phpunit/wp-phpunit": "^6.6",
-        "yoast/phpunit-polyfills": "^2.0"
+        "yoast/phpunit-polyfills": "^2.0",
+        "laravel/pint": "^1.26"
     },
     "autoload": {
         "psr-4": {

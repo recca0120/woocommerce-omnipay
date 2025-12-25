@@ -2,6 +2,8 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
+use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Gateways\Features\FrequencyRecurringFeature;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -27,6 +29,13 @@ class ECPayDCAGatewayTest extends TestCase
     {
         parent::setUp();
 
+        $this->gateway = new ECPayGateway([
+            'gateway' => 'ECPay',
+            'gateway_id' => 'ecpay_dca',
+            'title' => '綠界定期定額',
+            'features' => [new FrequencyRecurringFeature],
+        ]);
+
         // Set up DCA periods for Shortcode mode
         update_option('woocommerce_omnipay_ecpay_dca_periods', [
             [
@@ -40,6 +49,16 @@ class ECPayDCAGatewayTest extends TestCase
         $this->gateway->update_option('periodType', 'M');
         $this->gateway->update_option('frequency', 1);
         $this->gateway->update_option('execTimes', 12);
+    }
+
+    protected function createGateway(): ECPayGateway
+    {
+        return new ECPayGateway([
+            'gateway' => 'ECPay',
+            'gateway_id' => 'ecpay_dca',
+            'title' => '綠界定期定額',
+            'features' => [new FrequencyRecurringFeature],
+        ]);
     }
 
     public function test_process_payment_sends_credit_payment_type()

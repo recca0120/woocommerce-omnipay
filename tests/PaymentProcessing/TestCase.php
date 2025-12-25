@@ -11,6 +11,8 @@ abstract class TestCase extends WP_UnitTestCase
 {
     protected $gateway;
 
+    protected $configCallback;
+
     protected $gatewayId;
 
     protected $gatewayName;
@@ -26,6 +28,19 @@ abstract class TestCase extends WP_UnitTestCase
         wp_cache_delete('woocommerce_omnipay_'.$this->gatewayId.'_settings', 'options');
         wp_cache_delete('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', 'options');
         wp_cache_delete('alloptions', 'options');
+
+        $gatewayId = $this->gatewayId;
+        $gatewayName = $this->gatewayName;
+        $this->configCallback = function () use ($gatewayId, $gatewayName) {
+            return [
+                'gateways' => [[
+                    'gateway' => $gatewayName,
+                    'gateway_id' => $gatewayId,
+                    'title' => $gatewayName,
+                ]],
+            ];
+        };
+        add_filter('woocommerce_omnipay_gateway_config', $this->configCallback);
 
         // 設定 Gateway settings（只有 enabled）
         update_option('woocommerce_omnipay_'.$this->gatewayId.'_settings', [
@@ -53,6 +68,9 @@ abstract class TestCase extends WP_UnitTestCase
         wp_cache_delete('woocommerce_omnipay_'.strtolower($this->gatewayName).'_shared_settings', 'options');
         wp_cache_delete('alloptions', 'options');
 
+        if ($this->configCallback) {
+            remove_filter('woocommerce_omnipay_gateway_config', $this->configCallback);
+        }
         remove_filter('woocommerce_omnipay_should_exit', '__return_false');
         WC()->payment_gateways()->payment_gateways = [];
 
@@ -115,16 +133,5 @@ abstract class TestCase extends WP_UnitTestCase
         $product->save();
 
         return $product;
-    }
-
-    /**
-     * 建立 Gateway 實例（重新從 WooCommerce 載入）
-     */
-    protected function createGateway()
-    {
-        WC()->payment_gateways()->payment_gateways = [];
-        WC()->payment_gateways()->init();
-
-        return WC()->payment_gateways->payment_gateways()['omnipay_'.$this->gatewayId];
     }
 }
