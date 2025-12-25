@@ -202,10 +202,10 @@ composer test
 |---------|------|------|
 | `MinAmountFeature` | 最低金額限制 | 預設 $0 |
 | `MaxAmountFeature` | 最高金額限制 | 預設 $30,000 |
-| `InstallmentFeature` | 信用卡分期 | 欄位名稱、選項、預設值 |
-| `ExpireDateFeature` | 繳費期限設定 | 欄位名稱、預設值、最小值、最大值 |
-| `FrequencyRecurringFeature` | 定期定額（依頻率，ECPay） | - |
-| `ScheduledRecurringFeature` | 定期定額（依排程，NewebPay） | - |
+| `InstallmentFeature` | 信用卡分期 | `fieldName`（必填）、`config`（options, defaults, periodRules） |
+| `ExpireDateFeature` | 繳費期限設定 | `fieldName`、`defaultDays`、`minDays`、`maxDays` |
+| `FrequencyRecurringFeature` | 定期定額（依頻率） | `warningMessage`（選填） |
+| `ScheduledRecurringFeature` | 定期定額（依排程） | `warningMessage`（選填） |
 
 ### 專案結構
 

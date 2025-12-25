@@ -180,10 +180,10 @@ This plugin uses the **Feature Composition Pattern**, combining functionality th
 |---------|-------------|------------|
 | `MinAmountFeature` | Minimum amount limit | Default $0 |
 | `MaxAmountFeature` | Maximum amount limit | Default $30,000 |
-| `InstallmentFeature` | Credit card installments | Field name, options, defaults |
-| `ExpireDateFeature` | Payment expiry settings | Field name, default, min, max |
-| `FrequencyRecurringFeature` | Recurring payments (frequency-based, ECPay) | - |
-| `ScheduledRecurringFeature` | Recurring payments (schedule-based, NewebPay) | - |
+| `InstallmentFeature` | Credit card installments | `fieldName` (required), `config` (options, defaults, periodRules) |
+| `ExpireDateFeature` | Payment expiry settings | `fieldName`, `defaultDays`, `minDays`, `maxDays` |
+| `FrequencyRecurringFeature` | Recurring payments (frequency-based) | `warningMessage` (optional) |
+| `ScheduledRecurringFeature` | Recurring payments (schedule-based) | `warningMessage` (optional) |
 
 ### Project Structure
 
