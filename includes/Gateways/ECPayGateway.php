@@ -35,23 +35,10 @@ class ECPayGateway extends OmnipayGateway
 
     /**
      * 轉換圓夢分期值
-     *
-     * @param  string  $value  分期值（可能是單一值或逗號分隔）
      */
     private function convertDreamInstallment(string $value): string
     {
-        // 處理逗號分隔的多個分期選項
-        if (strpos($value, ',') !== false) {
-            $parts = explode(',', $value);
-            $converted = array_map(function ($v) {
-                return $v === '30' ? '30N' : $v;
-            }, $parts);
-
-            return implode(',', $converted);
-        }
-
-        // 處理單一值
-        return $value === '30' ? '30N' : $value;
+        return str_replace('30', '30N', $value);
     }
 
     /**
