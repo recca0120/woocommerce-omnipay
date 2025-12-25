@@ -8,7 +8,8 @@ abstract class HttpClientTestCase extends TestCase
 {
     protected static $serverProcess;
 
-    protected static int $serverPort = 8989;
+    /** @var int */
+    protected static $serverPort = 8989;
 
     public static function setUpBeforeClass(): void
     {
