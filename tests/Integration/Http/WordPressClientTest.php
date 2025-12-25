@@ -73,4 +73,13 @@ class WordPressClientTest extends HttpClientTestCase
 
         $client->request('GET', 'http://localhost:59999/not-exist');
     }
+
+    public function test_it_respects_timeout_option()
+    {
+        $this->expectException(NetworkException::class);
+
+        $client = new WordPressClient(1);
+
+        $client->request('GET', $this->getServerUrl('/delay'));
+    }
 }

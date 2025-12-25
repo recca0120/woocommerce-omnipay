@@ -15,6 +15,16 @@ use WooCommerceOmnipay\Exceptions\NetworkException;
 class WordPressClient implements ClientInterface
 {
     /**
+     * @var int
+     */
+    private $timeout;
+
+    public function __construct(int $timeout = 30)
+    {
+        $this->timeout = $timeout;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function request(
@@ -27,7 +37,7 @@ class WordPressClient implements ClientInterface
         $args = [
             'method' => strtoupper($method),
             'headers' => $headers,
-            'timeout' => 30,
+            'timeout' => $this->timeout,
             'httpversion' => $protocolVersion,
         ];
 
