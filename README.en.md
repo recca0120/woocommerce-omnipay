@@ -136,10 +136,61 @@ composer test
 ./vendor/bin/phpunit --coverage-text
 ```
 
+### Architecture Overview
+
+This plugin uses the **Feature Composition Pattern**, combining functionality through configuration rather than inheritance:
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│ config/gateways │────▶│  GatewayRegistry │────▶│  OmnipayGateway │
+└─────────────────┘     └──────────────────┘     └────────┬────────┘
+                                                          │
+                                            ┌─────────────▼─────────────┐
+                                            │     Feature[] Composition │
+                                            │  ┌─────────────────────┐  │
+                                            │  │ • MinAmountFeature  │  │
+                                            │  │ • MaxAmountFeature  │  │
+                                            │  │ • InstallmentFeature│  │
+                                            │  │ • ExpireDateFeature │  │
+                                            │  │ • RecurringFeature  │  │
+                                            │  └─────────────────────┘  │
+                                            └───────────────────────────┘
+```
+
+#### Gateway Configuration Example
+
+```php
+// config/gateways.php
+[
+    'gateway' => 'ECPay',
+    'gateway_id' => 'ecpay_atm',
+    'title' => __('ECPay ATM', 'woocommerce-omnipay'),
+    'payment_data' => ['ChoosePayment' => 'ATM'],
+    'features' => [
+        new MinAmountFeature,
+        new MaxAmountFeature,
+        new ExpireDateFeature('ExpireDate', 3, 1, 60),
+    ],
+],
+```
+
+#### Available Features
+
+| Feature | Description | Parameters |
+|---------|-------------|------------|
+| `MinAmountFeature` | Minimum amount limit | Default $0 |
+| `MaxAmountFeature` | Maximum amount limit | Default $30,000 |
+| `InstallmentFeature` | Credit card installments | Field name, options, defaults |
+| `ExpireDateFeature` | Payment expiry settings | Field name, default, min, max |
+| `FrequencyRecurringFeature` | Recurring payments (frequency-based, ECPay) | - |
+| `ScheduledRecurringFeature` | Recurring payments (schedule-based, NewebPay) | - |
+
 ### Project Structure
 
 ```
 woocommerce-omnipay/
+├── config/
+│   └── gateways.php                # Gateway configuration (Feature composition)
 ├── includes/
 │   ├── Adapters/                   # Gateway Adapter layer
 │   │   ├── Contracts/
@@ -151,13 +202,16 @@ woocommerce-omnipay/
 │   │   └── DefaultGatewayAdapter.php
 │   ├── Gateways/
 │   │   ├── Concerns/               # Gateway Traits
-│   │   ├── ECPay/                  # ECPay payment methods
-│   │   ├── NewebPay/               # NewebPay payment methods
-│   │   ├── YiPay/                  # YiPay payment methods
-│   │   ├── OmnipayGateway.php      # Base gateway class
-│   │   ├── ECPayGateway.php        # ECPay implementation
-│   │   ├── NewebPayGateway.php     # NewebPay implementation
-│   │   └── YiPayGateway.php        # YiPay implementation
+│   │   ├── Features/               # Feature components
+│   │   │   ├── GatewayFeature.php  # Feature interface
+│   │   │   ├── AbstractFeature.php # Abstract base class
+│   │   │   ├── MinAmountFeature.php
+│   │   │   ├── MaxAmountFeature.php
+│   │   │   ├── InstallmentFeature.php
+│   │   │   ├── ExpireDateFeature.php
+│   │   │   ├── FrequencyRecurringFeature.php
+│   │   │   └── ScheduledRecurringFeature.php
+│   │   └── OmnipayGateway.php      # Universal gateway class
 │   ├── WordPress/
 │   │   ├── Logger.php              # PSR-3 logger
 │   │   └── SettingsManager.php     # Settings manager
@@ -176,6 +230,38 @@ woocommerce-omnipay/
 │   └── js/
 │       └── barcode.js              # Barcode rendering
 └── tests/                          # PHPUnit tests
+```
+
+### Creating a Custom Feature
+
+Implement the `GatewayFeature` interface or extend `AbstractFeature`:
+
+```php
+namespace WooCommerceOmnipay\Gateways\Features;
+
+class MyCustomFeature extends AbstractFeature
+{
+    public function initFormFields(array &$formFields): void
+    {
+        $formFields['my_option'] = [
+            'title' => __('My Option', 'woocommerce-omnipay'),
+            'type' => 'text',
+            'default' => '',
+        ];
+    }
+
+    public function isAvailable(\WC_Payment_Gateway $gateway): bool
+    {
+        // Custom availability check logic
+        return true;
+    }
+
+    public function preparePaymentData(array $data, \WC_Order $order, \WC_Payment_Gateway $gateway): array
+    {
+        $data['myParam'] = $gateway->get_option('my_option');
+        return $data;
+    }
+}
 ```
 
 ### Adding a New Gateway
