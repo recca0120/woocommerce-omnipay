@@ -21,6 +21,7 @@ $table_prefix = getenv('WP_TABLE_PREFIX') ?: 'wptests_';
 define('WP_PHP_BINARY', 'php');
 
 // Test environment
+define('WPLANG', '');  // Use English for tests
 define('WP_TESTS_DOMAIN', getenv('WP_TESTS_DOMAIN') ?: 'example.org');
 define('WP_TESTS_EMAIL', getenv('WP_TESTS_EMAIL') ?: 'admin@example.org');
 define('WP_TESTS_TITLE', getenv('WP_TESTS_TITLE') ?: 'Test Blog');
