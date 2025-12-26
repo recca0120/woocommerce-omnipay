@@ -14,7 +14,7 @@ A flexible WooCommerce payment gateway plugin that integrates multiple Taiwan-ba
 ## Features
 
 - **Multiple Payment Gateways**: Support for ECPay, NewebPay, YiPay, and Bank Transfer
-- **Omnipay Integration**: Built on the robust Omnipay payment abstraction library
+- **Omnipay Integration**: Built on the robust Omnipay payment abstraction library, using WordPress native HTTP API
 - **HPOS Compatible**: Full support for WooCommerce High-Performance Order Storage
 - **Offline Payment Support**: ATM transfers, CVS codes, and barcode payments
 - **Automatic Redirect Handling**: Supports both GET and POST redirect methods
@@ -136,10 +136,61 @@ composer test
 ./vendor/bin/phpunit --coverage-text
 ```
 
+### Architecture Overview
+
+This plugin uses the **Feature Composition Pattern**, combining functionality through configuration rather than inheritance:
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│ config/gateways │────▶│  GatewayRegistry │────▶│  OmnipayGateway │
+└─────────────────┘     └──────────────────┘     └────────┬────────┘
+                                                          │
+                                            ┌─────────────▼─────────────┐
+                                            │     Feature[] Composition │
+                                            │  ┌─────────────────────┐  │
+                                            │  │ • MinAmountFeature  │  │
+                                            │  │ • MaxAmountFeature  │  │
+                                            │  │ • InstallmentFeature│  │
+                                            │  │ • ExpireDateFeature │  │
+                                            │  │ • RecurringFeature  │  │
+                                            │  └─────────────────────┘  │
+                                            └───────────────────────────┘
+```
+
+#### Gateway Configuration Example
+
+```php
+// config/gateways.php
+[
+    'gateway' => 'ECPay',
+    'gateway_id' => 'ecpay_atm',
+    'title' => __('ECPay ATM', 'woocommerce-omnipay'),
+    'payment_data' => ['ChoosePayment' => 'ATM'],
+    'features' => [
+        new MinAmountFeature,
+        new MaxAmountFeature,
+        new ExpireDateFeature('ExpireDate', 3, 1, 60),
+    ],
+],
+```
+
+#### Available Features
+
+| Feature | Description | Parameters |
+|---------|-------------|------------|
+| `MinAmountFeature` | Minimum amount limit | Default $0 |
+| `MaxAmountFeature` | Maximum amount limit | Default $30,000 |
+| `InstallmentFeature` | Credit card installments | `fieldName` (required), `config` (options, defaults, periodRules) |
+| `ExpireDateFeature` | Payment expiry settings | `fieldName`, `defaultDays`, `minDays`, `maxDays` |
+| `FrequencyRecurringFeature` | Recurring payments (frequency-based) | - |
+| `ScheduledRecurringFeature` | Recurring payments (schedule-based) | - |
+
 ### Project Structure
 
 ```
 woocommerce-omnipay/
+├── config/
+│   └── gateways.php                # Gateway configuration (Feature composition)
 ├── includes/
 │   ├── Adapters/                   # Gateway Adapter layer
 │   │   ├── Contracts/
@@ -151,16 +202,23 @@ woocommerce-omnipay/
 │   │   └── DefaultGatewayAdapter.php
 │   ├── Gateways/
 │   │   ├── Concerns/               # Gateway Traits
-│   │   ├── ECPay/                  # ECPay payment methods
-│   │   ├── NewebPay/               # NewebPay payment methods
-│   │   ├── YiPay/                  # YiPay payment methods
-│   │   ├── OmnipayGateway.php      # Base gateway class
-│   │   ├── ECPayGateway.php        # ECPay implementation
-│   │   ├── NewebPayGateway.php     # NewebPay implementation
-│   │   └── YiPayGateway.php        # YiPay implementation
+│   │   ├── Features/               # Feature components
+│   │   │   ├── GatewayFeature.php  # Feature interface
+│   │   │   ├── AbstractFeature.php # Abstract base class
+│   │   │   ├── MinAmountFeature.php
+│   │   │   ├── MaxAmountFeature.php
+│   │   │   ├── InstallmentFeature.php
+│   │   │   ├── ExpireDateFeature.php
+│   │   │   ├── FrequencyRecurringFeature.php
+│   │   │   └── ScheduledRecurringFeature.php
+│   │   └── OmnipayGateway.php      # Universal gateway class
+│   ├── Exceptions/
+│   │   ├── NetworkException.php    # Network exception
+│   │   └── OrderNotFoundException.php
 │   ├── Http/
-│   │   ├── WordPressHttpClient.php # WordPress HTTP Client
-│   │   └── NetworkException.php    # Network exception
+│   │   ├── WordPressClient.php     # WordPress HTTP Client
+│   │   ├── CurlClient.php          # cURL HTTP Client
+│   │   └── StreamClient.php        # Stream HTTP Client
 │   ├── WordPress/
 │   │   ├── Logger.php              # PSR-3 logger
 │   │   └── SettingsManager.php     # Settings manager
@@ -179,6 +237,38 @@ woocommerce-omnipay/
 │   └── js/
 │       └── barcode.js              # Barcode rendering
 └── tests/                          # PHPUnit tests
+```
+
+### Creating a Custom Feature
+
+Implement the `GatewayFeature` interface or extend `AbstractFeature`:
+
+```php
+namespace WooCommerceOmnipay\Gateways\Features;
+
+class MyCustomFeature extends AbstractFeature
+{
+    public function initFormFields(array &$formFields): void
+    {
+        $formFields['my_option'] = [
+            'title' => __('My Option', 'woocommerce-omnipay'),
+            'type' => 'text',
+            'default' => '',
+        ];
+    }
+
+    public function isAvailable(\WC_Payment_Gateway $gateway): bool
+    {
+        // Custom availability check logic
+        return true;
+    }
+
+    public function preparePaymentData(array $data, \WC_Order $order, \WC_Payment_Gateway $gateway): array
+    {
+        $data['myParam'] = $gateway->get_option('my_option');
+        return $data;
+    }
+}
 ```
 
 ### Adding a New Gateway

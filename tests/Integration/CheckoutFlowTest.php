@@ -2,7 +2,7 @@
 
 namespace WooCommerceOmnipay\Tests\Integration;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayDCAGateway;
+use WooCommerceOmnipay\Gateways\ECPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -20,6 +20,30 @@ class CheckoutFlowTest extends TestCase
         'MerchantID' => '2000132',
         'testMode' => 'yes',
     ];
+
+    /**
+     * 取得 DCA Gateway 配置
+     */
+    protected function getDcaGatewayConfig(): array
+    {
+        $gateways = require WOOCOMMERCE_OMNIPAY_PLUGIN_DIR.'config/gateways.php';
+
+        foreach ($gateways as $config) {
+            if (($config['gateway_id'] ?? '') === 'ecpay_dca') {
+                return $config;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * 取得 DCA Gateway
+     */
+    protected function getDcaGateway(): ECPayGateway
+    {
+        return new ECPayGateway($this->getDcaGatewayConfig());
+    }
 
     /**
      * Test full checkout flow: Create order → Process payment → Accept callback → Order completed
@@ -62,27 +86,18 @@ class CheckoutFlowTest extends TestCase
      */
     public function test_dca_blocks_mode_checkout_flow()
     {
-        // Setup DCA gateway
-        $dcaSettings = [
-            'HashKey' => '5294y06JbISpM5x9',
-            'HashIV' => 'v77hoKGq4kWxNNIS',
-            'MerchantID' => '2000132',
-            'testMode' => 'yes',
+        // Setup DCA gateway settings
+        update_option('woocommerce_omnipay_ecpay_dca_settings', [
+            'enabled' => 'yes',
             'periodType' => 'M',
             'frequency' => 1,
             'execTimes' => 12,
-        ];
-
-        update_option('woocommerce_omnipay_ecpay_dca_settings', array_merge(
-            ['enabled' => 'yes'],
-            $dcaSettings
-        ));
-
-        $dcaGateway = new ECPayDCAGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_dca',
-            'title' => 'ECPay DCA',
         ]);
+
+        $dcaGateway = $this->getDcaGateway();
+        $dcaGateway->update_option('periodType', 'M');
+        $dcaGateway->update_option('frequency', 1);
+        $dcaGateway->update_option('execTimes', 12);
 
         // 1. Create order
         $order = $this->createOrder(1000);
@@ -115,11 +130,7 @@ class CheckoutFlowTest extends TestCase
             ['periodType' => 'Y', 'frequency' => 1, 'execTimes' => 3],
         ]);
 
-        $dcaGateway = new ECPayDCAGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_dca',
-            'title' => 'ECPay DCA',
-        ]);
+        $dcaGateway = $this->getDcaGateway();
 
         // Simulate user selecting the 24-month plan
         $_POST['omnipay_period'] = 'M_1_24';

@@ -39,8 +39,6 @@
         "test": "phpunit"
     },
     "config": {
-        "allow-plugins": {
-            "php-http/discovery": true
-        }
+        "allow-plugins": {}
     }
 }

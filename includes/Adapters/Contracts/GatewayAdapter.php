@@ -92,11 +92,11 @@ interface GatewayAdapter
     public function normalizePaymentInfo(array $data): array;
 
     /**
-     * 取得付款資訊 URL endpoint
+     * 取得付款資訊 URL 後綴
      *
      * 預設為 _payment_info，ECPay 為 _notify
      */
-    public function getPaymentInfoEndpoint(): string;
+    public function getPaymentInfoUrlSuffix(): string;
 
     /**
      * 取得回調成功回應

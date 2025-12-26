@@ -4,14 +4,13 @@
  *
  * @var array $installments Available installment periods
  * @var float $total Order total amount
- * @var bool $validate_30_min_amount Whether 30 period requires minimum amount validation (ECPay Dream Installment requires >= 20000)
+ * @var array $period_rules Period rules (e.g., ['30' => ['min_amount' => 20000]])
  */
 defined('ABSPATH') || exit;
 
-// Filter installments based on amount validation
-$available_installments = array_filter($installments, function ($period) use ($total, $validate_30_min_amount) {
-    // ECPay's 30 period (Dream Installment) requires amount >= 20000
-    if ($period === '30' && $validate_30_min_amount && $total < 20000) {
+// Filter installments based on period rules
+$available_installments = array_filter($installments, function ($period) use ($total, $period_rules) {
+    if (isset($period_rules[$period]['min_amount']) && $total < $period_rules[$period]['min_amount']) {
         return false;
     }
 

@@ -17,6 +17,31 @@ class ECPayGateway extends OmnipayGateway
     }
 
     /**
+     * 準備付款資料
+     *
+     * ECPay 特有：將分期 30 轉換為 30N（圓夢分期）
+     */
+    protected function preparePaymentData($order): array
+    {
+        $data = parent::preparePaymentData($order);
+
+        // 處理圓夢分期：30 -> 30N
+        if (! empty($data['CreditInstallment'])) {
+            $data['CreditInstallment'] = $this->convertDreamInstallment($data['CreditInstallment']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * 轉換圓夢分期值
+     */
+    private function convertDreamInstallment(string $value): string
+    {
+        return str_replace('30', '30N', $value);
+    }
+
+    /**
      * 處理 AcceptNotification 回應
      *
      * ECPay 的付款資訊通知與付款完成通知共用同一個 endpoint

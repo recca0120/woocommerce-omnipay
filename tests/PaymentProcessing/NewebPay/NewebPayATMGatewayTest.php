@@ -3,7 +3,9 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\NewebPay\NewebPayATMGateway;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
+use WooCommerceOmnipay\Gateways\NewebPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -24,21 +26,24 @@ class NewebPayATMGatewayTest extends TestCase
 
     private $merchantId = 'MS350098593';
 
+    protected $settings = [
+        'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
+        'HashIV' => 'VVcW9t4feCshKOTi',
+        'MerchantID' => 'MS350098593',
+        'testMode' => 'yes',
+        'allow_resubmit' => 'no',
+    ];
+
     protected function setUp(): void
     {
-        $this->settings = [
-            'HashKey' => $this->hashKey,
-            'HashIV' => $this->hashIV,
-            'MerchantID' => $this->merchantId,
-            'testMode' => 'yes',
-            'allow_resubmit' => 'no',
-        ];
         parent::setUp();
 
-        $this->gateway = new NewebPayATMGateway([
+        $this->gateway = new NewebPayGateway([
             'gateway' => 'NewebPay',
             'gateway_id' => 'newebpay_atm',
             'title' => '藍新 ATM',
+            'payment_data' => ['VACC' => 1],
+            'features' => [new MinAmountFeature, new MaxAmountFeature],
         ]);
     }
 

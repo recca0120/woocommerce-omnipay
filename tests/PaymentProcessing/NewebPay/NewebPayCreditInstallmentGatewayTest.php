@@ -3,7 +3,9 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\NewebPay\NewebPayCreditInstallmentGateway;
+use WooCommerceOmnipay\Gateways\Features\InstallmentFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
+use WooCommerceOmnipay\Gateways\NewebPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -24,20 +26,26 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
 
     private $merchantId = 'MS350098593';
 
+    protected $settings = [
+        'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
+        'HashIV' => 'VVcW9t4feCshKOTi',
+        'MerchantID' => 'MS350098593',
+        'testMode' => 'yes',
+    ];
+
     protected function setUp(): void
     {
-        $this->settings = [
-            'HashKey' => $this->hashKey,
-            'HashIV' => $this->hashIV,
-            'MerchantID' => $this->merchantId,
-            'testMode' => 'yes',
-        ];
         parent::setUp();
 
-        $this->gateway = new NewebPayCreditInstallmentGateway([
+        $this->gateway = new NewebPayGateway([
             'gateway' => 'NewebPay',
             'gateway_id' => 'newebpay_credit_installment',
             'title' => '藍新信用卡分期',
+            'payment_data' => ['CREDIT' => 1],
+            'features' => [
+                new MinAmountFeature,
+                new InstallmentFeature('InstFlag'),
+            ],
         ]);
     }
 

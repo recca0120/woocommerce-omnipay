@@ -2,7 +2,9 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayCreditInstallmentGateway;
+use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Gateways\Features\InstallmentFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -28,10 +30,15 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayCreditInstallmentGateway([
+        $this->gateway = new ECPayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_credit_installment',
             'title' => '綠界信用卡分期',
+            'payment_data' => ['ChoosePayment' => 'Credit'],
+            'features' => [
+                new MinAmountFeature,
+                new InstallmentFeature('CreditInstallment', ['periodRules' => ['30' => ['min_amount' => 20000]]]),
+            ],
         ]);
     }
 

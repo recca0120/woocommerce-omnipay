@@ -2,7 +2,9 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayWebATMGateway;
+use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -25,10 +27,12 @@ class ECPayWebATMGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new ECPayWebATMGateway([
+        $this->gateway = new ECPayGateway([
             'gateway' => 'ECPay',
             'gateway_id' => 'ecpay_webatm',
             'title' => '綠界網路 ATM',
+            'payment_data' => ['ChoosePayment' => 'WebATM'],
+            'features' => [new MinAmountFeature, new MaxAmountFeature],
         ]);
     }
 

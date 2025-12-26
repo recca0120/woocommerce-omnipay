@@ -3,7 +3,9 @@
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\NewebPay\NewebPayCVSGateway;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
+use WooCommerceOmnipay\Gateways\NewebPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -24,21 +26,24 @@ class NewebPayCVSGatewayTest extends TestCase
 
     private $merchantId = 'MS350098593';
 
+    protected $settings = [
+        'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
+        'HashIV' => 'VVcW9t4feCshKOTi',
+        'MerchantID' => 'MS350098593',
+        'testMode' => 'yes',
+        'allow_resubmit' => 'no',
+    ];
+
     protected function setUp(): void
     {
-        $this->settings = [
-            'HashKey' => $this->hashKey,
-            'HashIV' => $this->hashIV,
-            'MerchantID' => $this->merchantId,
-            'testMode' => 'yes',
-            'allow_resubmit' => 'no',
-        ];
         parent::setUp();
 
-        $this->gateway = new NewebPayCVSGateway([
+        $this->gateway = new NewebPayGateway([
             'gateway' => 'NewebPay',
             'gateway_id' => 'newebpay_cvs',
             'title' => '藍新超商代碼',
+            'payment_data' => ['CVS' => 1],
+            'features' => [new MinAmountFeature, new MaxAmountFeature],
         ]);
     }
 
@@ -71,7 +76,7 @@ class NewebPayCVSGatewayTest extends TestCase
             'CodeNo' => 'LLL24112512345',
         ]));
 
-        $url = $this->gateway->getPaymentInfo();
+        $url = $this->gateway->handlePaymentInfoCallback();
 
         $this->assertStringContainsString('order-received', $url);
 

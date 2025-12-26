@@ -39,8 +39,17 @@ class DefaultGatewayAdapter implements GatewayAdapter
 
     public function validateAmount(array $data, int $orderTotal): bool
     {
-        // 預設不驗證金額
         return true;
+    }
+
+    /**
+     * 驗證指定欄位的金額是否與訂單金額相符
+     */
+    protected function validateAmountField(array $data, string $fieldName, int $orderTotal): bool
+    {
+        $amount = isset($data[$fieldName]) ? (int) $data[$fieldName] : 0;
+
+        return $amount === $orderTotal;
     }
 
     public function normalizePaymentInfo(array $data): array

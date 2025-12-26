@@ -2,7 +2,8 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPay\ECPayDCAGateway;
+use WooCommerceOmnipay\Gateways\ECPayGateway;
+use WooCommerceOmnipay\Gateways\Features\FrequencyRecurringFeature;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -28,6 +29,14 @@ class ECPayDCAGatewayTest extends TestCase
     {
         parent::setUp();
 
+        $this->gateway = new ECPayGateway([
+            'gateway' => 'ECPay',
+            'gateway_id' => 'ecpay_dca',
+            'title' => '綠界定期定額',
+            'payment_data' => ['ChoosePayment' => 'Credit'],
+            'features' => [new FrequencyRecurringFeature],
+        ]);
+
         // Set up DCA periods for Shortcode mode
         update_option('woocommerce_omnipay_ecpay_dca_periods', [
             [
@@ -37,16 +46,21 @@ class ECPayDCAGatewayTest extends TestCase
             ],
         ]);
 
-        $this->gateway = new ECPayDCAGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_dca',
-            'title' => '綠界定期定額',
-        ]);
-
         // Set up Blocks mode settings
         $this->gateway->update_option('periodType', 'M');
         $this->gateway->update_option('frequency', 1);
         $this->gateway->update_option('execTimes', 12);
+    }
+
+    protected function createGateway(): ECPayGateway
+    {
+        return new ECPayGateway([
+            'gateway' => 'ECPay',
+            'gateway_id' => 'ecpay_dca',
+            'title' => '綠界定期定額',
+            'payment_data' => ['ChoosePayment' => 'Credit'],
+            'features' => [new FrequencyRecurringFeature],
+        ]);
     }
 
     public function test_process_payment_sends_credit_payment_type()
@@ -189,10 +203,7 @@ class ECPayDCAGatewayTest extends TestCase
         update_option('woocommerce_omnipay_ecpay_dca_periods', $testPeriods);
 
         // Create new gateway instance to trigger loadDcaPeriods
-        $newGateway = new ECPayDCAGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_dca',
-        ]);
+        $newGateway = $this->createGateway();
 
         // Verify periods were loaded by testing generate_periods_html output
         $html = $newGateway->generate_periods_html('periods', []);
@@ -285,10 +296,7 @@ class ECPayDCAGatewayTest extends TestCase
         ]);
 
         // Create new gateway instance to load periods
-        $gateway = new ECPayDCAGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_dca',
-        ]);
+        $gateway = $this->createGateway();
 
         // Test via public WooCommerce API method
         $html = $gateway->generate_periods_html('periods', []);
@@ -350,11 +358,7 @@ class ECPayDCAGatewayTest extends TestCase
         ]);
 
         // Recreate gateway to load new periods
-        $this->gateway = new ECPayDCAGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_dca',
-            'title' => '綠界定期定額',
-        ]);
+        $this->gateway = $this->createGateway();
 
         // Mock is_checkout() to return true using filter
         add_filter('woocommerce_is_checkout', '__return_true');

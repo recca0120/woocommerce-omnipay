@@ -141,7 +141,7 @@ class NewebPayTest extends TestCase
             'CodeNo' => '9103522175887271',
         ]));
 
-        $url = $this->gateway->getPaymentInfo();
+        $url = $this->gateway->handlePaymentInfoCallback();
 
         $this->assertStringContainsString('order-received', $url);
 
@@ -161,7 +161,7 @@ class NewebPayTest extends TestCase
             'CodeNo' => 'LLL24112512345',
         ]));
 
-        $url = $this->gateway->getPaymentInfo();
+        $url = $this->gateway->handlePaymentInfoCallback();
 
         $this->assertStringContainsString('order-received', $url);
 

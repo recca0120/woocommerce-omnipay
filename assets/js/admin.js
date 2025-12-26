@@ -7,12 +7,12 @@
     'use strict';
 
     /**
-     * 更新 ECPay DCA 欄位限制
+     * 更新頻率式定期付款欄位限制 (Frequency Recurring)
      * - Year (Y): frequency=1, execTimes=1-9
      * - Month (M): frequency=1-12, execTimes=1-99
      * - Day (D): frequency=1-365, execTimes=1-999
      */
-    function updateECPayConstraints(periodTypeInput) {
+    function updateFrequencyRecurringConstraints(periodTypeInput) {
         const row = periodTypeInput.closest('tr');
         const periodType = periodTypeInput.value.toUpperCase();
 
@@ -46,13 +46,13 @@
     }
 
     /**
-     * 更新 NewebPay DCA 欄位限制
+     * 更新排程式定期付款欄位限制 (Scheduled Recurring)
      * - Year (Y): periodTimes=2-99
      * - Month (M): periodTimes=2-99
      * - Week (W): periodTimes=2-99
      * - Day (D): periodTimes=2-999
      */
-    function updateNewebPayConstraints(periodTypeInput) {
+    function updateScheduledRecurringConstraints(periodTypeInput) {
         const row = periodTypeInput.closest('tr');
         const periodType = periodTypeInput.value.toUpperCase();
 
@@ -84,8 +84,8 @@
      * 根據週期類型更新欄位限制（統一入口）
      */
     function updatePeriodConstraints(periodTypeInput) {
-        updateECPayConstraints(periodTypeInput);
-        updateNewebPayConstraints(periodTypeInput);
+        updateFrequencyRecurringConstraints(periodTypeInput);
+        updateScheduledRecurringConstraints(periodTypeInput);
     }
 
     /**

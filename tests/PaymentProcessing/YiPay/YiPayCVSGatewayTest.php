@@ -2,7 +2,9 @@
 
 namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
 
-use WooCommerceOmnipay\Gateways\YiPay\YiPayCVSGateway;
+use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
+use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
+use WooCommerceOmnipay\Gateways\YiPayGateway;
 use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
 
 /**
@@ -28,10 +30,12 @@ class YiPayCVSGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->gateway = new YiPayCVSGateway([
+        $this->gateway = new YiPayGateway([
             'gateway' => 'YiPay',
             'gateway_id' => 'yipay_cvs',
-            'title' => '乙禾超商代碼',
+            'title' => 'YiPay 超商代碼',
+            'payment_data' => ['type' => '3'],
+            'features' => [new MinAmountFeature, new MaxAmountFeature],
         ]);
     }
 

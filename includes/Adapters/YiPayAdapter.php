@@ -2,26 +2,13 @@
 
 namespace WooCommerceOmnipay\Adapters;
 
-use WooCommerceOmnipay\Adapters\Concerns\CreatesGateway;
-use WooCommerceOmnipay\Adapters\Concerns\FormatsCallbackResponse;
-use WooCommerceOmnipay\Adapters\Concerns\HandlesNotifications;
-use WooCommerceOmnipay\Adapters\Concerns\HandlesPurchases;
-use WooCommerceOmnipay\Adapters\Concerns\HasPaymentInfo;
-use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
-
 /**
  * YiPay Adapter
  *
  * 封裝 YiPay 特有的邏輯
  */
-class YiPayAdapter implements GatewayAdapter
+class YiPayAdapter extends DefaultGatewayAdapter
 {
-    use CreatesGateway;
-    use FormatsCallbackResponse;
-    use HandlesNotifications;
-    use HandlesPurchases;
-    use HasPaymentInfo;
-
     /**
      * YiPay 付款類型
      */
@@ -29,16 +16,14 @@ class YiPayAdapter implements GatewayAdapter
 
     private const TYPE_ATM = 4;
 
-    public function getGatewayName(): string
+    public function __construct()
     {
-        return 'YiPay';
+        parent::__construct('YiPay');
     }
 
     public function validateAmount(array $data, int $orderTotal): bool
     {
-        $amount = isset($data['amount']) ? (int) $data['amount'] : 0;
-
-        return $amount === $orderTotal;
+        return $this->validateAmountField($data, 'amount', $orderTotal);
     }
 
     public function normalizePaymentInfo(array $data): array

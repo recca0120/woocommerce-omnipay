@@ -14,7 +14,7 @@
 ## 功能特色
 
 - **多金流支援**：支援綠界、藍新、乙禾及銀行轉帳
-- **Omnipay 整合**：基於穩定的 Omnipay 付款抽象層
+- **Omnipay 整合**：基於穩定的 Omnipay 付款抽象層，使用 WordPress 原生 HTTP API
 - **HPOS 相容**：完整支援 WooCommerce 高效能訂單儲存
 - **離線付款支援**：ATM 轉帳、超商代碼、條碼繳費
 - **自動導向處理**：支援 GET 和 POST 導向方式
@@ -158,10 +158,61 @@ composer test
 ./vendor/bin/phpunit --coverage-text
 ```
 
+### 架構概述
+
+本插件使用 **Feature 組合模式**，透過配置組合功能而非繼承：
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│ config/gateways │────▶│  GatewayRegistry │────▶│  OmnipayGateway │
+└─────────────────┘     └──────────────────┘     └────────┬────────┘
+                                                          │
+                                            ┌─────────────▼─────────────┐
+                                            │      Feature[] 組合       │
+                                            │  ┌─────────────────────┐  │
+                                            │  │ • MinAmountFeature  │  │
+                                            │  │ • MaxAmountFeature  │  │
+                                            │  │ • InstallmentFeature│  │
+                                            │  │ • ExpireDateFeature │  │
+                                            │  │ • RecurringFeature  │  │
+                                            │  └─────────────────────┘  │
+                                            └───────────────────────────┘
+```
+
+#### Gateway 配置範例
+
+```php
+// config/gateways.php
+[
+    'gateway' => 'ECPay',
+    'gateway_id' => 'ecpay_atm',
+    'title' => __('ECPay ATM', 'woocommerce-omnipay'),
+    'payment_data' => ['ChoosePayment' => 'ATM'],
+    'features' => [
+        new MinAmountFeature,
+        new MaxAmountFeature,
+        new ExpireDateFeature('ExpireDate', 3, 1, 60),
+    ],
+],
+```
+
+#### 可用的 Features
+
+| Feature | 說明 | 參數 |
+|---------|------|------|
+| `MinAmountFeature` | 最低金額限制 | 預設 $0 |
+| `MaxAmountFeature` | 最高金額限制 | 預設 $30,000 |
+| `InstallmentFeature` | 信用卡分期 | `fieldName`（必填）、`config`（options, defaults, periodRules） |
+| `ExpireDateFeature` | 繳費期限設定 | `fieldName`、`defaultDays`、`minDays`、`maxDays` |
+| `FrequencyRecurringFeature` | 定期定額（依頻率） | - |
+| `ScheduledRecurringFeature` | 定期定額（依排程） | - |
+
 ### 專案結構
 
 ```
 woocommerce-omnipay/
+├── config/
+│   └── gateways.php                # 金流配置（Feature 組合）
 ├── includes/
 │   ├── Adapters/                   # Gateway Adapter 層
 │   │   ├── Contracts/
@@ -173,16 +224,23 @@ woocommerce-omnipay/
 │   │   └── DefaultGatewayAdapter.php
 │   ├── Gateways/
 │   │   ├── Concerns/               # Gateway Traits
-│   │   ├── ECPay/                  # 綠界各付款方式
-│   │   ├── NewebPay/               # 藍新各付款方式
-│   │   ├── YiPay/                  # 乙禾各付款方式
-│   │   ├── OmnipayGateway.php      # 基礎金流類別
-│   │   ├── ECPayGateway.php        # 綠界實作
-│   │   ├── NewebPayGateway.php     # 藍新實作
-│   │   └── YiPayGateway.php        # 乙禾實作
+│   │   ├── Features/               # Feature 組件
+│   │   │   ├── GatewayFeature.php  # Feature 介面
+│   │   │   ├── AbstractFeature.php # 抽象基類
+│   │   │   ├── MinAmountFeature.php
+│   │   │   ├── MaxAmountFeature.php
+│   │   │   ├── InstallmentFeature.php
+│   │   │   ├── ExpireDateFeature.php
+│   │   │   ├── FrequencyRecurringFeature.php
+│   │   │   └── ScheduledRecurringFeature.php
+│   │   └── OmnipayGateway.php      # 通用金流類別
+│   ├── Exceptions/
+│   │   ├── NetworkException.php    # 網路例外
+│   │   └── OrderNotFoundException.php
 │   ├── Http/
-│   │   ├── WordPressHttpClient.php # WordPress HTTP Client
-│   │   └── NetworkException.php    # 網路例外
+│   │   ├── WordPressClient.php     # WordPress HTTP Client
+│   │   ├── CurlClient.php          # cURL HTTP Client
+│   │   └── StreamClient.php        # Stream HTTP Client
 │   ├── WordPress/
 │   │   ├── Logger.php              # PSR-3 日誌
 │   │   └── SettingsManager.php     # 設定管理
@@ -201,6 +259,38 @@ woocommerce-omnipay/
 │   └── js/
 │       └── barcode.js              # 條碼渲染
 └── tests/                          # PHPUnit 測試
+```
+
+### 新增自訂 Feature
+
+實作 `GatewayFeature` 介面或繼承 `AbstractFeature`：
+
+```php
+namespace WooCommerceOmnipay\Gateways\Features;
+
+class MyCustomFeature extends AbstractFeature
+{
+    public function initFormFields(array &$formFields): void
+    {
+        $formFields['my_option'] = [
+            'title' => __('My Option', 'woocommerce-omnipay'),
+            'type' => 'text',
+            'default' => '',
+        ];
+    }
+
+    public function isAvailable(\WC_Payment_Gateway $gateway): bool
+    {
+        // 自訂可用性檢查邏輯
+        return true;
+    }
+
+    public function preparePaymentData(array $data, \WC_Order $order, \WC_Payment_Gateway $gateway): array
+    {
+        $data['myParam'] = $gateway->get_option('my_option');
+        return $data;
+    }
+}
 ```
 
 ### 新增金流
