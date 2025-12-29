@@ -91,6 +91,16 @@ function _install_woocommerce()
     }
 }
 
+// Define CartFlows mock function for testing
+if (! function_exists('_is_wcf_thankyou_type')) {
+    function _is_wcf_thankyou_type()
+    {
+        global $omnipay_test_cartflows_mode;
+
+        return $omnipay_test_cartflows_mode ?? false;
+    }
+}
+
 // Register plugin loader hook
 tests_add_filter('muplugins_loaded', '_manually_load_plugins');
 

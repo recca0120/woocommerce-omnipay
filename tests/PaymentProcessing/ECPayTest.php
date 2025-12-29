@@ -502,9 +502,15 @@ class ECPayTest extends TestCase
         $this->assertEmpty($html);
     }
 
-    public static function paymentInfoHooksProvider()
+    public function paymentInfoHooksProvider()
     {
         return [
+            'thankyou' => ['woocommerce_thankyou_omnipay_ecpay', function ($order) {
+                return [$order->get_id()];
+            }],
+            'receipt (CartFlows Instant)' => ['woocommerce_receipt_omnipay_ecpay', function ($order) {
+                return [$order->get_id()];
+            }],
             'admin' => ['woocommerce_admin_order_data_after_billing_address', function ($order) {
                 return [$order];
             }],
@@ -512,6 +518,128 @@ class ECPayTest extends TestCase
                 return [$order, true, false];
             }],
         ];
+    }
+
+    public function test_payment_info_displayed_on_view_order()
+    {
+        global $wp;
+
+        $order = $this->createOrder(100);
+        $order->set_payment_method($this->gateway->id);
+        $order->update_meta_data('_omnipay_virtual_account', '9103522175887271');
+        $order->save();
+
+        // Mock is_wc_endpoint_url('view-order') by setting query vars
+        $wp->query_vars['view-order'] = $order->get_id();
+
+        ob_start();
+        do_action('woocommerce_order_details_after_order_table', $order);
+        $html = ob_get_clean();
+
+        unset($wp->query_vars['view-order']);
+
+        $this->assertStringContainsString('9103522175887271', $html);
+    }
+
+    public function test_payment_info_not_displayed_on_non_view_order_page()
+    {
+        $order = $this->createOrder(100);
+        $order->set_payment_method($this->gateway->id);
+        $order->update_meta_data('_omnipay_virtual_account', '9103522175887271');
+        $order->save();
+
+        // Ensure we're not on view-order page
+        ob_start();
+        do_action('woocommerce_order_details_after_order_table', $order);
+        $html = ob_get_clean();
+
+        $this->assertEmpty($html);
+    }
+
+    public function test_get_payment_info_output_plain_text()
+    {
+        $order = $this->createOrder(100);
+        $order->update_meta_data('_omnipay_virtual_account', '9103522175887271');
+        $order->update_meta_data('_omnipay_expire_date', '2024/12/01');
+        $order->save();
+
+        $output = $this->gateway->getPaymentInfoOutput($order, true);
+
+        // Plain text should not contain HTML tags
+        $this->assertStringNotContainsString('<table', $output);
+        $this->assertStringNotContainsString('<section', $output);
+        $this->assertStringContainsString('9103522175887271', $output);
+        $this->assertStringContainsString('2024/12/01', $output);
+    }
+
+    public function test_get_payment_info_output_uses_cartflows_template()
+    {
+        global $omnipay_test_cartflows_mode;
+
+        // Enable CartFlows mode
+        $omnipay_test_cartflows_mode = true;
+
+        $order = $this->createOrder(100);
+        $order->update_meta_data('_omnipay_virtual_account', '9103522175887271');
+        $order->save();
+
+        $output = $this->gateway->getPaymentInfoOutput($order);
+
+        // Reset CartFlows mode
+        $omnipay_test_cartflows_mode = false;
+
+        // CartFlows template uses specific CSS classes
+        $this->assertStringContainsString('wcf-ic-review-customer__row', $output);
+        $this->assertStringContainsString('wcf-ic-review-customer__label', $output);
+        $this->assertStringContainsString('wcf-ic-review-customer__content', $output);
+        $this->assertStringContainsString('9103522175887271', $output);
+    }
+
+    public function test_get_payment_info_output_barcode_renders_svg()
+    {
+        $order = $this->createOrder(100);
+        $order->update_meta_data('_omnipay_barcode_1', '1104ES0987654321');
+        $order->update_meta_data('_omnipay_barcode_2', '3453010192168');
+        $order->update_meta_data('_omnipay_barcode_3', '110400100000100');
+        $order->save();
+
+        $output = $this->gateway->getPaymentInfoOutput($order);
+
+        // Verify SVG barcode elements are present
+        $this->assertStringContainsString('omnipay-barcode', $output);
+        $this->assertStringContainsString('data-barcode="1104ES0987654321"', $output);
+        $this->assertStringContainsString('data-barcode="3453010192168"', $output);
+        $this->assertStringContainsString('data-barcode="110400100000100"', $output);
+        $this->assertStringContainsString('data-format="CODE39"', $output);
+    }
+
+    public function test_get_payment_info_output_barcode_renders_svg_in_cartflows()
+    {
+        global $omnipay_test_cartflows_mode;
+
+        // Enable CartFlows mode
+        $omnipay_test_cartflows_mode = true;
+
+        $order = $this->createOrder(100);
+        $order->update_meta_data('_omnipay_barcode_1', '1104ES0987654321');
+        $order->update_meta_data('_omnipay_barcode_2', '3453010192168');
+        $order->update_meta_data('_omnipay_barcode_3', '110400100000100');
+        $order->save();
+
+        $output = $this->gateway->getPaymentInfoOutput($order);
+
+        // Reset CartFlows mode
+        $omnipay_test_cartflows_mode = false;
+
+        // Verify CartFlows template structure with barcode SVG
+        $this->assertStringContainsString('wcf-ic-review-customer__row', $output);
+        $this->assertStringContainsString('omnipay-barcode', $output);
+        $this->assertStringContainsString('data-barcode="1104ES0987654321"', $output);
+        $this->assertStringContainsString('data-barcode="3453010192168"', $output);
+        $this->assertStringContainsString('data-barcode="110400100000100"', $output);
+        $this->assertStringContainsString('data-format="CODE39"', $output);
+        // Verify noscript fallback is present
+        $this->assertStringContainsString('<noscript>', $output);
     }
 
     // ==================== Helper ====================

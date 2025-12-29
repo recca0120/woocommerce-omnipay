@@ -440,3 +440,35 @@ msgstr "週週期的 PeriodPoint 必須是 1-7（1=週一，7=週日）。"
 msgid "For daily periods, PeriodPoint must be 2-999 (day interval)."
 msgstr "日週期的 PeriodPoint 必須是 2-999（天數間隔）。"
 
+# Bank Accounts Table
+msgid "Bank Code"
+msgstr "銀行代碼"
+
+msgid "Bank Name"
+msgstr "銀行名稱"
+
+msgid "Account Number"
+msgstr "帳號"
+
+msgid "Secret"
+msgstr "密鑰"
+
+msgid "Add Account"
+msgstr "新增帳號"
+
+msgid "Select Bank Account"
+msgstr "選擇銀行帳號"
+
+# Selection Mode
+msgid "How to select bank account when multiple accounts are configured"
+msgstr "設定多個帳號時的選擇方式"
+
+msgid "Random"
+msgstr "隨機"
+
+msgid "Round Robin"
+msgstr "輪流"
+
+msgid "User Choice"
+msgstr "用戶選擇"
+

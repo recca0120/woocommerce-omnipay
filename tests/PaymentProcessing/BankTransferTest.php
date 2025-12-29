@@ -105,18 +105,55 @@ class BankTransferTest extends TestCase
 
     // ==================== Payment Info 測試 ====================
 
+    public function test_process_payment_saves_payment_info()
+    {
+        $order = $this->createSimpleOrder(1000);
+        $this->gateway->process_payment($order->get_id());
+
+        $order = wc_get_order($order->get_id());
+
+        // 驗證付款資訊已儲存到 order meta
+        $this->assertEquals('012', $order->get_meta(OrderRepository::META_BANK_CODE));
+        $this->assertEquals('1234567890', $order->get_meta(OrderRepository::META_BANK_ACCOUNT));
+    }
+
     public function test_get_payment_info_output()
     {
         $order = $this->createSimpleOrder(1000);
         $order->update_meta_data('_omnipay_bank_code', '012');
         $order->update_meta_data('_omnipay_bank_account', '1234567890');
+        $order->set_payment_method($this->gateway->id);
         $order->save();
 
         $output = $this->gateway->getPaymentInfoOutput($order);
 
-        $this->assertStringContainsString('012', $output);
-        $this->assertStringContainsString('1234567890', $output);
+        // 驗證付款資訊區塊
+        $this->assertStringContainsString('omnipay-payment-info', $output);
+        $this->assertStringContainsString('Payment Information', $output);
+        $this->assertStringContainsString('012-1234567890', $output);
+
+        // 驗證匯款確認表單
+        $this->assertStringContainsString('Remittance Confirmation', $output);
         $this->assertStringContainsString('remittance_last5', $output);
+    }
+
+    public function test_get_payment_info_output_shows_submitted_last5()
+    {
+        $order = $this->createSimpleOrder(1000);
+        $order->update_meta_data('_omnipay_bank_code', '012');
+        $order->update_meta_data('_omnipay_bank_account', '1234567890');
+        $order->update_meta_data('_omnipay_remittance_last5', '12345');
+        $order->set_payment_method($this->gateway->id);
+        $order->save();
+
+        $output = $this->gateway->getPaymentInfoOutput($order);
+
+        // 驗證付款資訊
+        $this->assertStringContainsString('012-1234567890', $output);
+
+        // 驗證已提交的匯款帳號後5碼顯示
+        $this->assertStringContainsString('12345', $output);
+        $this->assertStringContainsString('submitted', $output);
     }
 
     // ==================== 匯款帳號後5碼 ====================
@@ -183,7 +220,204 @@ class BankTransferTest extends TestCase
         $this->assertFalse($response['success']);
     }
 
+    // ==================== 帳號池測試 ====================
+
+    public function test_process_payment_with_bank_accounts_as_json_string()
+    {
+        // 模擬 WooCommerce 儲存的 JSON 字串格式
+        $this->updateSharedSettings([
+            'bank_accounts' => '[{"bank_code": "013", "account_number": "111111111"}]',
+            'selection_mode' => 'random',
+            'secret' => 'test_secret',
+            'testMode' => 'yes',
+        ]);
+        $this->reloadGateway();
+
+        $order = $this->createSimpleOrder(1000);
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('013', $redirectData['data']['bank_code']);
+        $this->assertEquals('111111111', $redirectData['data']['account_number']);
+    }
+
+    public function test_process_payment_with_bank_accounts_pool_random_mode()
+    {
+        // 設定帳號池（陣列格式）
+        $this->updateSharedSettings([
+            'bank_accounts' => [
+                ['bank_code' => '013', 'account_number' => '111111111'],
+                ['bank_code' => '808', 'account_number' => '222222222'],
+            ],
+            'selection_mode' => 'random',
+            'secret' => 'test_secret',
+            'testMode' => 'yes',
+        ]);
+        $this->reloadGateway();
+
+        $order = $this->createSimpleOrder(1000);
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $bankCode = $redirectData['data']['bank_code'];
+        $accountNumber = $redirectData['data']['account_number'];
+
+        // 應該是帳號池中的其中一個
+        $this->assertContains($bankCode, ['013', '808']);
+        if ($bankCode === '013') {
+            $this->assertEquals('111111111', $accountNumber);
+        } else {
+            $this->assertEquals('222222222', $accountNumber);
+        }
+    }
+
+    public function test_process_payment_with_bank_accounts_pool_user_choice_mode()
+    {
+        // 設定帳號池
+        $this->updateSharedSettings([
+            'bank_accounts' => [
+                ['bank_code' => '013', 'account_number' => '111111111'],
+                ['bank_code' => '808', 'account_number' => '222222222'],
+            ],
+            'selection_mode' => 'user_choice',
+            'secret' => 'test_secret',
+            'testMode' => 'yes',
+        ]);
+        $this->reloadGateway();
+
+        $order = $this->createSimpleOrder(1000);
+
+        // 模擬用戶選擇第二個帳號
+        $_POST['bank_account_index'] = '1';
+
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('808', $redirectData['data']['bank_code']);
+        $this->assertEquals('222222222', $redirectData['data']['account_number']);
+    }
+
+    public function test_process_payment_with_bank_accounts_pool_round_robin_mode()
+    {
+        // 重設輪詢索引
+        delete_option('omnipay_banktransfer_last_account_index');
+
+        // 設定帳號池
+        $this->updateSharedSettings([
+            'bank_accounts' => [
+                ['bank_code' => '013', 'account_number' => '111111111'],
+                ['bank_code' => '808', 'account_number' => '222222222'],
+            ],
+            'selection_mode' => 'round_robin',
+            'secret' => 'test_secret',
+            'testMode' => 'yes',
+        ]);
+        $this->reloadGateway();
+
+        // 第一筆訂單應該使用第一個帳號
+        $order1 = $this->createSimpleOrder(1000);
+        $this->gateway->process_payment($order1->get_id());
+        $redirectData1 = get_transient('omnipay_redirect_'.$order1->get_id());
+        $this->assertEquals('013', $redirectData1['data']['bank_code']);
+
+        // 第二筆訂單應該使用第二個帳號
+        $order2 = $this->createSimpleOrder(1000);
+        $this->gateway->process_payment($order2->get_id());
+        $redirectData2 = get_transient('omnipay_redirect_'.$order2->get_id());
+        $this->assertEquals('808', $redirectData2['data']['bank_code']);
+
+        // 第三筆訂單應該回到第一個帳號
+        $order3 = $this->createSimpleOrder(1000);
+        $this->gateway->process_payment($order3->get_id());
+        $redirectData3 = get_transient('omnipay_redirect_'.$order3->get_id());
+        $this->assertEquals('013', $redirectData3['data']['bank_code']);
+    }
+
+    public function test_fallback_to_single_account_when_no_bank_accounts_pool()
+    {
+        // 只設定單一帳號（原本的方式）
+        $this->updateSharedSettings([
+            'bank_code' => '012',
+            'account_number' => '1234567890',
+            'secret' => 'test_secret',
+            'testMode' => 'yes',
+        ]);
+        $this->reloadGateway();
+
+        $order = $this->createSimpleOrder(1000);
+        $result = $this->gateway->process_payment($order->get_id());
+
+        $this->assertEquals('success', $result['result']);
+
+        $redirectData = get_transient('omnipay_redirect_'.$order->get_id());
+        $this->assertEquals('012', $redirectData['data']['bank_code']);
+        $this->assertEquals('1234567890', $redirectData['data']['account_number']);
+    }
+
+    // ==================== 結帳頁面 UI 測試 ====================
+
+    public function test_payment_fields_shows_account_selector_in_user_choice_mode()
+    {
+        $this->updateSharedSettings([
+            'bank_accounts' => [
+                ['bank_code' => '013', 'account_number' => '111111111'],
+                ['bank_code' => '808', 'account_number' => '222222222'],
+            ],
+            'selection_mode' => 'user_choice',
+            'secret' => 'test_secret',
+            'testMode' => 'yes',
+        ]);
+        $this->reloadGateway();
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('bank_account_index', $output);
+        $this->assertStringContainsString('013-111111111', $output);
+        $this->assertStringContainsString('808-222222222', $output);
+    }
+
+    public function test_payment_fields_hides_account_selector_in_random_mode()
+    {
+        $this->updateSharedSettings([
+            'bank_accounts' => [
+                ['bank_code' => '013', 'account_number' => '111111111'],
+            ],
+            'selection_mode' => 'random',
+            'secret' => 'test_secret',
+            'testMode' => 'yes',
+        ]);
+        $this->reloadGateway();
+
+        ob_start();
+        $this->gateway->payment_fields();
+        $output = ob_get_clean();
+
+        $this->assertStringNotContainsString('bank_account_index', $output);
+    }
+
     // ==================== Helper ====================
+
+    private function updateSharedSettings(array $settings)
+    {
+        update_option('woocommerce_omnipay_banktransfer_shared_settings', $settings);
+        wp_cache_delete('woocommerce_omnipay_banktransfer_shared_settings', 'options');
+        wp_cache_delete('alloptions', 'options');
+    }
+
+    private function reloadGateway()
+    {
+        WC()->payment_gateways()->payment_gateways = [];
+        WC()->payment_gateways()->init();
+        $this->gateway = WC()->payment_gateways->payment_gateways()['omnipay_'.$this->gatewayId];
+    }
 
     private function makeNotification($transactionId, $amount)
     {

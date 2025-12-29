@@ -14,6 +14,13 @@ use WooCommerceOmnipay\Repositories\OrderRepository;
 class BankTransferGateway extends OmnipayGateway
 {
     /**
+     * 選中的銀行帳號
+     *
+     * @var array|null
+     */
+    protected $selectedAccount;
+
+    /**
      * Constructor
      */
     public function __construct(array $config)
@@ -22,6 +29,163 @@ class BankTransferGateway extends OmnipayGateway
 
         // 註冊匯款帳號後5碼的 AJAX 處理
         add_action('woocommerce_api_'.$this->id.'_remittance', [$this, 'handleRemittance']);
+    }
+
+    /**
+     * 取得已初始化的 Adapter（支援多帳號選擇）
+     *
+     * @return \WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter
+     */
+    protected function getAdapter()
+    {
+        $settings = $this->overrideSettings ? $this->settings : [];
+        $allSettings = $this->settingsManager->getAllSettings($settings);
+
+        // 處理多帳號選擇
+        $allSettings = $this->applySelectedAccount($allSettings);
+
+        return $this->adapter->initializeFromSettings($allSettings);
+    }
+
+    /**
+     * 套用選中的帳號到設定
+     *
+     * @param  array  $settings  原始設定
+     * @return array
+     */
+    protected function applySelectedAccount(array $settings)
+    {
+        $bankAccounts = $settings['bank_accounts'] ?? [];
+
+        // 如果是 JSON 字串，解析為陣列
+        if (is_string($bankAccounts) && ! empty($bankAccounts)) {
+            $bankAccounts = json_decode($bankAccounts, true) ?: [];
+        }
+
+        // 如果沒有帳號池，使用原本的單一帳號設定
+        if (empty($bankAccounts) || ! is_array($bankAccounts)) {
+            return $settings;
+        }
+
+        $selectionMode = $settings['selection_mode'] ?? 'random';
+        $account = $this->selectAccount($bankAccounts, $selectionMode);
+
+        if ($account) {
+            $this->selectedAccount = $account;
+            $settings['bank_code'] = $account['bank_code'] ?? '';
+            $settings['account_number'] = $account['account_number'] ?? '';
+            $settings['secret'] = $account['secret'] ?? '';
+        }
+
+        return $settings;
+    }
+
+    /**
+     * 根據選擇模式選擇帳號
+     *
+     * @param  array  $accounts  帳號池
+     * @param  string  $mode  選擇模式
+     * @return array|null
+     */
+    protected function selectAccount(array $accounts, $mode)
+    {
+        if (empty($accounts)) {
+            return null;
+        }
+
+        switch ($mode) {
+            case 'user_choice':
+                return $this->selectByUserChoice($accounts);
+
+            case 'round_robin':
+                return $this->selectByRoundRobin($accounts);
+
+            case 'random':
+            default:
+                return $this->selectByRandom($accounts);
+        }
+    }
+
+    /**
+     * 隨機選擇帳號
+     */
+    protected function selectByRandom(array $accounts)
+    {
+        return $accounts[array_rand($accounts)];
+    }
+
+    /**
+     * 輪詢選擇帳號
+     */
+    protected function selectByRoundRobin(array $accounts)
+    {
+        $lastIndex = (int) get_option('omnipay_banktransfer_last_account_index', -1);
+        $nextIndex = ($lastIndex + 1) % count($accounts);
+        update_option('omnipay_banktransfer_last_account_index', $nextIndex);
+
+        return $accounts[$nextIndex];
+    }
+
+    /**
+     * 用戶選擇帳號
+     */
+    protected function selectByUserChoice(array $accounts)
+    {
+        // 檢查是否有用戶選擇的帳號索引（Shortcode 模式）
+        if (isset($_POST['bank_account_index'])) {
+            $index = (int) $_POST['bank_account_index'];
+
+            return $accounts[$index] ?? $accounts[0];
+        }
+
+        // Blocks 模式：fallback 到隨機選擇
+        return $this->selectByRandom($accounts);
+    }
+
+    /**
+     * 檢查是否有付款欄位需要顯示
+     */
+    protected function hasPaymentFields(): bool
+    {
+        $settings = $this->settingsManager->getAllSettings($this->overrideSettings ? $this->settings : []);
+        $selectionMode = $settings['selection_mode'] ?? 'random';
+        $bankAccounts = $settings['bank_accounts'] ?? [];
+
+        // 如果是 JSON 字串，解析為陣列
+        if (is_string($bankAccounts) && ! empty($bankAccounts)) {
+            $bankAccounts = json_decode($bankAccounts, true) ?: [];
+        }
+
+        // 用戶選擇模式且有多個帳號時，需要顯示付款欄位
+        return $selectionMode === 'user_choice' && count($bankAccounts) > 1;
+    }
+
+    /**
+     * 顯示付款欄位
+     */
+    public function payment_fields()
+    {
+        parent::payment_fields();
+
+        $settings = $this->settingsManager->getAllSettings($this->overrideSettings ? $this->settings : []);
+        $selectionMode = $settings['selection_mode'] ?? 'random';
+
+        if ($selectionMode !== 'user_choice') {
+            return;
+        }
+
+        $bankAccounts = $settings['bank_accounts'] ?? [];
+        if (is_string($bankAccounts) && ! empty($bankAccounts)) {
+            $bankAccounts = json_decode($bankAccounts, true) ?: [];
+        }
+
+        if (empty($bankAccounts) || ! is_array($bankAccounts)) {
+            return;
+        }
+
+        echo woocommerce_omnipay_get_template('checkout/bank-account-form.php', [
+            'accounts' => $bankAccounts,
+        ]);
     }
 
     /**
@@ -78,7 +242,30 @@ class BankTransferGateway extends OmnipayGateway
      */
     public function getPaymentInfoOutput($order, $plainText = false)
     {
-        $output = parent::getPaymentInfoOutput($order, $plainText);
+        // 取得銀行資訊
+        $bankCode = $order->get_meta(OrderRepository::META_BANK_CODE);
+        $bankAccount = $order->get_meta(OrderRepository::META_BANK_ACCOUNT);
+
+        // 格式化銀行帳號：銀行代碼-帳號 (例: 822-xxxxxxxx)
+        $formattedAccount = $this->formatBankAccount($bankCode, $bankAccount);
+
+        // 組合付款資訊
+        $paymentInfo = [];
+        if (! empty($formattedAccount)) {
+            $paymentInfo[OrderRepository::META_BANK_ACCOUNT] = $formattedAccount;
+        }
+
+        // 加入匯款帳號後5碼（如果有）
+        $remittanceLast5 = $order->get_meta(OrderRepository::META_REMITTANCE_LAST5);
+        if (! empty($remittanceLast5)) {
+            $paymentInfo[OrderRepository::META_REMITTANCE_LAST5] = $remittanceLast5;
+        }
+
+        $template = $this->getPaymentInfoTemplate($plainText);
+        $output = woocommerce_omnipay_get_template($template, [
+            'payment_info' => $paymentInfo,
+            'labels' => $this->getBankTransferLabels(),
+        ]);
 
         // 純文字模式或非此 gateway 的訂單不顯示表單
         if ($plainText || $order->get_payment_method() !== $this->id) {
@@ -92,6 +279,42 @@ class BankTransferGateway extends OmnipayGateway
     }
 
     /**
+     * 格式化銀行帳號顯示
+     *
+     * @param  string  $bankCode  銀行代碼
+     * @param  string  $accountNumber  帳號
+     * @return string 格式: 銀行代碼-帳號
+     */
+    protected function formatBankAccount($bankCode, $accountNumber)
+    {
+        if (empty($bankCode) && empty($accountNumber)) {
+            return '';
+        }
+
+        if (empty($accountNumber)) {
+            return $bankCode;
+        }
+
+        return $bankCode.'-'.$accountNumber;
+    }
+
+    /**
+     * 取得銀行轉帳的標籤
+     *
+     * @return array
+     */
+    protected function getBankTransferLabels()
+    {
+        return [
+            OrderRepository::META_BANK_ACCOUNT => __('Account Number', 'woocommerce-omnipay'),
+            OrderRepository::META_REMITTANCE_LAST5 => sprintf(
+                __('Last %d Digits of Remittance Account', 'woocommerce-omnipay'),
+                Constants::REMITTANCE_LAST_DIGITS
+            ),
+        ];
+    }
+
+    /**
      * 取得匯款帳號後5碼表單輸出
      *
      * @param  \WC_Order  $order
@@ -99,7 +322,11 @@ class BankTransferGateway extends OmnipayGateway
      */
     protected function getRemittanceFormOutput($order)
     {
-        return woocommerce_omnipay_get_template('order/remittance-form.php', [
+        $template = $this->isCartFlowsThankYouPage()
+            ? 'order/remittance-form-cartflows.php'
+            : 'order/remittance-form.php';
+
+        return woocommerce_omnipay_get_template($template, [
             'order' => $order,
             'submitted_last5' => $order->get_meta(OrderRepository::META_REMITTANCE_LAST5),
             'submit_url' => WC()->api_request_url($this->id.'_remittance'),

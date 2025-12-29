@@ -16,22 +16,31 @@ trait DisplaysPaymentInfo
      */
     protected function registerPaymentInfoHooks()
     {
-        // 感謝頁：付款資訊在訂單詳情之前
-        add_action('woocommerce_order_details_before_order_table', [$this, 'display_payment_info_on_thankyou']);
-        // view-order：付款資訊在訂單詳情之後
+        // WooCommerce 感謝頁 + CartFlows 一般模式（載入 WC thankyou.php）
+        add_action('woocommerce_thankyou_'.$this->id, [$this, 'display_payment_info_by_order_id']);
+
+        // CartFlows Instant 模式
+        add_action('woocommerce_receipt_'.$this->id, [$this, 'display_payment_info_by_order_id']);
+
+        // view-order 頁面
         add_action('woocommerce_order_details_after_order_table', [$this, 'display_payment_info_on_view_order']);
-        add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'display_payment_info']);
+
+        // 管理後台
+        add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'display_payment_info_admin']);
+
+        // Email
         add_action('woocommerce_email_after_order_table', [$this, 'display_payment_info_on_email'], 10, 3);
     }
 
     /**
-     * 在感謝頁顯示付款資訊（訂單詳情之前）
+     * 透過訂單 ID 顯示付款資訊
      *
-     * @param  \WC_Order  $order
+     * @param  int  $order_id
      */
-    public function display_payment_info_on_thankyou($order)
+    public function display_payment_info_by_order_id($order_id)
     {
-        if (! is_wc_endpoint_url('order-received')) {
+        $order = wc_get_order($order_id);
+        if (! $order) {
             return;
         }
 
@@ -53,11 +62,25 @@ trait DisplaysPaymentInfo
     }
 
     /**
-     * 顯示付款資訊（管理後台）
+     * 顯示付款資訊（前台）
      *
      * @param  \WC_Order  $order
      */
     public function display_payment_info($order)
+    {
+        if ($order->get_payment_method() !== $this->id) {
+            return;
+        }
+
+        echo $this->getPaymentInfoOutput($order);
+    }
+
+    /**
+     * 顯示付款資訊（管理後台）
+     *
+     * @param  \WC_Order  $order
+     */
+    public function display_payment_info_admin($order)
     {
         if ($order->get_payment_method() !== $this->id) {
             return;
@@ -92,11 +115,40 @@ trait DisplaysPaymentInfo
     public function getPaymentInfoOutput($order, $plainText = false)
     {
         $paymentInfo = $this->orders->getPaymentInfo($order);
-        $template = $plainText ? 'order/payment-info-plain.php' : 'order/payment-info.php';
+        $template = $this->getPaymentInfoTemplate($plainText);
 
         return woocommerce_omnipay_get_template($template, [
             'payment_info' => $paymentInfo,
             'labels' => OrderRepository::getPaymentInfoLabels(),
         ]);
+    }
+
+    /**
+     * 取得付款資訊 template 路徑
+     *
+     * @param  bool  $plainText  是否為純文字格式
+     * @return string
+     */
+    protected function getPaymentInfoTemplate($plainText = false)
+    {
+        if ($plainText) {
+            return 'order/payment-info-plain.php';
+        }
+
+        if ($this->isCartFlowsThankYouPage()) {
+            return 'order/payment-info-cartflows.php';
+        }
+
+        return 'order/payment-info.php';
+    }
+
+    /**
+     * 判斷是否為 CartFlows 感謝頁
+     *
+     * @return bool
+     */
+    protected function isCartFlowsThankYouPage()
+    {
+        return function_exists('_is_wcf_thankyou_type') && _is_wcf_thankyou_type();
     }
 }

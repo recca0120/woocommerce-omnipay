@@ -236,17 +236,17 @@ function woocommerce_omnipay_get_gateways()
     $yipayIcon = plugins_url('assets/images/payment-icons/yipay.png', __FILE__);
 
     return [
-        // Bank Transfer
-        [
-            'gateway' => 'BankTransfer',
-            'gateway_id' => 'banktransfer',
-            'title' => __('Bank Transfer', 'woocommerce-omnipay'),
-        ],
         // Dummy (for testing)
         [
             'gateway' => 'Dummy',
             'gateway_id' => 'dummy',
             'title' => __('Dummy Gateway', 'woocommerce-omnipay'),
+        ],
+        // Bank Transfer
+        [
+            'gateway' => 'BankTransfer',
+            'gateway_id' => 'banktransfer',
+            'title' => __('Bank Transfer', 'woocommerce-omnipay'),
         ],
         // ECPay (All-in-one)
         [
