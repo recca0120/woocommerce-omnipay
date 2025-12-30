@@ -3,6 +3,7 @@
  * Bank Account Selection Form Template
  *
  * @var array $accounts Available bank accounts
+ * @var int $last_digits Number of digits for remittance confirmation
  */
 defined('ABSPATH') || exit;
 
@@ -31,5 +32,5 @@ $isSingleAccount = count($accounts) === 1;
     </select>
 </p>
 <div class="woocommerce-info">
-    <?php esc_html_e('After completing the transfer, please enter the last 5 digits of your remittance account to help us verify the payment.', 'woocommerce-omnipay'); ?>
+    <?php echo esc_html(sprintf(__('Please enter the last %d digits of your remittance account after payment to help us confirm the transaction.', 'woocommerce-omnipay'), $last_digits)); ?>
 </div>

@@ -186,6 +186,7 @@ class BankTransferGateway extends OmnipayGateway
         // 統一使用選單顯示（包含單一帳號情況）
         echo woocommerce_omnipay_get_template('checkout/bank-account-form.php', [
             'accounts' => $accounts,
+            'last_digits' => Constants::REMITTANCE_LAST_DIGITS,
         ]);
     }
 
