@@ -425,11 +425,15 @@ class BankTransferTest extends TestCase
         $output = ob_get_clean();
 
         $this->assertStringContainsString('bank_account_index', $output);
+        $this->assertStringContainsString('Select Bank Account', $output);
         $this->assertStringContainsString('013-111111111', $output);
         $this->assertStringContainsString('808-222222222', $output);
+        // 應該顯示提示文字
+        $this->assertStringContainsString('woocommerce-info', $output);
+        $this->assertStringContainsString('last 5 digits', $output);
     }
 
-    public function test_payment_fields_shows_account_info_for_single_account()
+    public function test_payment_fields_shows_select_for_single_account()
     {
         $this->updateSharedSettings([
             'bank_accounts' => [
@@ -445,11 +449,13 @@ class BankTransferTest extends TestCase
         $this->gateway->payment_fields();
         $output = ob_get_clean();
 
-        // 單一帳號時應該顯示帳號資訊（純文字）
+        // 單一帳號時也使用選單顯示（統一 UI）
         $this->assertStringContainsString('013-111111111', $output);
         $this->assertStringContainsString('Payment Account', $output);
-        // 不應該顯示選擇器
-        $this->assertStringNotContainsString('bank_account_index', $output);
+        $this->assertStringContainsString('bank_account_index', $output);
+        // 應該顯示提示文字
+        $this->assertStringContainsString('woocommerce-info', $output);
+        $this->assertStringContainsString('last 5 digits', $output);
     }
 
     public function test_has_fields_is_true_with_single_account()

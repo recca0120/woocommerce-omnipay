@@ -9,9 +9,11 @@ defined('ABSPATH') || exit;
 if (empty($accounts)) {
     return;
 }
+
+$isSingleAccount = count($accounts) === 1;
 ?>
 <p class="form-row form-row-wide">
-    <label><?php esc_html_e('Select Bank Account', 'woocommerce-omnipay'); ?></label>
+    <label><?php echo esc_html($isSingleAccount ? __('Payment Account', 'woocommerce-omnipay') : __('Select Bank Account', 'woocommerce-omnipay')); ?></label>
     <select id="bank_account_index" name="bank_account_index" class="select">
     <?php foreach ($accounts as $index => $account) { ?>
         <?php
@@ -28,3 +30,6 @@ if (empty($accounts)) {
     <?php } ?>
     </select>
 </p>
+<div class="woocommerce-info">
+    <?php esc_html_e('After completing the transfer, please enter the last 5 digits of your remittance account to help us verify the payment.', 'woocommerce-omnipay'); ?>
+</div>
