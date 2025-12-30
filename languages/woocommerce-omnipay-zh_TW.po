@@ -465,6 +465,9 @@ msgstr "選擇銀行帳號"
 msgid "Bank Account"
 msgstr "銀行帳號"
 
+msgid "Payment Account"
+msgstr "付款帳號"
+
 # Selection Mode
 msgid "How to select bank account when multiple accounts are configured"
 msgstr "設定多個帳號時的選擇方式"

@@ -20,6 +20,6 @@ if ($accountNumber) {
 }
 ?>
 <p class="form-row form-row-wide omnipay-bank-account-info">
-    <strong><?php esc_html_e('Bank Account', 'woocommerce-omnipay'); ?>:</strong>
+    <strong><?php esc_html_e('Payment Account', 'woocommerce-omnipay'); ?>:</strong>
     <?php echo esc_html($label); ?>
 </p>
