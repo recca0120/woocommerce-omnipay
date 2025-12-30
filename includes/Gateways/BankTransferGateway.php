@@ -164,11 +164,9 @@ class BankTransferGateway extends OmnipayGateway
     protected function hasPaymentFields(): bool
     {
         $config = $this->getBankAccountsConfig();
-        $accountCount = count($config['accounts']);
 
-        // 有帳號時需要顯示：單一帳號顯示資訊，多帳號 + user_choice 顯示選單
-        return $accountCount === 1
-            || ($config['selection_mode'] === 'user_choice' && $accountCount > 1);
+        // 只要有帳號就需要顯示選單
+        return count($config['accounts']) >= 1;
     }
 
     /**
@@ -185,21 +183,11 @@ class BankTransferGateway extends OmnipayGateway
             return;
         }
 
-        // 只有一個帳號時，顯示純文字
-        if (count($accounts) === 1) {
-            echo woocommerce_omnipay_get_template('checkout/bank-account-info.php', [
-                'account' => $accounts[0],
-            ]);
-
-            return;
-        }
-
-        // 多個帳號且 user_choice 模式時，顯示下拉選單
-        if ($config['selection_mode'] === 'user_choice') {
-            echo woocommerce_omnipay_get_template('checkout/bank-account-form.php', [
-                'accounts' => $accounts,
-            ]);
-        }
+        // 統一使用選單顯示（包含單一帳號情況）
+        echo woocommerce_omnipay_get_template('checkout/bank-account-form.php', [
+            'accounts' => $accounts,
+            'last_digits' => Constants::REMITTANCE_LAST_DIGITS,
+        ]);
     }
 
     /**

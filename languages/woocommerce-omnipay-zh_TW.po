@@ -256,6 +256,9 @@ msgid "Number of periods"
 msgstr "分期期數"
 
 # DCA (Recurring Payment)
+msgid "Payment Schedule"
+msgstr "付款排程"
+
 msgid "Payment Plan"
 msgstr "付款方案"
 
