@@ -13,11 +13,20 @@ use WooCommerceOmnipay\WordPress\SettingsManager;
  */
 class GatewaySettingsSection implements SettingsSectionProvider
 {
-    protected GatewayAdapter $adapter;
+    /**
+     * @var GatewayAdapter
+     */
+    protected $adapter;
 
-    protected string $name;
+    /**
+     * @var string
+     */
+    protected $name;
 
-    protected string $optionKey;
+    /**
+     * @var string
+     */
+    protected $optionKey;
 
     /**
      * Fields to exclude from gateway settings (handled in General Settings)

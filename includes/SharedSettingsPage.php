@@ -11,8 +11,10 @@ use WooCommerceOmnipay\Settings\Contracts\SettingsSectionProvider;
  */
 class SharedSettingsPage
 {
-    /** @var SettingsSectionProvider[] */
-    private array $sections = [];
+    /**
+     * @var SettingsSectionProvider[]
+     */
+    private $sections = [];
 
     /**
      * @param  SettingsSectionProvider[]  $sections
@@ -149,7 +151,8 @@ class SharedSettingsPage
     private function getDefaultSection(): string
     {
         $sections = $this->getSections();
+        reset($sections);
 
-        return array_key_first($sections) ?: '';
+        return (string) key($sections);
     }
 }
