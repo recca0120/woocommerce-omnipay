@@ -164,9 +164,11 @@ class BankTransferGateway extends OmnipayGateway
     protected function hasPaymentFields(): bool
     {
         $config = $this->getBankAccountsConfig();
+        $accountCount = count($config['accounts']);
 
-        // 用戶選擇模式且有多個帳號時，需要顯示付款欄位
-        return $config['selection_mode'] === 'user_choice' && count($config['accounts']) > 1;
+        // 有帳號時需要顯示：單一帳號顯示資訊，多帳號 + user_choice 顯示選單
+        return $accountCount === 1
+            || ($config['selection_mode'] === 'user_choice' && $accountCount > 1);
     }
 
     /**

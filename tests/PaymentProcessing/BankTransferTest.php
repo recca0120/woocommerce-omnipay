@@ -448,9 +448,9 @@ class BankTransferTest extends TestCase
         $this->assertStringNotContainsString('bank_account_index', $output);
     }
 
-    public function test_has_fields_is_false_in_user_choice_mode_with_single_account()
+    public function test_has_fields_is_true_with_single_account()
     {
-        // user_choice 模式但只有一個帳號時，has_fields 應該為 false
+        // 只有一個帳號時，has_fields 應該為 true（顯示帳號資訊）
         $this->updateSharedSettings([
             'bank_accounts' => [
                 ['bank_code' => '013', 'account_number' => '111111111'],
@@ -461,9 +461,8 @@ class BankTransferTest extends TestCase
         ]);
         $this->reloadGateway();
 
-        // hasPaymentFields 在只有一個帳號時返回 false
-        // has_fields 會在 constructor 中根據 hasPaymentFields() 設定
-        $this->assertFalse($this->gateway->has_fields);
+        // 單一帳號需要顯示帳號資訊
+        $this->assertTrue($this->gateway->has_fields);
     }
 
     public function test_has_fields_is_true_in_user_choice_mode_with_multiple_accounts()
