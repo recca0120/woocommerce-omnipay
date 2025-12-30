@@ -73,17 +73,39 @@ Each gateway can be configured in WooCommerce → Settings → Payments:
 4. Optional: Set transaction ID prefix for multi-site scenarios
 5. Optional: Enable resubmit to allow customers to retry failed payments
 
+### Shared Settings
+
+Shared parameters (MerchantID, HashKey, HashIV, etc.) for each payment provider can be configured in WooCommerce → Settings → Omnipay. These settings are automatically applied to all payment methods using the same provider.
+
+**Settings Priority**: Individual gateway settings > Shared settings > Omnipay defaults
+
 ### Plugin Configuration
 
 Gateway configuration can be customized via the `woocommerce_omnipay_gateway_config` filter:
 
 ```php
 add_filter('woocommerce_omnipay_gateway_config', function($config) {
-    $config['gateways']['ECPay']['enabled'] = true;
-    $config['gateways']['ECPay']['title'] = '綠界金流';
+    // Add a gateway
+    $config['gateways'][] = [
+        'gateway' => 'ECPay',           // Omnipay gateway name
+        'gateway_id' => 'ecpay_credit', // WooCommerce gateway ID
+        'title' => 'ECPay Credit Card',
+        'description' => 'Pay with credit card',
+        'override_settings' => true,    // Show Omnipay parameter fields (default false)
+    ];
     return $config;
 });
 ```
+
+**Configuration Fields**:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `gateway` | Yes | Omnipay gateway name (e.g., ECPay, NewebPay) |
+| `gateway_id` | Yes | WooCommerce payment method ID (auto-prefixed with `omnipay_`) |
+| `title` | No | Display name (defaults to gateway name) |
+| `description` | No | Payment method description |
+| `override_settings` | No | Whether to show Omnipay parameter fields in individual gateway settings (default false, uses shared settings) |
 
 ## Payment Flow
 
@@ -178,63 +200,109 @@ This plugin uses the **Feature Composition Pattern**, combining functionality th
 
 | Feature | Description | Parameters |
 |---------|-------------|------------|
+| `PaymentDataFeature` | Static payment data | Merges payment_data config into request data |
 | `MinAmountFeature` | Minimum amount limit | Default $0 |
 | `MaxAmountFeature` | Maximum amount limit | Default $30,000 |
 | `InstallmentFeature` | Credit card installments | `fieldName` (required), `config` (options, defaults, periodRules) |
 | `ExpireDateFeature` | Payment expiry settings | `fieldName`, `defaultDays`, `minDays`, `maxDays` |
-| `FrequencyRecurringFeature` | Recurring payments (frequency-based) | - |
-| `ScheduledRecurringFeature` | Recurring payments (schedule-based) | - |
+| `FrequencyRecurringFeature` | Recurring payments (frequency-based) | For ECPay DCA |
+| `ScheduledRecurringFeature` | Recurring payments (schedule-based) | For NewebPay DCA |
 
 ### Project Structure
 
 ```
 woocommerce-omnipay/
 ├── includes/
-│   ├── Adapters/                   # Gateway Adapter layer
+│   ├── Adapters/                     # Gateway Adapter layer
 │   │   ├── Contracts/
-│   │   │   └── GatewayAdapter.php  # Adapter interface
-│   │   ├── Concerns/               # Adapter Traits
-│   │   ├── ECPayAdapter.php        # ECPay Adapter
-│   │   ├── NewebPayAdapter.php     # NewebPay Adapter
-│   │   ├── YiPayAdapter.php        # YiPay Adapter
-│   │   └── DefaultGatewayAdapter.php
+│   │   │   └── GatewayAdapter.php    # Adapter interface
+│   │   ├── Concerns/                 # Adapter Traits
+│   │   │   ├── CreatesGateway.php    # Gateway instantiation
+│   │   │   ├── FormatsCallbackResponse.php
+│   │   │   ├── HandlesNotifications.php
+│   │   │   ├── HandlesPurchases.php
+│   │   │   └── HasPaymentInfo.php
+│   │   ├── BankTransferAdapter.php   # Bank Transfer Adapter
+│   │   ├── DefaultGatewayAdapter.php # Default Adapter
+│   │   ├── ECPayAdapter.php          # ECPay Adapter
+│   │   ├── NewebPayAdapter.php       # NewebPay Adapter
+│   │   └── YiPayAdapter.php          # YiPay Adapter
 │   ├── Gateways/
-│   │   ├── Concerns/               # Gateway Traits
-│   │   ├── Features/               # Feature components
-│   │   │   ├── GatewayFeature.php  # Feature interface
-│   │   │   ├── AbstractFeature.php # Abstract base class
+│   │   ├── Concerns/
+│   │   │   └── DisplaysPaymentInfo.php  # Payment info display
+│   │   ├── Features/                 # Feature components
+│   │   │   ├── GatewayFeature.php    # Feature interface
+│   │   │   ├── AbstractFeature.php   # Abstract base class
+│   │   │   ├── AbstractRecurringFeature.php  # Recurring base class
+│   │   │   ├── FeatureFactory.php    # Feature factory
 │   │   │   ├── MinAmountFeature.php
 │   │   │   ├── MaxAmountFeature.php
+│   │   │   ├── PaymentDataFeature.php
 │   │   │   ├── InstallmentFeature.php
 │   │   │   ├── ExpireDateFeature.php
+│   │   │   ├── RecurringFeature.php  # Recurring interface
 │   │   │   ├── FrequencyRecurringFeature.php
 │   │   │   └── ScheduledRecurringFeature.php
-│   │   └── OmnipayGateway.php      # Universal gateway class
+│   │   ├── BankTransferGateway.php   # Bank Transfer
+│   │   ├── DummyGateway.php          # Testing
+│   │   ├── ECPayGateway.php          # ECPay
+│   │   ├── NewebPayGateway.php       # NewebPay
+│   │   ├── YiPayGateway.php          # YiPay
+│   │   ├── OmnipayGateway.php        # Universal gateway class
+│   │   └── PaymentContext.php        # Payment context
 │   ├── Exceptions/
-│   │   ├── NetworkException.php    # Network exception
+│   │   ├── NetworkException.php      # Network exception
 │   │   └── OrderNotFoundException.php
 │   ├── Http/
-│   │   ├── WordPressClient.php     # WordPress HTTP Client
-│   │   ├── CurlClient.php          # cURL HTTP Client
-│   │   └── StreamClient.php        # Stream HTTP Client
+│   │   ├── WordPressClient.php       # WordPress HTTP Client
+│   │   ├── CurlClient.php            # cURL HTTP Client
+│   │   └── StreamClient.php          # Stream HTTP Client
+│   ├── Settings/
+│   │   ├── Contracts/
+│   │   │   └── SettingsSectionProvider.php  # Settings section interface
+│   │   ├── BankTransferSettingsSection.php  # Bank Transfer settings
+│   │   ├── GatewaySettingsSection.php       # Gateway shared settings
+│   │   └── GeneralSettingsSection.php       # General settings
 │   ├── WordPress/
-│   │   ├── Logger.php              # PSR-3 logger
-│   │   └── SettingsManager.php     # Settings manager
+│   │   ├── Logger.php                # PSR-3 logger
+│   │   └── SettingsManager.php       # Settings manager
 │   ├── Repositories/
-│   │   └── OrderRepository.php     # Order data persistence
-│   └── GatewayRegistry.php         # Gateway registration
+│   │   └── OrderRepository.php       # Order data persistence
+│   ├── Constants.php                 # Constants
+│   ├── GatewayRegistry.php           # Gateway registration
+│   ├── Helper.php                    # Helper functions
+│   └── SharedSettingsPage.php        # Shared settings page
 ├── templates/
+│   ├── admin/
+│   │   ├── bank-accounts-table.php   # Bank accounts management
+│   │   ├── dca-periods-table.php     # DCA periods table (base)
+│   │   ├── frequency-recurring-periods-table.php  # Frequency recurring
+│   │   ├── scheduled-recurring-periods-table.php  # Scheduled recurring
+│   │   └── settings-sections.php     # Settings page sections
 │   ├── checkout/
-│   │   └── credit-card-form.php    # Credit card form template
+│   │   ├── bank-account-form.php     # Bank account selection
+│   │   ├── credit-card-form.php      # Credit card form
+│   │   ├── dca-form.php              # DCA form (base)
+│   │   ├── frequency-recurring-form.php   # Frequency recurring
+│   │   ├── installment-form.php      # Installment selection
+│   │   ├── redirect-form.php         # Redirect form
+│   │   └── scheduled-recurring-form.php   # Scheduled recurring
 │   └── order/
-│       ├── payment-info.php        # Payment info display
-│       └── payment-info-plain.php  # Plain text for emails
+│       ├── payment-info.php          # Payment info display
+│       ├── payment-info-plain.php    # Plain text for emails
+│       ├── payment-info-cartflows.php     # CartFlows compatible
+│       ├── remittance-form.php       # Remittance info form
+│       └── remittance-form-cartflows.php  # CartFlows remittance
 ├── assets/
-│   ├── css/
-│   │   └── payment-info.css        # Payment info styles
+│   ├── images/
+│   │   └── payment-icons/            # Payment icons
 │   └── js/
-│       └── barcode.js              # Barcode rendering
-└── tests/                          # PHPUnit tests
+│       ├── admin.js                  # Admin scripts
+│       ├── barcode.js                # Barcode rendering
+│       ├── checkout.js               # Checkout scripts
+│       └── vendor/
+│           └── jsbarcode.min.js      # JsBarcode library
+└── tests/                            # PHPUnit tests
 ```
 
 ### Creating a Custom Feature

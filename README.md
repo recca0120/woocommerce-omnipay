@@ -200,63 +200,109 @@ composer test
 
 | Feature | 說明 | 參數 |
 |---------|------|------|
+| `PaymentDataFeature` | 靜態付款資料 | 合併 payment_data 設定至請求資料 |
 | `MinAmountFeature` | 最低金額限制 | 預設 $0 |
 | `MaxAmountFeature` | 最高金額限制 | 預設 $30,000 |
 | `InstallmentFeature` | 信用卡分期 | `fieldName`（必填）、`config`（options, defaults, periodRules） |
 | `ExpireDateFeature` | 繳費期限設定 | `fieldName`、`defaultDays`、`minDays`、`maxDays` |
-| `FrequencyRecurringFeature` | 定期定額（依頻率） | - |
-| `ScheduledRecurringFeature` | 定期定額（依排程） | - |
+| `FrequencyRecurringFeature` | 定期定額（依頻率） | ECPay DCA 使用 |
+| `ScheduledRecurringFeature` | 定期定額（依排程） | NewebPay DCA 使用 |
 
 ### 專案結構
 
 ```
 woocommerce-omnipay/
 ├── includes/
-│   ├── Adapters/                   # Gateway Adapter 層
+│   ├── Adapters/                     # Gateway Adapter 層
 │   │   ├── Contracts/
-│   │   │   └── GatewayAdapter.php  # Adapter 介面
-│   │   ├── Concerns/               # Adapter Traits
-│   │   ├── ECPayAdapter.php        # 綠界 Adapter
-│   │   ├── NewebPayAdapter.php     # 藍新 Adapter
-│   │   ├── YiPayAdapter.php        # 乙禾 Adapter
-│   │   └── DefaultGatewayAdapter.php
+│   │   │   └── GatewayAdapter.php    # Adapter 介面
+│   │   ├── Concerns/                 # Adapter Traits
+│   │   │   ├── CreatesGateway.php    # 建立 Gateway 實例
+│   │   │   ├── FormatsCallbackResponse.php
+│   │   │   ├── HandlesNotifications.php
+│   │   │   ├── HandlesPurchases.php
+│   │   │   └── HasPaymentInfo.php
+│   │   ├── BankTransferAdapter.php   # 銀行轉帳 Adapter
+│   │   ├── DefaultGatewayAdapter.php # 預設 Adapter
+│   │   ├── ECPayAdapter.php          # 綠界 Adapter
+│   │   ├── NewebPayAdapter.php       # 藍新 Adapter
+│   │   └── YiPayAdapter.php          # 乙禾 Adapter
 │   ├── Gateways/
-│   │   ├── Concerns/               # Gateway Traits
-│   │   ├── Features/               # Feature 組件
-│   │   │   ├── GatewayFeature.php  # Feature 介面
-│   │   │   ├── AbstractFeature.php # 抽象基類
+│   │   ├── Concerns/
+│   │   │   └── DisplaysPaymentInfo.php  # 付款資訊顯示
+│   │   ├── Features/                 # Feature 組件
+│   │   │   ├── GatewayFeature.php    # Feature 介面
+│   │   │   ├── AbstractFeature.php   # 抽象基類
+│   │   │   ├── AbstractRecurringFeature.php  # 定期定額基類
+│   │   │   ├── FeatureFactory.php    # Feature 工廠
 │   │   │   ├── MinAmountFeature.php
 │   │   │   ├── MaxAmountFeature.php
+│   │   │   ├── PaymentDataFeature.php
 │   │   │   ├── InstallmentFeature.php
 │   │   │   ├── ExpireDateFeature.php
+│   │   │   ├── RecurringFeature.php  # 定期定額介面
 │   │   │   ├── FrequencyRecurringFeature.php
 │   │   │   └── ScheduledRecurringFeature.php
-│   │   └── OmnipayGateway.php      # 通用金流類別
+│   │   ├── BankTransferGateway.php   # 銀行轉帳
+│   │   ├── DummyGateway.php          # 測試用
+│   │   ├── ECPayGateway.php          # 綠界
+│   │   ├── NewebPayGateway.php       # 藍新
+│   │   ├── YiPayGateway.php          # 乙禾
+│   │   ├── OmnipayGateway.php        # 通用金流類別
+│   │   └── PaymentContext.php        # 付款情境
 │   ├── Exceptions/
-│   │   ├── NetworkException.php    # 網路例外
+│   │   ├── NetworkException.php      # 網路例外
 │   │   └── OrderNotFoundException.php
 │   ├── Http/
-│   │   ├── WordPressClient.php     # WordPress HTTP Client
-│   │   ├── CurlClient.php          # cURL HTTP Client
-│   │   └── StreamClient.php        # Stream HTTP Client
+│   │   ├── WordPressClient.php       # WordPress HTTP Client
+│   │   ├── CurlClient.php            # cURL HTTP Client
+│   │   └── StreamClient.php          # Stream HTTP Client
+│   ├── Settings/
+│   │   ├── Contracts/
+│   │   │   └── SettingsSectionProvider.php  # 設定區段介面
+│   │   ├── BankTransferSettingsSection.php  # 銀行轉帳設定
+│   │   ├── GatewaySettingsSection.php       # 金流共用設定
+│   │   └── GeneralSettingsSection.php       # 一般設定
 │   ├── WordPress/
-│   │   ├── Logger.php              # PSR-3 日誌
-│   │   └── SettingsManager.php     # 設定管理
+│   │   ├── Logger.php                # PSR-3 日誌
+│   │   └── SettingsManager.php       # 設定管理
 │   ├── Repositories/
-│   │   └── OrderRepository.php     # 訂單資料持久化
-│   └── GatewayRegistry.php         # 金流註冊
+│   │   └── OrderRepository.php       # 訂單資料持久化
+│   ├── Constants.php                 # 常數定義
+│   ├── GatewayRegistry.php           # 金流註冊
+│   ├── Helper.php                    # 輔助函式
+│   └── SharedSettingsPage.php        # 共用設定頁面
 ├── templates/
+│   ├── admin/
+│   │   ├── bank-accounts-table.php   # 銀行帳戶管理
+│   │   ├── dca-periods-table.php     # 定期定額期數表格（基礎）
+│   │   ├── frequency-recurring-periods-table.php  # 頻率型定期定額
+│   │   ├── scheduled-recurring-periods-table.php  # 排程型定期定額
+│   │   └── settings-sections.php     # 設定頁面區段
 │   ├── checkout/
-│   │   └── credit-card-form.php    # 信用卡表單模板
+│   │   ├── bank-account-form.php     # 銀行帳戶選擇
+│   │   ├── credit-card-form.php      # 信用卡表單
+│   │   ├── dca-form.php              # 定期定額表單（基礎）
+│   │   ├── frequency-recurring-form.php   # 頻率型定期定額
+│   │   ├── installment-form.php      # 分期付款選擇
+│   │   ├── redirect-form.php         # 導向表單
+│   │   └── scheduled-recurring-form.php   # 排程型定期定額
 │   └── order/
-│       ├── payment-info.php        # 付款資訊顯示
-│       └── payment-info-plain.php  # Email 純文字格式
+│       ├── payment-info.php          # 付款資訊顯示
+│       ├── payment-info-plain.php    # Email 純文字格式
+│       ├── payment-info-cartflows.php     # CartFlows 相容
+│       ├── remittance-form.php       # 匯款資訊表單
+│       └── remittance-form-cartflows.php  # CartFlows 匯款表單
 ├── assets/
-│   ├── css/
-│   │   └── payment-info.css        # 付款資訊樣式
+│   ├── images/
+│   │   └── payment-icons/            # 金流圖示
 │   └── js/
-│       └── barcode.js              # 條碼渲染
-└── tests/                          # PHPUnit 測試
+│       ├── admin.js                  # 後台管理
+│       ├── barcode.js                # 條碼渲染
+│       ├── checkout.js               # 結帳頁面
+│       └── vendor/
+│           └── jsbarcode.min.js      # JsBarcode 函式庫
+└── tests/                            # PHPUnit 測試
 ```
 
 ### 新增自訂 Feature
