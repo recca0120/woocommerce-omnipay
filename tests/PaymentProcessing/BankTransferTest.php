@@ -429,7 +429,7 @@ class BankTransferTest extends TestCase
         $this->assertStringContainsString('808-222222222', $output);
     }
 
-    public function test_payment_fields_hides_account_selector_in_random_mode()
+    public function test_payment_fields_shows_account_info_for_single_account()
     {
         $this->updateSharedSettings([
             'bank_accounts' => [
@@ -445,6 +445,10 @@ class BankTransferTest extends TestCase
         $this->gateway->payment_fields();
         $output = ob_get_clean();
 
+        // 單一帳號時應該顯示帳號資訊（純文字）
+        $this->assertStringContainsString('013-111111111', $output);
+        $this->assertStringContainsString('Payment Account', $output);
+        // 不應該顯示選擇器
         $this->assertStringNotContainsString('bank_account_index', $output);
     }
 
