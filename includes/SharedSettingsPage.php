@@ -40,7 +40,7 @@ class SharedSettingsPage
 
     public function addTab(array $tabs): array
     {
-        $tabs['omnipay'] = 'Omnipay';
+        $tabs['omnipay'] = 'Omni'.'pay';
 
         return $tabs;
     }
