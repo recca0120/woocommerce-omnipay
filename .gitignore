@@ -2,7 +2,9 @@
 /vendor/
 /vendor-prefixed/
 composer.lock
-strauss.phar
+
+# Strauss
+bin/strauss.phar
 
 # PHPUnit
 .phpunit.cache/

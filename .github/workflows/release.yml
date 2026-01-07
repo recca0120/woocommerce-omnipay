@@ -26,17 +26,19 @@ jobs:
 
       - name: Download and run Strauss
         run: |
-          curl -o strauss.phar -L -C - https://github.com/BrianHenryIE/strauss/releases/latest/download/strauss.phar
-          php strauss.phar
+          mkdir -p bin
+          curl -o bin/strauss.phar -L https://github.com/BrianHenryIE/strauss/releases/latest/download/strauss.phar
+          php bin/strauss.phar --updateCallSites=includes,woocommerce-omnipay.php
 
       - name: Create plugin directory
         run: |
           mkdir -p build/woocommerce-omnipay
 
-          # Copy plugin files (exclude dev files)
           rsync -av --progress . build/woocommerce-omnipay \
             --exclude='.git' \
             --exclude='.github' \
+            --exclude='.wordpress-test' \
+            --exclude='bin' \
             --exclude='build' \
             --exclude='tests' \
             --exclude='phpunit.xml' \
@@ -47,9 +49,9 @@ jobs:
             --exclude='*.md' \
             --exclude='coverage' \
             --exclude='.phpunit.cache' \
-            --exclude='.phpunit.result.cache'
+            --exclude='.phpunit.result.cache' \
+            --exclude='vendor'
 
-          # Keep LICENSE and essential files
           cp LICENSE build/woocommerce-omnipay/ 2>/dev/null || true
           cp README.md build/woocommerce-omnipay/ 2>/dev/null || true
 

@@ -47,8 +47,8 @@
             "namespace_prefix": "Recca0120\\WooCommerce_Omnipay\\Vendor\\",
             "classmap_prefix": "Recca0120_WooCommerce_Omnipay_Vendor_",
             "constant_prefix": "RECCA0120_WOOCOMMERCE_OMNIPAY_VENDOR_",
-            "delete_vendor_packages": false,
-            "delete_vendor_files": false,
+            "delete_vendor_packages": true,
+            "delete_vendor_files": true,
             "include_root_autoload": true
         }
     }
