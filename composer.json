@@ -40,5 +40,16 @@
     },
     "config": {
         "allow-plugins": {}
+    },
+    "extra": {
+        "strauss": {
+            "target_directory": "vendor-prefixed",
+            "namespace_prefix": "Recca0120\\WooCommerce_Omnipay\\Vendor\\",
+            "classmap_prefix": "Recca0120_WooCommerce_Omnipay_Vendor_",
+            "constant_prefix": "RECCA0120_WOOCOMMERCE_OMNIPAY_VENDOR_",
+            "delete_vendor_packages": false,
+            "delete_vendor_files": false,
+            "include_root_autoload": true
+        }
     }
 }
