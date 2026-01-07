@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\Unit;
+namespace Recca0120\WooCommerce_Omnipay\Tests\Unit;
 
 use Nyholm\Psr7\Response;
 use Omnipay\Common\Http\ClientInterface;

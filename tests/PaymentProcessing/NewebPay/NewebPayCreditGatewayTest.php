@@ -1,11 +1,11 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\PaymentProcessing\NewebPay;
+namespace Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\NewebPay;
 
 use Omnipay\NewebPay\Encryptor;
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Gateways\NewebPayGateway;
-use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature;
+use Recca0120\WooCommerce_Omnipay\Gateways\NewebPayGateway;
+use Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * NewebPay 信用卡 Gateway 測試

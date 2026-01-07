@@ -1,9 +1,9 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\Integration\Http;
+namespace Recca0120\WooCommerce_Omnipay\Tests\Integration\Http;
 
-use WooCommerceOmnipay\Exceptions\NetworkException;
-use WooCommerceOmnipay\Http\StreamClient;
+use Recca0120\WooCommerce_Omnipay\Exceptions\NetworkException;
+use Recca0120\WooCommerce_Omnipay\Http\StreamClient;
 
 class StreamClientTest extends HttpClientTestCase
 {

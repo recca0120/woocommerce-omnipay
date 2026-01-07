@@ -1,11 +1,11 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\Settings;
+namespace Recca0120\WooCommerce_Omnipay\Tests\Settings;
 
-use WooCommerceOmnipay\Adapters\BankTransferAdapter;
-use WooCommerceOmnipay\Settings\BankTransferSettingsSection;
-use WooCommerceOmnipay\Settings\GeneralSettingsSection;
-use WooCommerceOmnipay\SharedSettingsPage;
+use Recca0120\WooCommerce_Omnipay\Adapters\BankTransferAdapter;
+use Recca0120\WooCommerce_Omnipay\Settings\BankTransferSettingsSection;
+use Recca0120\WooCommerce_Omnipay\Settings\GeneralSettingsSection;
+use Recca0120\WooCommerce_Omnipay\SharedSettingsPage;
 use WP_UnitTestCase;
 
 /**
@@ -183,7 +183,7 @@ class BankTransferSettingsTest extends WP_UnitTestCase
             'selection_mode' => 'user_choice',
         ]);
 
-        $settingsManager = new \WooCommerceOmnipay\WordPress\SettingsManager('BankTransfer');
+        $settingsManager = new \Recca0120\WooCommerce_Omnipay\WordPress\SettingsManager('BankTransfer');
         $settings = $settingsManager->getAllSettings();
 
         $this->assertEquals('user_choice', $settings['selection_mode']);

@@ -1,8 +1,8 @@
 <?php
 
-namespace WooCommerceOmnipay\Settings;
+namespace Recca0120\WooCommerce_Omnipay\Settings;
 
-use WooCommerceOmnipay\Settings\Contracts\SettingsSectionProvider;
+use Recca0120\WooCommerce_Omnipay\Settings\Contracts\SettingsSectionProvider;
 
 /**
  * General Settings Section

@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Adapters;
+namespace Recca0120\WooCommerce_Omnipay\Adapters;
 
 /**
  * NewebPay Adapter

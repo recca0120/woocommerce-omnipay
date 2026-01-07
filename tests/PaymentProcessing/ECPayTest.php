@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\PaymentProcessing;
+namespace Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing;
 
 use Ecpay\Sdk\Services\CheckMacValueService;
 
@@ -240,7 +240,7 @@ class ECPayTest extends TestCase
         }
         update_option('woocommerce_omnipay_'.$gatewayId.'_settings', $settings);
 
-        $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $gateway = new \Recca0120\WooCommerce_Omnipay\Gateways\OmnipayGateway([
             'gateway_id' => $gatewayId,
             'title' => 'ECPay Test',
             'gateway' => 'ECPay',

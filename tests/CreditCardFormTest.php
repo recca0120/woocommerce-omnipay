@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests;
+namespace Recca0120\WooCommerce_Omnipay\Tests;
 
 use WP_UnitTestCase;
 
@@ -25,7 +25,7 @@ class CreditCardFormTest extends WP_UnitTestCase
         ]);
 
         // 使用 DummyGateway 測試表單功能
-        $this->gateway = new \WooCommerceOmnipay\Gateways\DummyGateway([
+        $this->gateway = new \Recca0120\WooCommerce_Omnipay\Gateways\DummyGateway([
             'gateway_id' => 'dummy',
             'title' => 'Dummy Gateway',
             'description' => 'Test payment gateway',

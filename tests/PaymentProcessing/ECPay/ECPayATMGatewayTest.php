@@ -1,12 +1,12 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
+namespace Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPayGateway;
-use WooCommerceOmnipay\Gateways\Features\ExpireDateFeature;
-use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
+use Recca0120\WooCommerce_Omnipay\Gateways\ECPayGateway;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\ExpireDateFeature;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature;
+use Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * ECPay ATM Gateway 測試

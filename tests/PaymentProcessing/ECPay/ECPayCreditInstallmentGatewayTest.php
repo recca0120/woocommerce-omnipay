@@ -1,11 +1,11 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\PaymentProcessing\ECPay;
+namespace Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\ECPay;
 
-use WooCommerceOmnipay\Gateways\ECPayGateway;
-use WooCommerceOmnipay\Gateways\Features\InstallmentFeature;
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
+use Recca0120\WooCommerce_Omnipay\Gateways\ECPayGateway;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\InstallmentFeature;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature;
+use Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * ECPay 信用卡分期 Gateway 測試

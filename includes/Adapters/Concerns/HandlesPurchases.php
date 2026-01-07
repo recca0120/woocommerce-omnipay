@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Adapters\Concerns;
+namespace Recca0120\WooCommerce_Omnipay\Adapters\Concerns;
 
 use Omnipay\Common\Message\ResponseInterface;
 

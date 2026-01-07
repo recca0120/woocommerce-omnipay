@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\WordPress;
+namespace Recca0120\WooCommerce_Omnipay\WordPress;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;

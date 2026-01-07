@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Adapters\Contracts;
+namespace Recca0120\WooCommerce_Omnipay\Adapters\Contracts;
 
 use Omnipay\Common\GatewayInterface;
 use Omnipay\Common\Http\ClientInterface;

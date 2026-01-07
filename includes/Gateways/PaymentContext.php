@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Gateways;
+namespace Recca0120\WooCommerce_Omnipay\Gateways;
 
 /**
  * Payment Context

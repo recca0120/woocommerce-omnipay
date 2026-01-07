@@ -1,12 +1,12 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\PaymentProcessing\YiPay;
+namespace Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\YiPay;
 
 use Omnipay\YiPay\Hasher;
-use WooCommerceOmnipay\Gateways\Features\MaxAmountFeature;
-use WooCommerceOmnipay\Gateways\Features\MinAmountFeature;
-use WooCommerceOmnipay\Gateways\YiPayGateway;
-use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature;
+use Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature;
+use Recca0120\WooCommerce_Omnipay\Gateways\YiPayGateway;
+use Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * YiPay ATM Gateway 測試

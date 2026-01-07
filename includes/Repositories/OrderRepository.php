@@ -1,9 +1,9 @@
 <?php
 
-namespace WooCommerceOmnipay\Repositories;
+namespace Recca0120\WooCommerce_Omnipay\Repositories;
 
-use WooCommerceOmnipay\Constants;
-use WooCommerceOmnipay\Exceptions\OrderNotFoundException;
+use Recca0120\WooCommerce_Omnipay\Constants;
+use Recca0120\WooCommerce_Omnipay\Exceptions\OrderNotFoundException;
 
 /**
  * Order Repository

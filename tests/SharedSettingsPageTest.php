@@ -1,12 +1,12 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests;
+namespace Recca0120\WooCommerce_Omnipay\Tests;
 
-use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
-use WooCommerceOmnipay\Http\WordPressClient;
-use WooCommerceOmnipay\Settings\GatewaySettingsSection;
-use WooCommerceOmnipay\Settings\GeneralSettingsSection;
-use WooCommerceOmnipay\SharedSettingsPage;
+use Recca0120\WooCommerce_Omnipay\Adapters\DefaultGatewayAdapter;
+use Recca0120\WooCommerce_Omnipay\Http\WordPressClient;
+use Recca0120\WooCommerce_Omnipay\Settings\GatewaySettingsSection;
+use Recca0120\WooCommerce_Omnipay\Settings\GeneralSettingsSection;
+use Recca0120\WooCommerce_Omnipay\SharedSettingsPage;
 use WP_UnitTestCase;
 
 class SharedSettingsPageTest extends WP_UnitTestCase

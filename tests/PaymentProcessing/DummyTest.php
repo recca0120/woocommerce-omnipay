@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\PaymentProcessing;
+namespace Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing;
 
 /**
  * Dummy Gateway 測試（Direct 型金流）

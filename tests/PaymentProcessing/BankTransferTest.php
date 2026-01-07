@@ -1,8 +1,8 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\PaymentProcessing;
+namespace Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing;
 
-use WooCommerceOmnipay\Repositories\OrderRepository;
+use Recca0120\WooCommerce_Omnipay\Repositories\OrderRepository;
 
 /**
  * BankTransfer 測試

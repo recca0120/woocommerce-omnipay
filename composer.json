@@ -27,12 +27,12 @@
     },
     "autoload": {
         "psr-4": {
-            "WooCommerceOmnipay\\": "includes/"
+            "Recca0120\\WooCommerce_Omnipay\\": "includes/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "WooCommerceOmnipay\\Tests\\": "tests/"
+            "Recca0120\\WooCommerce_Omnipay\\Tests\\": "tests/"
         }
     },
     "scripts": {

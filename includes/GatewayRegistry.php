@@ -1,11 +1,11 @@
 <?php
 
-namespace WooCommerceOmnipay;
+namespace Recca0120\WooCommerce_Omnipay;
 
 use Omnipay\Common\Http\ClientInterface;
-use WooCommerceOmnipay\Adapters\Contracts\GatewayAdapter;
-use WooCommerceOmnipay\Adapters\DefaultGatewayAdapter;
-use WooCommerceOmnipay\Http\WordPressClient;
+use Recca0120\WooCommerce_Omnipay\Adapters\Contracts\GatewayAdapter;
+use Recca0120\WooCommerce_Omnipay\Adapters\DefaultGatewayAdapter;
+use Recca0120\WooCommerce_Omnipay\Http\WordPressClient;
 
 /**
  * Gateway Registry
@@ -163,13 +163,13 @@ class GatewayRegistry
         $name = $gatewayInfo['gateway'] ?? '';
 
         // 2. 嘗試自動偵測具體 Gateway 類別
-        $gatewayClass = "\\WooCommerceOmnipay\\Gateways\\{$name}Gateway";
+        $gatewayClass = "\\Recca0120\WooCommerce_Omnipay\\Gateways\\{$name}Gateway";
         if (class_exists($gatewayClass)) {
             return $gatewayClass;
         }
 
         // 3. 使用 OmnipayGateway 動態建立
-        return \WooCommerceOmnipay\Gateways\OmnipayGateway::class;
+        return \Recca0120\WooCommerce_Omnipay\Gateways\OmnipayGateway::class;
     }
 
     /**
@@ -203,7 +203,7 @@ class GatewayRegistry
         $name = $gatewayInfo['gateway'] ?? '';
 
         // 2. 嘗試自動偵測具體 Adapter 類別
-        $adapterClass = "\\WooCommerceOmnipay\\Adapters\\{$name}Adapter";
+        $adapterClass = "\\Recca0120\WooCommerce_Omnipay\\Adapters\\{$name}Adapter";
         if (class_exists($adapterClass)) {
             return new $adapterClass;
         }

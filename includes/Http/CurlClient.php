@@ -1,11 +1,11 @@
 <?php
 
-namespace WooCommerceOmnipay\Http;
+namespace Recca0120\WooCommerce_Omnipay\Http;
 
 use Nyholm\Psr7\Response;
 use Omnipay\Common\Http\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
-use WooCommerceOmnipay\Exceptions\NetworkException;
+use Recca0120\WooCommerce_Omnipay\Exceptions\NetworkException;
 
 /**
  * Curl HTTP Client for Omnipay

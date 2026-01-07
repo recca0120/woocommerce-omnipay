@@ -1,6 +1,6 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\WooCommerce;
+namespace Recca0120\WooCommerce_Omnipay\Tests\WooCommerce;
 
 use WP_UnitTestCase;
 
@@ -121,7 +121,7 @@ class AdminSettingsTest extends WP_UnitTestCase
         $gateway->process_admin_options();
 
         // 重新載入 gateway 以讀取儲存的設定
-        $reloadedGateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $reloadedGateway = new \Recca0120\WooCommerce_Omnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'ecpay',
             'title' => 'ECPay',
             'description' => '綠界金流',
@@ -155,7 +155,7 @@ class AdminSettingsTest extends WP_UnitTestCase
         ];
 
         $gateway->process_admin_options();
-        $reloadedGateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $reloadedGateway = new \Recca0120\WooCommerce_Omnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'ecpay',
             'gateway' => 'ECPay',
         ]);
@@ -165,7 +165,7 @@ class AdminSettingsTest extends WP_UnitTestCase
         $_POST = [];
 
         $gateway->process_admin_options();
-        $reloadedGateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $reloadedGateway = new \Recca0120\WooCommerce_Omnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'ecpay',
             'gateway' => 'ECPay',
         ]);
@@ -234,7 +234,7 @@ class AdminSettingsTest extends WP_UnitTestCase
         ];
 
         // 測試設定合併邏輯
-        $settingsManager = new \WooCommerceOmnipay\WordPress\SettingsManager('ECPay');
+        $settingsManager = new \Recca0120\WooCommerce_Omnipay\WordPress\SettingsManager('ECPay');
         $allSettings = $settingsManager->getAllSettings($gatewaySettings);
 
         // Gateway 設定優先
@@ -260,7 +260,7 @@ class AdminSettingsTest extends WP_UnitTestCase
         delete_option('woocommerce_omnipay_ecpay_settings');
 
         // 測試設定合併邏輯
-        $settingsManager = new \WooCommerceOmnipay\WordPress\SettingsManager('ECPay');
+        $settingsManager = new \Recca0120\WooCommerce_Omnipay\WordPress\SettingsManager('ECPay');
         $allSettings = $settingsManager->getAllSettings([]);
 
         $this->assertEquals('shared_merchant', $allSettings['MerchantID']);
@@ -274,7 +274,7 @@ class AdminSettingsTest extends WP_UnitTestCase
     public function test_omnipay_fields_hidden_by_default()
     {
         // 使用預設 config（override_settings 未設定或為 false）
-        $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $gateway = new \Recca0120\WooCommerce_Omnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'test_hidden',
             'gateway' => 'ECPay',
         ]);
@@ -297,7 +297,7 @@ class AdminSettingsTest extends WP_UnitTestCase
      */
     public function test_omnipay_fields_shown_when_override_settings_enabled()
     {
-        $gateway = new \WooCommerceOmnipay\Gateways\OmnipayGateway([
+        $gateway = new \Recca0120\WooCommerce_Omnipay\Gateways\OmnipayGateway([
             'gateway_id' => 'test_shown',
             'gateway' => 'ECPay',
             'override_settings' => true,

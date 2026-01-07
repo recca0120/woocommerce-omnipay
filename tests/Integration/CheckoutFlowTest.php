@@ -1,9 +1,9 @@
 <?php
 
-namespace WooCommerceOmnipay\Tests\Integration;
+namespace Recca0120\WooCommerce_Omnipay\Tests\Integration;
 
-use WooCommerceOmnipay\Gateways\ECPayGateway;
-use WooCommerceOmnipay\Tests\PaymentProcessing\TestCase;
+use Recca0120\WooCommerce_Omnipay\Gateways\ECPayGateway;
+use Recca0120\WooCommerce_Omnipay\Tests\PaymentProcessing\TestCase;
 
 /**
  * Integration tests for full checkout flows
