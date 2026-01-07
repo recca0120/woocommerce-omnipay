@@ -24,6 +24,11 @@ jobs:
       - name: Install dependencies
         run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
 
+      - name: Download and run Strauss
+        run: |
+          curl -o strauss.phar -L -C - https://github.com/BrianHenryIE/strauss/releases/latest/download/strauss.phar
+          php strauss.phar
+
       - name: Create plugin directory
         run: |
           mkdir -p build/woocommerce-omnipay

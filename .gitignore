@@ -1,6 +1,8 @@
 # Composer dependencies
 /vendor/
+/vendor-prefixed/
 composer.lock
+strauss.phar
 
 # PHPUnit
 .phpunit.cache/
