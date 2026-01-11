@@ -54,7 +54,7 @@ class GatewayRegistry
         $this->config = array_merge([
             'gateways' => [],
         ], $config);
-        $this->httpClient = $httpClient ?? new WordPressClient;
+        $this->httpClient = $httpClient ?? new WordPressClient();
     }
 
     /**
@@ -110,39 +110,6 @@ class GatewayRegistry
     }
 
     /**
-     * 驗證配置是否有效
-     *
-     * @param  array  $config  配置
-     * @return bool
-     */
-    protected function isValidConfig(array $config)
-    {
-        if (empty($config['gateway']) || empty($config['gateway_id'])) {
-            return false;
-        }
-
-        return $this->isAvailable($config['gateway']);
-    }
-
-    /**
-     * 建立 gateway 資訊
-     *
-     * @param  array  $config  配置
-     * @return array
-     */
-    protected function createGatewayInfo(array $config)
-    {
-        $name = $config['gateway'];
-
-        $defaults = [
-            'title' => $name,
-            'description' => '',
-        ];
-
-        return array_merge($defaults, $config);
-    }
-
-    /**
      * 解析 Gateway 類別
      *
      * 優先順序：
@@ -191,13 +158,46 @@ class GatewayRegistry
     }
 
     /**
+     * 驗證配置是否有效
+     *
+     * @param  array  $config  配置
+     * @return bool
+     */
+    protected function isValidConfig(array $config)
+    {
+        if (empty($config['gateway']) || empty($config['gateway_id'])) {
+            return false;
+        }
+
+        return $this->isAvailable($config['gateway']);
+    }
+
+    /**
+     * 建立 gateway 資訊
+     *
+     * @param  array  $config  配置
+     * @return array
+     */
+    protected function createGatewayInfo(array $config)
+    {
+        $name = $config['gateway'];
+
+        $defaults = [
+            'title' => $name,
+            'description' => '',
+        ];
+
+        return array_merge($defaults, $config);
+    }
+
+    /**
      * 建立 Adapter 實例
      */
     protected function createAdapter(array $gatewayInfo): GatewayAdapter
     {
         // 1. 優先使用配置中指定的 adapter
         if (! empty($gatewayInfo['adapter']) && class_exists($gatewayInfo['adapter'])) {
-            return new $gatewayInfo['adapter'];
+            return new $gatewayInfo['adapter']();
         }
 
         $name = $gatewayInfo['gateway'] ?? '';
@@ -205,7 +205,7 @@ class GatewayRegistry
         // 2. 嘗試自動偵測具體 Adapter 類別
         $adapterClass = "\\Recca0120\WooCommerce_Omnipay\\Adapters\\{$name}Adapter";
         if (class_exists($adapterClass)) {
-            return new $adapterClass;
+            return new $adapterClass();
         }
 
         // 3. 使用 DefaultGatewayAdapter

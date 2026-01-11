@@ -20,18 +20,18 @@ class NewebPayWebATMGatewayTest extends TestCase
 
     protected $gatewayName = 'NewebPay';
 
-    private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
-
-    private $hashIV = 'VVcW9t4feCshKOTi';
-
-    private $merchantId = 'MS350098593';
-
     protected $settings = [
         'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
         'HashIV' => 'VVcW9t4feCshKOTi',
         'MerchantID' => 'MS350098593',
         'testMode' => 'yes',
     ];
+
+    private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
+
+    private $hashIV = 'VVcW9t4feCshKOTi';
+
+    private $merchantId = 'MS350098593';
 
     protected function setUp(): void
     {
@@ -42,7 +42,7 @@ class NewebPayWebATMGatewayTest extends TestCase
             'gateway_id' => 'newebpay_webatm',
             'title' => '藍新網路 ATM',
             'payment_data' => ['WEBATM' => 1],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

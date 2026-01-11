@@ -34,7 +34,7 @@ class ECPayDCAGatewayTest extends TestCase
             'gateway_id' => 'ecpay_dca',
             'title' => '綠界定期定額',
             'payment_data' => ['ChoosePayment' => 'Credit'],
-            'features' => [new FrequencyRecurringFeature],
+            'features' => [new FrequencyRecurringFeature()],
         ]);
 
         // Set up DCA periods for Shortcode mode
@@ -50,17 +50,6 @@ class ECPayDCAGatewayTest extends TestCase
         $this->gateway->update_option('periodType', 'M');
         $this->gateway->update_option('frequency', 1);
         $this->gateway->update_option('execTimes', 12);
-    }
-
-    protected function createGateway(): ECPayGateway
-    {
-        return new ECPayGateway([
-            'gateway' => 'ECPay',
-            'gateway_id' => 'ecpay_dca',
-            'title' => '綠界定期定額',
-            'payment_data' => ['ChoosePayment' => 'Credit'],
-            'features' => [new FrequencyRecurringFeature],
-        ]);
     }
 
     public function test_process_payment_sends_credit_payment_type()
@@ -412,5 +401,16 @@ class ECPayDCAGatewayTest extends TestCase
         $this->assertStringContainsString('id="omnipay_period"', $output);
         $this->assertStringContainsString('name="omnipay_period"', $output);
         $this->assertStringContainsString('id="omnipay_period_info"', $output);
+    }
+
+    protected function createGateway(): ECPayGateway
+    {
+        return new ECPayGateway([
+            'gateway' => 'ECPay',
+            'gateway_id' => 'ecpay_dca',
+            'title' => '綠界定期定額',
+            'payment_data' => ['ChoosePayment' => 'Credit'],
+            'features' => [new FrequencyRecurringFeature()],
+        ]);
     }
 }

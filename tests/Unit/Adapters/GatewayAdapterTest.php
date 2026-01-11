@@ -24,18 +24,7 @@ class GatewayAdapterTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->httpClient = new TestHttpClient;
-    }
-
-    /**
-     * 建立 Adapter 並注入 HttpClient
-     */
-    private function createAdapter(string $adapterClass): GatewayAdapter
-    {
-        $adapter = new $adapterClass;
-        $adapter->setHttpClient($this->httpClient);
-
-        return $adapter;
+        $this->httpClient = new TestHttpClient();
     }
 
     /**
@@ -43,7 +32,7 @@ class GatewayAdapterTest extends TestCase
      */
     public function test_adapter_implements_interface(string $adapterClass): void
     {
-        $adapter = new $adapterClass;
+        $adapter = new $adapterClass();
 
         $this->assertInstanceOf(GatewayAdapter::class, $adapter);
     }
@@ -53,7 +42,7 @@ class GatewayAdapterTest extends TestCase
      */
     public function test_adapter_returns_gateway_name(string $adapterClass, string $expectedName): void
     {
-        $adapter = new $adapterClass;
+        $adapter = new $adapterClass();
 
         $this->assertEquals($expectedName, $adapter->getGatewayName());
     }
@@ -78,7 +67,7 @@ class GatewayAdapterTest extends TestCase
         int $orderTotal,
         bool $expected
     ): void {
-        $adapter = new $adapterClass;
+        $adapter = new $adapterClass();
 
         $this->assertEquals($expected, $adapter->validateAmount($data, $orderTotal));
     }
@@ -91,7 +80,7 @@ class GatewayAdapterTest extends TestCase
         array $input,
         array $expectedKeys
     ): void {
-        $adapter = new $adapterClass;
+        $adapter = new $adapterClass();
         $normalized = $adapter->normalizePaymentInfo($input);
 
         foreach ($expectedKeys as $key) {
@@ -101,7 +90,7 @@ class GatewayAdapterTest extends TestCase
 
     public function test_ecpay_adapter_identifies_payment_info_notification(): void
     {
-        $adapter = new ECPayAdapter;
+        $adapter = new ECPayAdapter();
 
         // ATM 取號成功
         $this->assertTrue($adapter->isPaymentInfoNotification(['RtnCode' => '2']));
@@ -185,5 +174,16 @@ class GatewayAdapterTest extends TestCase
                 ['PaymentNo', 'ExpireDate'],
             ],
         ];
+    }
+
+    /**
+     * 建立 Adapter 並注入 HttpClient
+     */
+    private function createAdapter(string $adapterClass): GatewayAdapter
+    {
+        $adapter = new $adapterClass();
+        $adapter->setHttpClient($this->httpClient);
+
+        return $adapter;
     }
 }

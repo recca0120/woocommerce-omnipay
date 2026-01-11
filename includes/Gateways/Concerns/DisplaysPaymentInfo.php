@@ -12,27 +12,6 @@ use Recca0120\WooCommerce_Omnipay\Repositories\OrderRepository;
 trait DisplaysPaymentInfo
 {
     /**
-     * 註冊付款資訊顯示 hooks
-     */
-    protected function registerPaymentInfoHooks()
-    {
-        // WooCommerce 感謝頁 + CartFlows 一般模式（載入 WC thankyou.php）
-        add_action('woocommerce_thankyou_'.$this->id, [$this, 'display_payment_info_by_order_id']);
-
-        // CartFlows Instant 模式
-        add_action('woocommerce_receipt_'.$this->id, [$this, 'display_payment_info_by_order_id']);
-
-        // view-order 頁面
-        add_action('woocommerce_order_details_after_order_table', [$this, 'display_payment_info_on_view_order']);
-
-        // 管理後台
-        add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'display_payment_info_admin']);
-
-        // Email
-        add_action('woocommerce_email_after_order_table', [$this, 'display_payment_info_on_email'], 10, 3);
-    }
-
-    /**
      * 透過訂單 ID 顯示付款資訊
      *
      * @param  int  $order_id
@@ -121,6 +100,26 @@ trait DisplaysPaymentInfo
             'payment_info' => $paymentInfo,
             'labels' => OrderRepository::getPaymentInfoLabels(),
         ]);
+    }
+    /**
+     * 註冊付款資訊顯示 hooks
+     */
+    protected function registerPaymentInfoHooks()
+    {
+        // WooCommerce 感謝頁 + CartFlows 一般模式（載入 WC thankyou.php）
+        add_action('woocommerce_thankyou_'.$this->id, [$this, 'display_payment_info_by_order_id']);
+
+        // CartFlows Instant 模式
+        add_action('woocommerce_receipt_'.$this->id, [$this, 'display_payment_info_by_order_id']);
+
+        // view-order 頁面
+        add_action('woocommerce_order_details_after_order_table', [$this, 'display_payment_info_on_view_order']);
+
+        // 管理後台
+        add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'display_payment_info_admin']);
+
+        // Email
+        add_action('woocommerce_email_after_order_table', [$this, 'display_payment_info_on_email'], 10, 3);
     }
 
     /**

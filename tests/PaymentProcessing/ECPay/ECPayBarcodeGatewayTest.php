@@ -39,8 +39,8 @@ class ECPayBarcodeGatewayTest extends TestCase
             'title' => '綠界超商條碼',
             'payment_data' => ['ChoosePayment' => 'BARCODE'],
             'features' => [
-                new MinAmountFeature,
-                new MaxAmountFeature,
+                new MinAmountFeature(),
+                new MaxAmountFeature(),
                 new ExpireDateFeature('StoreExpireDate', 7, 1, 30),
             ],
         ]);

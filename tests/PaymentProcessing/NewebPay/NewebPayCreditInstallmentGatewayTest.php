@@ -20,18 +20,18 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
 
     protected $gatewayName = 'NewebPay';
 
-    private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
-
-    private $hashIV = 'VVcW9t4feCshKOTi';
-
-    private $merchantId = 'MS350098593';
-
     protected $settings = [
         'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
         'HashIV' => 'VVcW9t4feCshKOTi',
         'MerchantID' => 'MS350098593',
         'testMode' => 'yes',
     ];
+
+    private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
+
+    private $hashIV = 'VVcW9t4feCshKOTi';
+
+    private $merchantId = 'MS350098593';
 
     protected function setUp(): void
     {
@@ -43,7 +43,7 @@ class NewebPayCreditInstallmentGatewayTest extends TestCase
             'title' => '藍新信用卡分期',
             'payment_data' => ['CREDIT' => 1],
             'features' => [
-                new MinAmountFeature,
+                new MinAmountFeature(),
                 new InstallmentFeature('InstFlag'),
             ],
         ]);

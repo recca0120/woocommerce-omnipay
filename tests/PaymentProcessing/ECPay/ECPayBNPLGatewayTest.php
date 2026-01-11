@@ -35,7 +35,7 @@ class ECPayBNPLGatewayTest extends TestCase
             'gateway_id' => 'ecpay_bnpl',
             'title' => '綠界 BNPL',
             'payment_data' => ['ChoosePayment' => 'BNPL'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

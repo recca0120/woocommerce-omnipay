@@ -15,6 +15,77 @@ class FrequencyRecurringFeature extends AbstractRecurringFeature
     /**
      * {@inheritdoc}
      */
+    public function initFormFields(array &$formFields): void
+    {
+        // Blocks 與 Shortcode 說明區塊
+        $formFields['blocks_line'] = [
+            'title' => '<hr>',
+            'type' => 'title',
+        ];
+
+        $formFields['blocks_caption'] = [
+            'title' => '',
+            'type' => 'title',
+            'description' => __('Configure settings for both WooCommerce Blocks and Shortcode checkout. Fill in the section matching your checkout page type.', 'woocommerce-omnipay'),
+        ];
+
+        $formFields['blocks_title'] = [
+            'title' => __('WooCommerce Blocks Checkout', 'woocommerce-omnipay'),
+            'type' => 'title',
+            'description' => __('These settings apply when using WooCommerce Blocks checkout page.', 'woocommerce-omnipay'),
+        ];
+
+        // Blocks 模式欄位
+        $formFields['periodType'] = [
+            'title' => __('Period Type', 'woocommerce-omnipay'),
+            'type' => 'select',
+            'default' => 'M',
+            'description' => '',
+            'options' => [
+                'Y' => __('Year', 'woocommerce-omnipay'),
+                'M' => __('Month', 'woocommerce-omnipay'),
+                'D' => __('Day', 'woocommerce-omnipay'),
+            ],
+        ];
+
+        $formFields['frequency'] = [
+            'title' => __('Frequency', 'woocommerce-omnipay'),
+            'type' => 'number',
+            'default' => 1,
+            'description' => '',
+            'custom_attributes' => ['min' => 1, 'step' => 1],
+        ];
+
+        $formFields['execTimes'] = [
+            'title' => __('Execute Times', 'woocommerce-omnipay'),
+            'type' => 'number',
+            'default' => 2,
+            'description' => '',
+            'custom_attributes' => ['min' => 1, 'step' => 1],
+        ];
+
+        // Shortcode 模式欄位
+        $formFields['shortcode_line'] = [
+            'title' => '<hr>',
+            'type' => 'title',
+        ];
+
+        $formFields['shortcode_title'] = [
+            'title' => __('Shortcode Checkout', 'woocommerce-omnipay'),
+            'type' => 'title',
+            'description' => __('These settings apply when using traditional shortcode-based checkout page.', 'woocommerce-omnipay'),
+        ];
+
+        $formFields['periods'] = [
+            'title' => __('DCA Periods', 'woocommerce-omnipay'),
+            'type' => 'periods',
+            'default' => '',
+            'description' => '',
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
     protected function getFieldConfigs(): array
     {
         return [
@@ -105,78 +176,6 @@ class FrequencyRecurringFeature extends AbstractRecurringFeature
             'PeriodType' => 'M',
             'Frequency' => 1,
             'ExecTimes' => 2,
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initFormFields(array &$formFields): void
-    {
-        // Blocks 與 Shortcode 說明區塊
-        $formFields['blocks_line'] = [
-            'title' => '<hr>',
-            'type' => 'title',
-        ];
-
-        $formFields['blocks_caption'] = [
-            'title' => '',
-            'type' => 'title',
-            'description' => __('Configure settings for both WooCommerce Blocks and Shortcode checkout. Fill in the section matching your checkout page type.', 'woocommerce-omnipay'),
-        ];
-
-        $formFields['blocks_title'] = [
-            'title' => __('WooCommerce Blocks Checkout', 'woocommerce-omnipay'),
-            'type' => 'title',
-            'description' => __('These settings apply when using WooCommerce Blocks checkout page.', 'woocommerce-omnipay'),
-        ];
-
-        // Blocks 模式欄位
-        $formFields['periodType'] = [
-            'title' => __('Period Type', 'woocommerce-omnipay'),
-            'type' => 'select',
-            'default' => 'M',
-            'description' => '',
-            'options' => [
-                'Y' => __('Year', 'woocommerce-omnipay'),
-                'M' => __('Month', 'woocommerce-omnipay'),
-                'D' => __('Day', 'woocommerce-omnipay'),
-            ],
-        ];
-
-        $formFields['frequency'] = [
-            'title' => __('Frequency', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'default' => 1,
-            'description' => '',
-            'custom_attributes' => ['min' => 1, 'step' => 1],
-        ];
-
-        $formFields['execTimes'] = [
-            'title' => __('Execute Times', 'woocommerce-omnipay'),
-            'type' => 'number',
-            'default' => 2,
-            'description' => '',
-            'custom_attributes' => ['min' => 1, 'step' => 1],
-        ];
-
-        // Shortcode 模式欄位
-        $formFields['shortcode_line'] = [
-            'title' => '<hr>',
-            'type' => 'title',
-        ];
-
-        $formFields['shortcode_title'] = [
-            'title' => __('Shortcode Checkout', 'woocommerce-omnipay'),
-            'type' => 'title',
-            'description' => __('These settings apply when using traditional shortcode-based checkout page.', 'woocommerce-omnipay'),
-        ];
-
-        $formFields['periods'] = [
-            'title' => __('DCA Periods', 'woocommerce-omnipay'),
-            'type' => 'periods',
-            'default' => '',
-            'description' => '',
         ];
     }
 

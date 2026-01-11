@@ -39,7 +39,7 @@ class NewebPayDCAGatewayTest extends TestCase
             'gateway' => 'NewebPay',
             'gateway_id' => 'newebpay_dca',
             'title' => '藍新定期定額',
-            'features' => [new ScheduledRecurringFeature],
+            'features' => [new ScheduledRecurringFeature()],
         ]);
 
         // Set up DCA periods for Shortcode mode
@@ -57,16 +57,6 @@ class NewebPayDCAGatewayTest extends TestCase
         $this->gateway->update_option('periodPoint', '1');
         $this->gateway->update_option('periodTimes', 12);
         $this->gateway->update_option('periodStartType', 2);
-    }
-
-    protected function createGateway(): NewebPayGateway
-    {
-        return new NewebPayGateway([
-            'gateway' => 'NewebPay',
-            'gateway_id' => 'newebpay_dca',
-            'title' => '藍新定期定額',
-            'features' => [new ScheduledRecurringFeature],
-        ]);
     }
 
     public function test_process_payment_sends_credit_parameter()
@@ -521,5 +511,15 @@ class NewebPayDCAGatewayTest extends TestCase
         $this->assertStringContainsString('id="omnipay_period"', $output);
         $this->assertStringContainsString('name="omnipay_period"', $output);
         $this->assertStringContainsString('id="omnipay_period_info"', $output);
+    }
+
+    protected function createGateway(): NewebPayGateway
+    {
+        return new NewebPayGateway([
+            'gateway' => 'NewebPay',
+            'gateway_id' => 'newebpay_dca',
+            'title' => '藍新定期定額',
+            'features' => [new ScheduledRecurringFeature()],
+        ]);
     }
 }

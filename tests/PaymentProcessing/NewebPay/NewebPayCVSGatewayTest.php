@@ -20,12 +20,6 @@ class NewebPayCVSGatewayTest extends TestCase
 
     protected $gatewayName = 'NewebPay';
 
-    private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
-
-    private $hashIV = 'VVcW9t4feCshKOTi';
-
-    private $merchantId = 'MS350098593';
-
     protected $settings = [
         'HashKey' => 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt',
         'HashIV' => 'VVcW9t4feCshKOTi',
@@ -33,6 +27,12 @@ class NewebPayCVSGatewayTest extends TestCase
         'testMode' => 'yes',
         'allow_resubmit' => 'no',
     ];
+
+    private $hashKey = 'Fs5cX7xLlHwjbKKW6rxNfEOI3I1WxqWt';
+
+    private $hashIV = 'VVcW9t4feCshKOTi';
+
+    private $merchantId = 'MS350098593';
 
     protected function setUp(): void
     {
@@ -43,7 +43,7 @@ class NewebPayCVSGatewayTest extends TestCase
             'gateway_id' => 'newebpay_cvs',
             'title' => '藍新超商代碼',
             'payment_data' => ['CVS' => 1],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

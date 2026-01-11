@@ -31,7 +31,7 @@ class ECPayApplePayGatewayTest extends TestCase
             'gateway_id' => 'ecpay_applepay',
             'title' => '綠界 Apple Pay',
             'payment_data' => ['ChoosePayment' => 'ApplePay'],
-            'features' => [new MinAmountFeature],
+            'features' => [new MinAmountFeature()],
         ]);
     }
 

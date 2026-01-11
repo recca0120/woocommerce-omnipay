@@ -34,7 +34,7 @@ class YiPayCreditGatewayTest extends TestCase
             'gateway_id' => 'yipay_credit',
             'title' => 'YiPay 信用卡',
             'payment_data' => ['type' => '2'],
-            'features' => [new MinAmountFeature],
+            'features' => [new MinAmountFeature()],
         ]);
     }
 

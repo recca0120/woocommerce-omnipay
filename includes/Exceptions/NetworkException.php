@@ -7,4 +7,6 @@ use RuntimeException;
 /**
  * Network Exception for WordPress HTTP Client
  */
-class NetworkException extends RuntimeException {}
+class NetworkException extends RuntimeException
+{
+}

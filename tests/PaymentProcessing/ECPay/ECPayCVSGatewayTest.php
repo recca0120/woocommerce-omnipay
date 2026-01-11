@@ -38,8 +38,8 @@ class ECPayCVSGatewayTest extends TestCase
             'title' => '綠界超商代碼',
             'payment_data' => ['ChoosePayment' => 'CVS'],
             'features' => [
-                new MinAmountFeature,
-                new MaxAmountFeature,
+                new MinAmountFeature(),
+                new MaxAmountFeature(),
                 new ExpireDateFeature('StoreExpireDate', 10080, 1, 43200),
             ],
         ]);

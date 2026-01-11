@@ -227,23 +227,6 @@ class OrderRepository
     }
 
     /**
-     * 產生隨機的 transactionId
-     *
-     * 格式：{base_id}T{random}，總長度不超過 20 字元
-     *
-     * @param  string  $baseId  基礎 ID（prefix + order_id）
-     * @return string
-     */
-    private function generateRandomTransactionId($baseId)
-    {
-        $maxRandomLength = 20 - strlen($baseId) - 1; // -1 for 'T' separator
-
-        $random = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $maxRandomLength);
-
-        return $baseId.'T'.$random;
-    }
-
-    /**
      * 新增訂單備註
      *
      * @param  \WC_Order  $order
@@ -312,5 +295,22 @@ class OrderRepository
             $last5
         ));
         $order->save();
+    }
+
+    /**
+     * 產生隨機的 transactionId
+     *
+     * 格式：{base_id}T{random}，總長度不超過 20 字元
+     *
+     * @param  string  $baseId  基礎 ID（prefix + order_id）
+     * @return string
+     */
+    private function generateRandomTransactionId($baseId)
+    {
+        $maxRandomLength = 20 - strlen($baseId) - 1; // -1 for 'T' separator
+
+        $random = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $maxRandomLength);
+
+        return $baseId.'T'.$random;
     }
 }

@@ -14,6 +14,10 @@ use Recca0120\WooCommerce_Omnipay\WordPress\SettingsManager;
 class GatewaySettingsSection implements SettingsSectionProvider
 {
     /**
+     * Fields to exclude from gateway settings (handled in General Settings)
+     */
+    private const GENERAL_FIELDS = ['testMode', 'transaction_id_prefix', 'allow_resubmit'];
+    /**
      * @var GatewayAdapter
      */
     protected $adapter;
@@ -27,11 +31,6 @@ class GatewaySettingsSection implements SettingsSectionProvider
      * @var string
      */
     protected $optionKey;
-
-    /**
-     * Fields to exclude from gateway settings (handled in General Settings)
-     */
-    private const GENERAL_FIELDS = ['testMode', 'transaction_id_prefix', 'allow_resubmit'];
 
     public function __construct(GatewayAdapter $adapter)
     {

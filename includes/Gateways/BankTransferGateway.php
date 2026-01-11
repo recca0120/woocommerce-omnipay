@@ -32,6 +32,124 @@ class BankTransferGateway extends OmnipayGateway
     }
 
     /**
+     * 顯示付款欄位
+     */
+    public function payment_fields()
+    {
+        parent::payment_fields();
+
+        $config = $this->getBankAccountsConfig();
+        $accounts = $config['accounts'];
+
+        if (empty($accounts)) {
+            return;
+        }
+
+        // 統一使用選單顯示（包含單一帳號情況）
+        echo woocommerce_omnipay_get_template('checkout/bank-account-form.php', [
+            'accounts' => $accounts,
+            'last_digits' => Constants::REMITTANCE_LAST_DIGITS,
+        ]);
+    }
+
+    /**
+     * 取得付款資訊輸出（含匯款帳號後5碼表單）
+     *
+     * @param  \WC_Order  $order
+     * @param  bool  $plainText
+     * @return string
+     */
+    public function getPaymentInfoOutput($order, $plainText = false)
+    {
+        // 取得銀行資訊
+        $bankCode = $order->get_meta(OrderRepository::META_BANK_CODE);
+        $bankAccount = $order->get_meta(OrderRepository::META_BANK_ACCOUNT);
+
+        // 格式化銀行帳號：銀行代碼-帳號 (例: 822-xxxxxxxx)
+        $formattedAccount = $this->formatBankAccount($bankCode, $bankAccount);
+
+        // 組合付款資訊
+        $paymentInfo = [];
+        if (! empty($formattedAccount)) {
+            $paymentInfo[OrderRepository::META_BANK_ACCOUNT] = $formattedAccount;
+        }
+
+        // 加入匯款帳號後5碼（如果有）
+        $remittanceLast5 = $order->get_meta(OrderRepository::META_REMITTANCE_LAST5);
+        if (! empty($remittanceLast5)) {
+            $paymentInfo[OrderRepository::META_REMITTANCE_LAST5] = $remittanceLast5;
+        }
+
+        $template = $this->getPaymentInfoTemplate($plainText);
+        $output = woocommerce_omnipay_get_template($template, [
+            'payment_info' => $paymentInfo,
+            'labels' => $this->getBankTransferLabels(),
+        ]);
+
+        // 純文字模式或非此 gateway 的訂單不顯示表單
+        if ($plainText || $order->get_payment_method() !== $this->id) {
+            return $output;
+        }
+
+        // 加入匯款帳號後5碼表單
+        $output .= $this->getRemittanceFormOutput($order);
+
+        return $output;
+    }
+
+    /**
+     * 處理匯款帳號後5碼提交
+     */
+    public function handleRemittance()
+    {
+        $order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+        $order_key = isset($_POST['order_key']) ? sanitize_text_field($_POST['order_key']) : '';
+        $last5 = isset($_POST['remittance_last5']) ? sanitize_text_field($_POST['remittance_last5']) : '';
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+
+        // 取得訂單以便取得 redirect URL
+        $order = $this->orders->findById($order_id);
+        $redirect_url = $order ? $order->get_view_order_url() : wc_get_page_permalink('myaccount');
+
+        // 驗證 nonce
+        if (! wp_verify_nonce($nonce, 'omnipay_remittance_nonce')) {
+            wc_add_notice(__('Security verification failed', 'woocommerce-omnipay'), 'error');
+            $this->redirectAndExit($redirect_url);
+
+            return;
+        }
+
+        // 驗證訂單
+        if (! $order || $order->get_order_key() !== $order_key) {
+            wc_add_notice(__('Order verification failed', 'woocommerce-omnipay'), 'error');
+            $this->redirectAndExit($redirect_url);
+
+            return;
+        }
+
+        // 驗證格式（必須是指定位數的數字）
+        $pattern = sprintf('/^\d{%d}$/', Constants::REMITTANCE_LAST_DIGITS);
+        if (! preg_match($pattern, $last5)) {
+            wc_add_notice(
+                sprintf(__('Please enter %d digits', 'woocommerce-omnipay'), Constants::REMITTANCE_LAST_DIGITS),
+                'error'
+            );
+            $this->redirectAndExit($redirect_url);
+
+            return;
+        }
+
+        // 儲存
+        $this->orders->saveRemittanceLast5($order, $last5);
+
+        wc_add_notice(__('Successfully submitted', 'woocommerce-omnipay'), 'success');
+
+        // 從 referer 取得原始頁面 URL，優先導回原頁面
+        $referer = wp_get_referer();
+        $this->redirectAndExit($referer ?: $redirect_url);
+    }
+
+    /**
      * 取得已初始化的 Adapter（支援多帳號選擇）
      *
      * @return \Recca0120\WooCommerce_Omnipay\Adapters\Contracts\GatewayAdapter
@@ -170,27 +288,6 @@ class BankTransferGateway extends OmnipayGateway
     }
 
     /**
-     * 顯示付款欄位
-     */
-    public function payment_fields()
-    {
-        parent::payment_fields();
-
-        $config = $this->getBankAccountsConfig();
-        $accounts = $config['accounts'];
-
-        if (empty($accounts)) {
-            return;
-        }
-
-        // 統一使用選單顯示（包含單一帳號情況）
-        echo woocommerce_omnipay_get_template('checkout/bank-account-form.php', [
-            'accounts' => $accounts,
-            'last_digits' => Constants::REMITTANCE_LAST_DIGITS,
-        ]);
-    }
-
-    /**
      * 取得付款資訊通知 URL
      *
      * BankTransfer 的 paymentInfoUrl 用於用戶 redirect
@@ -233,51 +330,6 @@ class BankTransferGateway extends OmnipayGateway
             'BankCode' => $data['bank_code'] ?? '',
             'BankAccount' => $data['account_number'] ?? '',
         ]);
-    }
-
-    /**
-     * 取得付款資訊輸出（含匯款帳號後5碼表單）
-     *
-     * @param  \WC_Order  $order
-     * @param  bool  $plainText
-     * @return string
-     */
-    public function getPaymentInfoOutput($order, $plainText = false)
-    {
-        // 取得銀行資訊
-        $bankCode = $order->get_meta(OrderRepository::META_BANK_CODE);
-        $bankAccount = $order->get_meta(OrderRepository::META_BANK_ACCOUNT);
-
-        // 格式化銀行帳號：銀行代碼-帳號 (例: 822-xxxxxxxx)
-        $formattedAccount = $this->formatBankAccount($bankCode, $bankAccount);
-
-        // 組合付款資訊
-        $paymentInfo = [];
-        if (! empty($formattedAccount)) {
-            $paymentInfo[OrderRepository::META_BANK_ACCOUNT] = $formattedAccount;
-        }
-
-        // 加入匯款帳號後5碼（如果有）
-        $remittanceLast5 = $order->get_meta(OrderRepository::META_REMITTANCE_LAST5);
-        if (! empty($remittanceLast5)) {
-            $paymentInfo[OrderRepository::META_REMITTANCE_LAST5] = $remittanceLast5;
-        }
-
-        $template = $this->getPaymentInfoTemplate($plainText);
-        $output = woocommerce_omnipay_get_template($template, [
-            'payment_info' => $paymentInfo,
-            'labels' => $this->getBankTransferLabels(),
-        ]);
-
-        // 純文字模式或非此 gateway 的訂單不顯示表單
-        if ($plainText || $order->get_payment_method() !== $this->id) {
-            return $output;
-        }
-
-        // 加入匯款帳號後5碼表單
-        $output .= $this->getRemittanceFormOutput($order);
-
-        return $output;
     }
 
     /**
@@ -334,58 +386,6 @@ class BankTransferGateway extends OmnipayGateway
             'submit_url' => WC()->api_request_url($this->id.'_remittance'),
             'last_digits' => Constants::REMITTANCE_LAST_DIGITS,
         ]);
-    }
-
-    /**
-     * 處理匯款帳號後5碼提交
-     */
-    public function handleRemittance()
-    {
-        $order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
-        $order_key = isset($_POST['order_key']) ? sanitize_text_field($_POST['order_key']) : '';
-        $last5 = isset($_POST['remittance_last5']) ? sanitize_text_field($_POST['remittance_last5']) : '';
-        $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
-
-        // 取得訂單以便取得 redirect URL
-        $order = $this->orders->findById($order_id);
-        $redirect_url = $order ? $order->get_view_order_url() : wc_get_page_permalink('myaccount');
-
-        // 驗證 nonce
-        if (! wp_verify_nonce($nonce, 'omnipay_remittance_nonce')) {
-            wc_add_notice(__('Security verification failed', 'woocommerce-omnipay'), 'error');
-            $this->redirectAndExit($redirect_url);
-
-            return;
-        }
-
-        // 驗證訂單
-        if (! $order || $order->get_order_key() !== $order_key) {
-            wc_add_notice(__('Order verification failed', 'woocommerce-omnipay'), 'error');
-            $this->redirectAndExit($redirect_url);
-
-            return;
-        }
-
-        // 驗證格式（必須是指定位數的數字）
-        $pattern = sprintf('/^\d{%d}$/', Constants::REMITTANCE_LAST_DIGITS);
-        if (! preg_match($pattern, $last5)) {
-            wc_add_notice(
-                sprintf(__('Please enter %d digits', 'woocommerce-omnipay'), Constants::REMITTANCE_LAST_DIGITS),
-                'error'
-            );
-            $this->redirectAndExit($redirect_url);
-
-            return;
-        }
-
-        // 儲存
-        $this->orders->saveRemittanceLast5($order, $last5);
-
-        wc_add_notice(__('Successfully submitted', 'woocommerce-omnipay'), 'success');
-
-        // 從 referer 取得原始頁面 URL，優先導回原頁面
-        $referer = wp_get_referer();
-        $this->redirectAndExit($referer ?: $redirect_url);
     }
 
     /**

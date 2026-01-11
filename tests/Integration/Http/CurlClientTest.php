@@ -9,7 +9,7 @@ class CurlClientTest extends HttpClientTestCase
 {
     public function test_it_sends_get_request()
     {
-        $client = new CurlClient;
+        $client = new CurlClient();
 
         $response = $client->request('GET', $this->getServerUrl('/api/test'));
 
@@ -23,7 +23,7 @@ class CurlClientTest extends HttpClientTestCase
 
     public function test_it_sends_post_request_with_body()
     {
-        $client = new CurlClient;
+        $client = new CurlClient();
 
         $response = $client->request(
             'POST',
@@ -41,7 +41,7 @@ class CurlClientTest extends HttpClientTestCase
 
     public function test_it_sends_request_headers()
     {
-        $client = new CurlClient;
+        $client = new CurlClient();
 
         $response = $client->request('GET', $this->getServerUrl('/'), [
             'Accept' => 'application/json',
@@ -56,7 +56,7 @@ class CurlClientTest extends HttpClientTestCase
 
     public function test_it_handles_error_status_codes()
     {
-        $client = new CurlClient;
+        $client = new CurlClient();
 
         $response404 = $client->request('GET', $this->getServerUrl('/status/404'));
         $this->assertEquals(404, $response404->getStatusCode());

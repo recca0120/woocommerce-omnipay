@@ -42,6 +42,12 @@ class DefaultGatewayAdapter implements GatewayAdapter
         return true;
     }
 
+    public function normalizePaymentInfo(array $data): array
+    {
+        // 預設直接回傳原始資料
+        return $data;
+    }
+
     /**
      * 驗證指定欄位的金額是否與訂單金額相符
      */
@@ -50,11 +56,5 @@ class DefaultGatewayAdapter implements GatewayAdapter
         $amount = isset($data[$fieldName]) ? (int) $data[$fieldName] : 0;
 
         return $amount === $orderTotal;
-    }
-
-    public function normalizePaymentInfo(array $data): array
-    {
-        // 預設直接回傳原始資料
-        return $data;
     }
 }

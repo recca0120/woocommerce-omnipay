@@ -22,30 +22,6 @@ class CheckoutFlowTest extends TestCase
     ];
 
     /**
-     * 取得 DCA Gateway 配置
-     */
-    protected function getDcaGatewayConfig(): array
-    {
-        $gateways = woocommerce_omnipay_get_gateways();
-
-        foreach ($gateways as $config) {
-            if (($config['gateway_id'] ?? '') === 'ecpay_dca') {
-                return $config;
-            }
-        }
-
-        return [];
-    }
-
-    /**
-     * 取得 DCA Gateway
-     */
-    protected function getDcaGateway(): ECPayGateway
-    {
-        return new ECPayGateway($this->getDcaGatewayConfig());
-    }
-
-    /**
      * Test full checkout flow: Create order → Process payment → Accept callback → Order completed
      */
     public function test_complete_credit_card_checkout_flow()
@@ -201,6 +177,30 @@ class CheckoutFlowTest extends TestCase
         // 3. Order should remain on-hold (not processed)
         $order = wc_get_order($order->get_id());
         $this->assertEquals('on-hold', $order->get_status());
+    }
+
+    /**
+     * 取得 DCA Gateway 配置
+     */
+    protected function getDcaGatewayConfig(): array
+    {
+        $gateways = woocommerce_omnipay_get_gateways();
+
+        foreach ($gateways as $config) {
+            if (($config['gateway_id'] ?? '') === 'ecpay_dca') {
+                return $config;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * 取得 DCA Gateway
+     */
+    protected function getDcaGateway(): ECPayGateway
+    {
+        return new ECPayGateway($this->getDcaGatewayConfig());
     }
 
     // Helper methods

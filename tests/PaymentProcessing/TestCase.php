@@ -82,7 +82,7 @@ abstract class TestCase extends WP_UnitTestCase
      */
     protected function createOrder($amount = 100, $currency = 'TWD', $virtual = false, $downloadable = false)
     {
-        $product = new \WC_Product_Simple;
+        $product = new \WC_Product_Simple();
         $product->set_name('Test Product');
         $product->set_regular_price($amount);
         $product->set_virtual($virtual);
@@ -127,7 +127,7 @@ abstract class TestCase extends WP_UnitTestCase
      */
     protected function createProduct($price = 100)
     {
-        $product = new \WC_Product_Simple;
+        $product = new \WC_Product_Simple();
         $product->set_name('Test Product');
         $product->set_regular_price($price);
         $product->save();

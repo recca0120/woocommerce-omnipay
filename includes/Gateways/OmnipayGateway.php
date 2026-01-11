@@ -72,7 +72,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         $this->method_title = $config['title'] ?? '';
         $this->method_description = $config['description'] ?? '';
         $this->overrideSettings = $config['override_settings'] ?? false;
-        $this->adapter = $adapter ?? (new GatewayRegistry)->resolveAdapter($config);
+        $this->adapter = $adapter ?? (new GatewayRegistry())->resolveAdapter($config);
         $this->features = FeatureFactory::createFromConfig($config);
 
         // 載入 DCA 方案
@@ -88,7 +88,7 @@ class OmnipayGateway extends WC_Payment_Gateway
         }
 
         $this->settingsManager = new SettingsManager($this->adapter->getGatewayName());
-        $this->orders = new OrderRepository;
+        $this->orders = new OrderRepository();
         $this->logger = new Logger($this->id);
 
         // 如果有 features 需要顯示付款欄位，則啟用
@@ -294,6 +294,150 @@ class OmnipayGateway extends WC_Payment_Gateway
     }
 
     /**
+     * Process the payment
+     *
+     * @param  int  $orderId  Order ID
+     * @return array
+     */
+    public function process_payment($orderId)
+    {
+        try {
+            $order = $this->orders->findByIdOrFail($orderId);
+            $response = $this->executePurchase($order);
+
+            return $this->handlePurchaseResponse($order, $response);
+        } catch (OrderNotFoundException $e) {
+            return $this->handleOrderNotFound($orderId, $e);
+        } catch (\Exception $e) {
+            return $this->handlePaymentException($order ?? null, $orderId, $e);
+        }
+    }
+
+    /**
+     * 處理金流的回調通知（對應 Omnipay acceptNotification）
+     */
+    public function acceptNotification()
+    {
+        $this->logger->info('acceptNotification: Received callback', $this->getRequestData());
+
+        try {
+            $adapter = $this->getAdapter();
+            $parameters = $this->getCallbackParameters();
+
+            if (! $adapter->supportsAcceptNotification()) {
+                $response = $adapter->completePurchase($parameters);
+
+                $this->logger->info('acceptNotification: Fallback to completePurchase', [
+                    'transaction_id' => $response->getTransactionId(),
+                    'successful' => $response->isSuccessful(),
+                    'message' => $response->getMessage(),
+                ]);
+
+                $this->handleCompletePurchaseCallback($response);
+
+                return;
+            }
+
+            $notification = $adapter->acceptNotification($parameters);
+            $data = $notification->getData() ?? [];
+
+            $this->logger->info('acceptNotification: Parsed notification', [
+                'transaction_id' => $notification->getTransactionId(),
+                'transaction_reference' => $notification->getTransactionReference(),
+                'status' => $notification->getTransactionStatus(),
+                'message' => $notification->getMessage(),
+            ]);
+
+            $this->handleNotification($notification, $data);
+        } catch (OrderNotFoundException $e) {
+            $this->logger->warning('acceptNotification: '.$e->getMessage());
+            $this->sendCallbackResponse(false, 'Order not found');
+        } catch (\Exception $e) {
+            $this->logger->error('acceptNotification: '.$e->getMessage());
+            $this->sendCallbackResponse(false, $e->getMessage());
+        }
+    }
+
+    /**
+     * 處理付款資訊回調（接收 paymentInfoUrl 的背景 POST 通知）
+     *
+     * 預設行為：處理背景 POST 通知並回應金流
+     * 子類可覆寫 handlePaymentInfo() 來改變處理邏輯
+     *
+     * @return string|void 測試時回傳 URL，正式環境 redirect 或 echo 後終止
+     */
+    public function handlePaymentInfoCallback()
+    {
+        $this->logger->info('handlePaymentInfoCallback: Received callback', $this->getRequestData());
+
+        try {
+            $redirectUrl = $this->handlePaymentInfo();
+
+            // 如果回傳 null，表示是背景通知，已 echo 回應，不需 redirect
+            if ($redirectUrl === null) {
+                return;
+            }
+
+            return $this->redirect($redirectUrl);
+        } catch (OrderNotFoundException $e) {
+            $this->logger->warning('handlePaymentInfoCallback: '.$e->getMessage());
+            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
+
+            return $this->redirect(wc_get_checkout_url());
+        } catch (\Exception $e) {
+            $this->logger->error('handlePaymentInfoCallback: '.$e->getMessage());
+            wc_add_notice(__('Error processing payment information.', 'woocommerce-omnipay'), 'error');
+
+            return $this->redirect(wc_get_checkout_url());
+        }
+    }
+
+    /**
+     * 處理用戶返回（對應 Omnipay completePurchase）
+     *
+     * @return string|void 測試時回傳 URL，正式環境 redirect 後終止
+     */
+    public function completePurchase()
+    {
+        $this->logger->info('completePurchase: User returned', $this->getRequestData());
+
+        try {
+            $response = $this->getAdapter()->completePurchase($this->getCallbackParameters());
+
+            $this->logger->info('completePurchase: Gateway response', [
+                'transaction_id' => $response->getTransactionId(),
+                'successful' => $response->isSuccessful(),
+                'message' => $response->getMessage(),
+                'data' => Helper::maskSensitiveData($response->getData() ?? []),
+            ]);
+
+            $order = $this->orders->findByTransactionIdOrFail($response->getTransactionId());
+
+            $result = $this->handlePaymentResult($response, $order, PaymentContext::fromReturnUrl());
+
+            if (! $result['success']) {
+                return $this->redirect(wc_get_checkout_url());
+            }
+
+            $this->logger->info('completePurchase: Payment completed', [
+                'order_id' => $order->get_id(),
+            ]);
+
+            return $this->redirect($this->get_return_url($order));
+        } catch (OrderNotFoundException $e) {
+            $this->logger->warning('completePurchase: '.$e->getMessage());
+            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
+
+            return $this->redirect(wc_get_checkout_url());
+        } catch (\Exception $e) {
+            $this->logger->error('completePurchase: '.$e->getMessage());
+            wc_add_notice(__('Error completing payment.', 'woocommerce-omnipay'), 'error');
+
+            return $this->redirect(wc_get_checkout_url());
+        }
+    }
+
+    /**
      * 檢查是否有付款欄位需要顯示
      */
     protected function hasPaymentFields(): bool
@@ -317,26 +461,6 @@ class OmnipayGateway extends WC_Payment_Gateway
         $settings = $this->overrideSettings ? $this->settings : [];
 
         return $this->adapter->initializeFromSettings($this->settingsManager->getAllSettings($settings));
-    }
-
-    /**
-     * Process the payment
-     *
-     * @param  int  $orderId  Order ID
-     * @return array
-     */
-    public function process_payment($orderId)
-    {
-        try {
-            $order = $this->orders->findByIdOrFail($orderId);
-            $response = $this->executePurchase($order);
-
-            return $this->handlePurchaseResponse($order, $response);
-        } catch (OrderNotFoundException $e) {
-            return $this->handleOrderNotFound($orderId, $e);
-        } catch (\Exception $e) {
-            return $this->handlePaymentException($order ?? null, $orderId, $e);
-        }
     }
 
     /**
@@ -632,85 +756,6 @@ class OmnipayGateway extends WC_Payment_Gateway
     }
 
     /**
-     * 處理金流的回調通知（對應 Omnipay acceptNotification）
-     */
-    public function acceptNotification()
-    {
-        $this->logger->info('acceptNotification: Received callback', $this->getRequestData());
-
-        try {
-            $adapter = $this->getAdapter();
-            $parameters = $this->getCallbackParameters();
-
-            if (! $adapter->supportsAcceptNotification()) {
-                $response = $adapter->completePurchase($parameters);
-
-                $this->logger->info('acceptNotification: Fallback to completePurchase', [
-                    'transaction_id' => $response->getTransactionId(),
-                    'successful' => $response->isSuccessful(),
-                    'message' => $response->getMessage(),
-                ]);
-
-                $this->handleCompletePurchaseCallback($response);
-
-                return;
-            }
-
-            $notification = $adapter->acceptNotification($parameters);
-            $data = $notification->getData() ?? [];
-
-            $this->logger->info('acceptNotification: Parsed notification', [
-                'transaction_id' => $notification->getTransactionId(),
-                'transaction_reference' => $notification->getTransactionReference(),
-                'status' => $notification->getTransactionStatus(),
-                'message' => $notification->getMessage(),
-            ]);
-
-            $this->handleNotification($notification, $data);
-        } catch (OrderNotFoundException $e) {
-            $this->logger->warning('acceptNotification: '.$e->getMessage());
-            $this->sendCallbackResponse(false, 'Order not found');
-        } catch (\Exception $e) {
-            $this->logger->error('acceptNotification: '.$e->getMessage());
-            $this->sendCallbackResponse(false, $e->getMessage());
-        }
-    }
-
-    /**
-     * 處理付款資訊回調（接收 paymentInfoUrl 的背景 POST 通知）
-     *
-     * 預設行為：處理背景 POST 通知並回應金流
-     * 子類可覆寫 handlePaymentInfo() 來改變處理邏輯
-     *
-     * @return string|void 測試時回傳 URL，正式環境 redirect 或 echo 後終止
-     */
-    public function handlePaymentInfoCallback()
-    {
-        $this->logger->info('handlePaymentInfoCallback: Received callback', $this->getRequestData());
-
-        try {
-            $redirectUrl = $this->handlePaymentInfo();
-
-            // 如果回傳 null，表示是背景通知，已 echo 回應，不需 redirect
-            if ($redirectUrl === null) {
-                return;
-            }
-
-            return $this->redirect($redirectUrl);
-        } catch (OrderNotFoundException $e) {
-            $this->logger->warning('handlePaymentInfoCallback: '.$e->getMessage());
-            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
-
-            return $this->redirect(wc_get_checkout_url());
-        } catch (\Exception $e) {
-            $this->logger->error('handlePaymentInfoCallback: '.$e->getMessage());
-            wc_add_notice(__('Error processing payment information.', 'woocommerce-omnipay'), 'error');
-
-            return $this->redirect(wc_get_checkout_url());
-        }
-    }
-
-    /**
      * 處理付款資訊的核心邏輯
      *
      * 預設行為：處理使用者端導向的付款資訊回傳（如 NewebPay 的 CustomerURL）
@@ -737,51 +782,6 @@ class OmnipayGateway extends WC_Payment_Gateway
         ]);
 
         return $this->get_return_url($order);
-    }
-
-    /**
-     * 處理用戶返回（對應 Omnipay completePurchase）
-     *
-     * @return string|void 測試時回傳 URL，正式環境 redirect 後終止
-     */
-    public function completePurchase()
-    {
-        $this->logger->info('completePurchase: User returned', $this->getRequestData());
-
-        try {
-            $response = $this->getAdapter()->completePurchase($this->getCallbackParameters());
-
-            $this->logger->info('completePurchase: Gateway response', [
-                'transaction_id' => $response->getTransactionId(),
-                'successful' => $response->isSuccessful(),
-                'message' => $response->getMessage(),
-                'data' => Helper::maskSensitiveData($response->getData() ?? []),
-            ]);
-
-            $order = $this->orders->findByTransactionIdOrFail($response->getTransactionId());
-
-            $result = $this->handlePaymentResult($response, $order, PaymentContext::fromReturnUrl());
-
-            if (! $result['success']) {
-                return $this->redirect(wc_get_checkout_url());
-            }
-
-            $this->logger->info('completePurchase: Payment completed', [
-                'order_id' => $order->get_id(),
-            ]);
-
-            return $this->redirect($this->get_return_url($order));
-        } catch (OrderNotFoundException $e) {
-            $this->logger->warning('completePurchase: '.$e->getMessage());
-            wc_add_notice(__('Order not found.', 'woocommerce-omnipay'), 'error');
-
-            return $this->redirect(wc_get_checkout_url());
-        } catch (\Exception $e) {
-            $this->logger->error('completePurchase: '.$e->getMessage());
-            wc_add_notice(__('Error completing payment.', 'woocommerce-omnipay'), 'error');
-
-            return $this->redirect(wc_get_checkout_url());
-        }
     }
 
     /**

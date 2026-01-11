@@ -31,7 +31,7 @@ class ECPayCreditGatewayTest extends TestCase
             'gateway_id' => 'ecpay_credit',
             'title' => '綠界信用卡',
             'payment_data' => ['ChoosePayment' => 'Credit'],
-            'features' => [new MinAmountFeature],
+            'features' => [new MinAmountFeature()],
         ]);
     }
 

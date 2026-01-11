@@ -16,9 +16,9 @@ class SharedSettingsPageTest extends WP_UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $httpClient = new WordPressClient;
+        $httpClient = new WordPressClient();
         $this->page = new SharedSettingsPage([
-            new GeneralSettingsSection,
+            new GeneralSettingsSection(),
             new GatewaySettingsSection((new DefaultGatewayAdapter('ECPay'))->setHttpClient($httpClient)),
             new GatewaySettingsSection((new DefaultGatewayAdapter('NewebPay'))->setHttpClient($httpClient)),
         ]);
@@ -126,13 +126,13 @@ class SharedSettingsPageTest extends WP_UnitTestCase
 
     public function test_duplicate_gateways_are_deduplicated()
     {
-        $httpClient = new WordPressClient;
+        $httpClient = new WordPressClient();
         $ecpaySection = new GatewaySettingsSection((new DefaultGatewayAdapter('ECPay'))->setHttpClient($httpClient));
         $newebpaySection = new GatewaySettingsSection((new DefaultGatewayAdapter('NewebPay'))->setHttpClient($httpClient));
 
         // 傳入重複的 section (same key)
         $page = new SharedSettingsPage([
-            new GeneralSettingsSection,
+            new GeneralSettingsSection(),
             $ecpaySection,
             $ecpaySection, // 重複 - 會被覆蓋
             $newebpaySection,
@@ -146,9 +146,9 @@ class SharedSettingsPageTest extends WP_UnitTestCase
 
     public function test_save_settings_handles_checkbox_field()
     {
-        $httpClient = new WordPressClient;
+        $httpClient = new WordPressClient();
         $page = new SharedSettingsPage([
-            new GeneralSettingsSection,
+            new GeneralSettingsSection(),
             new GatewaySettingsSection((new DefaultGatewayAdapter('ECPay'))->setHttpClient($httpClient)),
         ]);
         $page->register();

@@ -35,7 +35,7 @@ class YiPayCVSGatewayTest extends TestCase
             'gateway_id' => 'yipay_cvs',
             'title' => 'YiPay 超商代碼',
             'payment_data' => ['type' => '3'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

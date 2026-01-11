@@ -32,7 +32,7 @@ class ECPayWeiXinGatewayTest extends TestCase
             'gateway_id' => 'ecpay_weixin',
             'title' => '綠界微信支付',
             'payment_data' => ['ChoosePayment' => 'WeiXin'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

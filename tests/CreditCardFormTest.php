@@ -33,6 +33,13 @@ class CreditCardFormTest extends WP_UnitTestCase
         ]);
     }
 
+    protected function tearDown(): void
+    {
+        $_POST = [];
+        delete_option('woocommerce_omnipay_dummy_settings');
+        parent::tearDown();
+    }
+
     /**
      * 測試：payment_fields 輸出包含所有必要欄位和 description
      */
@@ -178,12 +185,5 @@ class CreditCardFormTest extends WP_UnitTestCase
         $this->assertIsString($output);
         $this->assertStringContainsString('omnipay_firstName', $output);
         $this->assertStringContainsString('omnipay_lastName', $output);
-    }
-
-    protected function tearDown(): void
-    {
-        $_POST = [];
-        delete_option('woocommerce_omnipay_dummy_settings');
-        parent::tearDown();
     }
 }

@@ -36,7 +36,7 @@ class ECPayCreditInstallmentGatewayTest extends TestCase
             'title' => '綠界信用卡分期',
             'payment_data' => ['ChoosePayment' => 'Credit'],
             'features' => [
-                new MinAmountFeature,
+                new MinAmountFeature(),
                 new InstallmentFeature('CreditInstallment', ['periodRules' => ['30' => ['min_amount' => 20000]]]),
             ],
         ]);

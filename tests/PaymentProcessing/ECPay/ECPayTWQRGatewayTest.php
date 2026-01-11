@@ -32,7 +32,7 @@ class ECPayTWQRGatewayTest extends TestCase
             'gateway_id' => 'ecpay_twqr',
             'title' => '綠界 TWQR',
             'payment_data' => ['ChoosePayment' => 'TWQR'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

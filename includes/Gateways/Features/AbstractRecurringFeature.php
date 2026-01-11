@@ -23,76 +23,12 @@ abstract class AbstractRecurringFeature extends AbstractFeature implements Recur
     protected $gatewayId;
 
     /**
-     * 欄位配置
-     */
-    abstract protected function getFieldConfigs(): array;
-
-    /**
-     * 預設週期
-     */
-    abstract protected function getDefaultPeriod(): array;
-
-    /**
-     * 結帳頁面模板
-     */
-    abstract protected function getFormTemplate(): string;
-
-    /**
-     * 管理頁面模板
-     */
-    abstract protected function getAdminTemplate(): string;
-
-    /**
-     * 金額欄位名稱
-     */
-    abstract protected function getAmountFieldName(): string;
-
-    /**
-     * Blocks 模式的 DCA 資料
-     */
-    abstract protected function getBlocksModeDcaData(WC_Payment_Gateway $gateway): array;
-
-    /**
-     * Shortcode 模式的 DCA 資料
-     */
-    abstract protected function getShortcodeModeDcaData(): array;
-
-    /**
-     * 驗證週期限制
-     */
-    abstract protected function validatePeriodConstraints(array $values): string;
-
-    /**
      * 載入 DCA 方案
      */
     public function loadPeriods(WC_Payment_Gateway $gateway): void
     {
         $this->gatewayId = $gateway->id;
         $this->dcaPeriods = get_option($this->getPeriodsOptionName(), []);
-    }
-
-    /**
-     * 取得方案儲存的 option name
-     */
-    protected function getPeriodsOptionName(): string
-    {
-        return 'woocommerce_'.$this->gatewayId.'_periods';
-    }
-
-    /**
-     * 取得 Blocks 模式需要檢查的欄位
-     */
-    protected function getBlocksFields(): array
-    {
-        return array_column($this->getFieldConfigs(), 'name');
-    }
-
-    /**
-     * 取得週期欄位名稱（用於模板）
-     */
-    protected function getPeriodFields(): array
-    {
-        return array_column($this->getFieldConfigs(), 'name');
     }
 
     /**
@@ -169,14 +105,6 @@ abstract class AbstractRecurringFeature extends AbstractFeature implements Recur
     }
 
     /**
-     * 是否為 Blocks 模式
-     */
-    protected function isBlocksMode(): bool
-    {
-        return ! isset($_POST['omnipay_period']);
-    }
-
-    /**
      * 生成 periods 欄位 HTML
      */
     public function generatePeriodsHtml(string $key, array $data, WC_Payment_Gateway $gateway): string
@@ -202,6 +130,78 @@ abstract class AbstractRecurringFeature extends AbstractFeature implements Recur
         $this->savePeriods();
 
         return true;
+    }
+
+    /**
+     * 欄位配置
+     */
+    abstract protected function getFieldConfigs(): array;
+
+    /**
+     * 預設週期
+     */
+    abstract protected function getDefaultPeriod(): array;
+
+    /**
+     * 結帳頁面模板
+     */
+    abstract protected function getFormTemplate(): string;
+
+    /**
+     * 管理頁面模板
+     */
+    abstract protected function getAdminTemplate(): string;
+
+    /**
+     * 金額欄位名稱
+     */
+    abstract protected function getAmountFieldName(): string;
+
+    /**
+     * Blocks 模式的 DCA 資料
+     */
+    abstract protected function getBlocksModeDcaData(WC_Payment_Gateway $gateway): array;
+
+    /**
+     * Shortcode 模式的 DCA 資料
+     */
+    abstract protected function getShortcodeModeDcaData(): array;
+
+    /**
+     * 驗證週期限制
+     */
+    abstract protected function validatePeriodConstraints(array $values): string;
+
+    /**
+     * 取得方案儲存的 option name
+     */
+    protected function getPeriodsOptionName(): string
+    {
+        return 'woocommerce_'.$this->gatewayId.'_periods';
+    }
+
+    /**
+     * 取得 Blocks 模式需要檢查的欄位
+     */
+    protected function getBlocksFields(): array
+    {
+        return array_column($this->getFieldConfigs(), 'name');
+    }
+
+    /**
+     * 取得週期欄位名稱（用於模板）
+     */
+    protected function getPeriodFields(): array
+    {
+        return array_column($this->getFieldConfigs(), 'name');
+    }
+
+    /**
+     * 是否為 Blocks 模式
+     */
+    protected function isBlocksMode(): bool
+    {
+        return ! isset($_POST['omnipay_period']);
     }
 
     /**

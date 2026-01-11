@@ -21,6 +21,15 @@ class AdminSettingsTest extends WP_UnitTestCase
         }
     }
 
+    protected function tearDown(): void
+    {
+        $_POST = [];
+        delete_option('woocommerce_omnipay_dummy_settings');
+        delete_option('woocommerce_omnipay_ecpay_settings');
+        delete_option('woocommerce_omnipay_ecpay_shared_settings');
+        parent::tearDown();
+    }
+
     /**
      * 測試：Gateway 預設有基本欄位
      */
@@ -309,14 +318,5 @@ class AdminSettingsTest extends WP_UnitTestCase
         $this->assertArrayHasKey('MerchantID', $formFields);
         $this->assertArrayHasKey('HashKey', $formFields);
         $this->assertArrayHasKey('HashIV', $formFields);
-    }
-
-    protected function tearDown(): void
-    {
-        $_POST = [];
-        delete_option('woocommerce_omnipay_dummy_settings');
-        delete_option('woocommerce_omnipay_ecpay_settings');
-        delete_option('woocommerce_omnipay_ecpay_shared_settings');
-        parent::tearDown();
     }
 }

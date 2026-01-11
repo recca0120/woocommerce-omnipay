@@ -27,14 +27,6 @@ class ECPayGateway extends OmnipayGateway
     }
 
     /**
-     * 轉換圓夢分期值
-     */
-    private function convertDreamInstallment(string $value): string
-    {
-        return str_replace('30', '30N', $value);
-    }
-
-    /**
      * 處理 AcceptNotification 回應
      *
      * ECPay 的付款資訊通知與付款完成通知共用同一個 endpoint
@@ -93,5 +85,13 @@ class ECPayGateway extends OmnipayGateway
         }
 
         $order->save();
+    }
+
+    /**
+     * 轉換圓夢分期值
+     */
+    private function convertDreamInstallment(string $value): string
+    {
+        return str_replace('30', '30N', $value);
     }
 }

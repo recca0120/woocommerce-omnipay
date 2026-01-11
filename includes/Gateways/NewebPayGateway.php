@@ -12,4 +12,6 @@ namespace Recca0120\WooCommerce_Omnipay\Gateways;
  * - NotifyURL (notifyUrl) → _notify endpoint → acceptNotification()
  * - ReturnURL (returnUrl) → _complete endpoint → completePurchase()
  */
-class NewebPayGateway extends OmnipayGateway {}
+class NewebPayGateway extends OmnipayGateway
+{
+}

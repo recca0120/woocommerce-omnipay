@@ -22,7 +22,7 @@ class GatewayRegistryTest extends WP_UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->registry = new GatewayRegistry;
+        $this->registry = new GatewayRegistry();
     }
 
     /**

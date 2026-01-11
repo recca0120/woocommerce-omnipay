@@ -38,8 +38,8 @@ class ECPayATMGatewayTest extends TestCase
             'title' => '綠界 ATM',
             'payment_data' => ['ChoosePayment' => 'ATM'],
             'features' => [
-                new MinAmountFeature,
-                new MaxAmountFeature,
+                new MinAmountFeature(),
+                new MaxAmountFeature(),
                 new ExpireDateFeature('ExpireDate', 3, 1, 60),
             ],
         ]);

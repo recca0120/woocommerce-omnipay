@@ -87,7 +87,7 @@ function woocommerce_omnipay_register_shared_settings()
     $config = woocommerce_omnipay_get_config();
     $registry = new \Recca0120\WooCommerce_Omnipay\GatewayRegistry($config);
 
-    $sections = [new \Recca0120\WooCommerce_Omnipay\Settings\GeneralSettingsSection];
+    $sections = [new \Recca0120\WooCommerce_Omnipay\Settings\GeneralSettingsSection()];
 
     // 取得不重複的 gateway 配置
     $seen = [];
@@ -274,7 +274,7 @@ function woocommerce_omnipay_get_gateways()
             'title' => __('ECPay Credit Card', 'woocommerce-omnipay'),
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'Credit'],
-            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature],
+            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature()],
         ],
         [
             'gateway' => 'ECPay',
@@ -283,7 +283,7 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'Credit'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
                 new \Recca0120\WooCommerce_Omnipay\Gateways\Features\InstallmentFeature('CreditInstallment', ['periodRules' => ['30' => ['min_amount' => 20000]]]),
             ],
         ],
@@ -293,7 +293,7 @@ function woocommerce_omnipay_get_gateways()
             'title' => __('ECPay Recurring Payment', 'woocommerce-omnipay'),
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'Credit'],
-            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\FrequencyRecurringFeature],
+            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\FrequencyRecurringFeature()],
         ],
         [
             'gateway' => 'ECPay',
@@ -302,8 +302,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'BNPL'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         [
@@ -313,8 +313,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'WebATM'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         [
@@ -324,8 +324,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'ATM'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
                 new \Recca0120\WooCommerce_Omnipay\Gateways\Features\ExpireDateFeature('ExpireDate', 3, 1, 60),
             ],
         ],
@@ -336,8 +336,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'CVS'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
                 new \Recca0120\WooCommerce_Omnipay\Gateways\Features\ExpireDateFeature('StoreExpireDate', 10080, 1, 43200),
             ],
         ],
@@ -348,8 +348,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'BARCODE'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
                 new \Recca0120\WooCommerce_Omnipay\Gateways\Features\ExpireDateFeature('StoreExpireDate', 7, 1, 30),
             ],
         ],
@@ -359,7 +359,7 @@ function woocommerce_omnipay_get_gateways()
             'title' => __('ECPay Apple Pay', 'woocommerce-omnipay'),
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'ApplePay'],
-            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature],
+            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature()],
         ],
         [
             'gateway' => 'ECPay',
@@ -368,8 +368,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'TWQR'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         [
@@ -379,8 +379,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $ecpayIcon,
             'payment_data' => ['ChoosePayment' => 'WeiXin'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         // NewebPay (All-in-one)
@@ -397,7 +397,7 @@ function woocommerce_omnipay_get_gateways()
             'title' => __('NewebPay Credit Card', 'woocommerce-omnipay'),
             'icon' => $newebpayIcon,
             'payment_data' => ['CREDIT' => 1],
-            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature],
+            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature()],
         ],
         [
             'gateway' => 'NewebPay',
@@ -406,7 +406,7 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $newebpayIcon,
             'payment_data' => ['CREDIT' => 1],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
                 new \Recca0120\WooCommerce_Omnipay\Gateways\Features\InstallmentFeature('InstFlag'),
             ],
         ],
@@ -416,7 +416,7 @@ function woocommerce_omnipay_get_gateways()
             'title' => __('NewebPay Recurring Payment', 'woocommerce-omnipay'),
             'icon' => $newebpayIcon,
             'payment_data' => ['CREDIT' => 1],
-            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\ScheduledRecurringFeature],
+            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\ScheduledRecurringFeature()],
         ],
         [
             'gateway' => 'NewebPay',
@@ -425,8 +425,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $newebpayIcon,
             'payment_data' => ['WEBATM' => 1],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         [
@@ -436,8 +436,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $newebpayIcon,
             'payment_data' => ['VACC' => 1],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         [
@@ -447,8 +447,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $newebpayIcon,
             'payment_data' => ['CVS' => 1],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         [
@@ -458,8 +458,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $newebpayIcon,
             'payment_data' => ['BARCODE' => 1],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         // YiPay (All-in-one)
@@ -476,7 +476,7 @@ function woocommerce_omnipay_get_gateways()
             'title' => __('YiPay Credit Card', 'woocommerce-omnipay'),
             'icon' => $yipayIcon,
             'payment_data' => ['type' => '2'],
-            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature],
+            'features' => [new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature()],
         ],
         [
             'gateway' => 'YiPay',
@@ -485,8 +485,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $yipayIcon,
             'payment_data' => ['type' => '4'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
         [
@@ -496,8 +496,8 @@ function woocommerce_omnipay_get_gateways()
             'icon' => $yipayIcon,
             'payment_data' => ['type' => '3'],
             'features' => [
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature,
-                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature,
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MinAmountFeature(),
+                new \Recca0120\WooCommerce_Omnipay\Gateways\Features\MaxAmountFeature(),
             ],
         ],
     ];

@@ -20,12 +20,6 @@ class YiPayATMGatewayTest extends TestCase
 
     protected $gatewayName = 'YiPay';
 
-    private $merchantId = '1234567890';
-
-    private $key = 'dGVzdGtleXRlc3QxMjM0NQ==';
-
-    private $iv = 'dGVzdGl2dGVzdDEyMzQ1Ng==';
-
     protected $settings = [
         'merchantId' => '1234567890',
         'key' => 'dGVzdGtleXRlc3QxMjM0NQ==',
@@ -33,6 +27,12 @@ class YiPayATMGatewayTest extends TestCase
         'testMode' => 'yes',
         'allow_resubmit' => 'no',
     ];
+
+    private $merchantId = '1234567890';
+
+    private $key = 'dGVzdGtleXRlc3QxMjM0NQ==';
+
+    private $iv = 'dGVzdGl2dGVzdDEyMzQ1Ng==';
 
     protected function setUp(): void
     {
@@ -43,7 +43,7 @@ class YiPayATMGatewayTest extends TestCase
             'gateway_id' => 'yipay_atm',
             'title' => 'YiPay ATM',
             'payment_data' => ['type' => '4'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

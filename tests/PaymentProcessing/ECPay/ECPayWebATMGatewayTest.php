@@ -32,7 +32,7 @@ class ECPayWebATMGatewayTest extends TestCase
             'gateway_id' => 'ecpay_webatm',
             'title' => '綠界網路 ATM',
             'payment_data' => ['ChoosePayment' => 'WebATM'],
-            'features' => [new MinAmountFeature, new MaxAmountFeature],
+            'features' => [new MinAmountFeature(), new MaxAmountFeature()],
         ]);
     }
 

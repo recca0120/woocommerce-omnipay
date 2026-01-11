@@ -70,18 +70,6 @@ trait CreatesGateway
         return $this->initialize($parameters);
     }
 
-    /**
-     * 取得 Gateway 實例
-     */
-    protected function getGateway(): GatewayInterface
-    {
-        if ($this->gateway === null) {
-            $this->gateway = $this->createGateway($this->settings);
-        }
-
-        return $this->gateway;
-    }
-
     public function getDefaultParameters(): array
     {
         return Omnipay::create($this->getGatewayName(), $this->getHttpClient())->getDefaultParameters();
@@ -98,6 +86,18 @@ trait CreatesGateway
         $gateway->initialize($settings);
 
         return $gateway;
+    }
+
+    /**
+     * 取得 Gateway 實例
+     */
+    protected function getGateway(): GatewayInterface
+    {
+        if ($this->gateway === null) {
+            $this->gateway = $this->createGateway($this->settings);
+        }
+
+        return $this->gateway;
     }
 
     /**

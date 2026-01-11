@@ -19,9 +19,9 @@ class ECPaySettingsTest extends WP_UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $httpClient = new WordPressClient;
+        $httpClient = new WordPressClient();
         $this->page = new SharedSettingsPage([
-            new GeneralSettingsSection,
+            new GeneralSettingsSection(),
             new GatewaySettingsSection((new DefaultGatewayAdapter('ECPay'))->setHttpClient($httpClient)),
         ]);
     }

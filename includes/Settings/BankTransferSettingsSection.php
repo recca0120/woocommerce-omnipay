@@ -28,6 +28,39 @@ class BankTransferSettingsSection extends GatewaySettingsSection
         add_action('woocommerce_update_option_bank_accounts_table', [$this, 'saveBankAccountsTable']);
     }
 
+    // =========================================================================
+    // Bank Accounts Table Field Type Handlers
+    // =========================================================================
+
+    public function outputBankAccountsTable(array $field): void
+    {
+        $accounts = $this->getAccounts($field);
+
+        echo woocommerce_omnipay_get_template('admin/bank-accounts-table.php', [
+            'value' => $field,
+            'accounts' => $accounts,
+            'fieldName' => esc_attr($field['id']),
+            'fieldId' => sanitize_title($field['id']),
+        ]);
+    }
+
+    public function saveBankAccountsTable(array $field): void
+    {
+        $parsed = $this->parseOptionId($field['id']);
+
+        if ($parsed === null) {
+            return;
+        }
+
+        [$optionName, $fieldKey] = $parsed;
+
+        $accounts = $this->sanitizeAccounts($optionName, $fieldKey);
+
+        $existingSettings = get_option($optionName, []);
+        $existingSettings[$fieldKey] = $accounts;
+        update_option($optionName, $existingSettings);
+    }
+
     protected function createField(string $key, $defaultValue): array
     {
         if ($key === 'selection_mode') {
@@ -71,39 +104,6 @@ class BankTransferSettingsSection extends GatewaySettingsSection
             'default' => is_array($defaultValue) ? $defaultValue : [],
             'desc_tip' => true,
         ];
-    }
-
-    // =========================================================================
-    // Bank Accounts Table Field Type Handlers
-    // =========================================================================
-
-    public function outputBankAccountsTable(array $field): void
-    {
-        $accounts = $this->getAccounts($field);
-
-        echo woocommerce_omnipay_get_template('admin/bank-accounts-table.php', [
-            'value' => $field,
-            'accounts' => $accounts,
-            'fieldName' => esc_attr($field['id']),
-            'fieldId' => sanitize_title($field['id']),
-        ]);
-    }
-
-    public function saveBankAccountsTable(array $field): void
-    {
-        $parsed = $this->parseOptionId($field['id']);
-
-        if ($parsed === null) {
-            return;
-        }
-
-        [$optionName, $fieldKey] = $parsed;
-
-        $accounts = $this->sanitizeAccounts($optionName, $fieldKey);
-
-        $existingSettings = get_option($optionName, []);
-        $existingSettings[$fieldKey] = $accounts;
-        update_option($optionName, $existingSettings);
     }
 
     private function getAccounts(array $field): array

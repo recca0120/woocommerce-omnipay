@@ -19,8 +19,8 @@ class BankTransferSettingsTest extends WP_UnitTestCase
     {
         parent::setUp();
         $this->page = new SharedSettingsPage([
-            new GeneralSettingsSection,
-            new BankTransferSettingsSection(new BankTransferAdapter),
+            new GeneralSettingsSection(),
+            new BankTransferSettingsSection(new BankTransferAdapter()),
         ]);
     }
 
