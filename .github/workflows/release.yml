@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p bin
           curl -o bin/strauss.phar -L https://github.com/BrianHenryIE/strauss/releases/latest/download/strauss.phar
-          php bin/strauss.phar --updateCallSites=includes,woocommerce-omnipay.php
+          php bin/strauss.phar --updateCallSites=src,woocommerce-omnipay.php
 
       - name: Create plugin directory
         run: |

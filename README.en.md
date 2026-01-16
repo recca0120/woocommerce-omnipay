@@ -212,7 +212,7 @@ This plugin uses the **Feature Composition Pattern**, combining functionality th
 
 ```
 woocommerce-omnipay/
-├── includes/
+├── src/
 │   ├── Adapters/                     # Gateway Adapter layer
 │   │   ├── Contracts/
 │   │   │   └── GatewayAdapter.php    # Adapter interface

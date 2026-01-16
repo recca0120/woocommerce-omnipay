@@ -27,11 +27,11 @@
     </php>
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">includes</directory>
+            <directory suffix=".php">src</directory>
         </include>
         <exclude>
-            <file>includes/Services/WooCommerceLogger.php</file>
-            <file>includes/Exceptions/OrderNotFoundException.php</file>
+            <file>src/Services/WooCommerceLogger.php</file>
+            <file>src/Exceptions/OrderNotFoundException.php</file>
         </exclude>
         <report>
             <html outputDirectory="coverage"/>

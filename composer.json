@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "OmnipayTaiwan\\WooCommerce_Omnipay\\": "includes/"
+            "OmnipayTaiwan\\WooCommerce_Omnipay\\": "src/"
         }
     },
     "autoload-dev": {

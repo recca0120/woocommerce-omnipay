@@ -212,7 +212,7 @@ composer test
 
 ```
 woocommerce-omnipay/
-├── includes/
+├── src/
 │   ├── Adapters/                     # Gateway Adapter 層
 │   │   ├── Contracts/
 │   │   │   └── GatewayAdapter.php    # Adapter 介面
